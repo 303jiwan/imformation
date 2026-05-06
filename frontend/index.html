@@ -3,11 +3,11 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Codetree — 지식에서 스킬로</title>
+    <title>Codenergy — 지식에서 스킬로</title>
   </head>
   <body>
     <header class="nav">
-      <div class="logo">Codetree ▲</div>
+      <div class="logo">Codenergy ▲</div>
       <nav class="menu">
         <a href="#">코드트레일</a>
         <a href="#">요금제</a>
@@ -19,21 +19,78 @@
       <div class="actions">
         <button class="ghost">🌐 한국어 ▾</button>
         <button class="icon">🔔</button>
-        <button class="ghost">My</button>
+        <button class="ghost" id="login-btn">로그인</button>
+        <button class="ghost" id="signup-btn">회원가입</button>
+        <div class="my-wrap" id="my-wrap" hidden>
+          <button class="ghost" id="my-btn">My</button>
+          <div class="my-menu" id="my-menu" hidden>
+            <div class="my-menu__profile">
+              <div class="my-menu__avatar" aria-hidden="true">👤</div>
+              <div class="my-menu__user">
+                <div class="my-menu__name" id="my-name">사용자 이름</div>
+                <div class="my-menu__email" id="my-email">user@example.com</div>
+              </div>
+            </div>
+            <ul class="my-menu__list">
+              <li><button type="button" class="my-menu__item">마이페이지</button></li>
+              <li><button type="button" class="my-menu__item">학습 기록</button></li>
+              <li><button type="button" class="my-menu__item">결제/구독 관리</button></li>
+              <li><button type="button" class="my-menu__item">친구 초대</button></li>
+              <li><button type="button" class="my-menu__item">설정</button></li>
+            </ul>
+            <div class="my-menu__divider"></div>
+            <button type="button" class="my-menu__item my-menu__logout" id="logout-btn">로그아웃</button>
+          </div>
+        </div>
         <button class="cta">학습하기 →</button>
       </div>
     </header>
 
+    <div id="auth-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <form class="modal-card" id="auth-form">
+        <h3 id="modal-title">로그인</h3>
+        <label>
+          <span>아이디</span>
+          <input name="username" autocomplete="username" required minlength="2" />
+        </label>
+        <label>
+          <span>비밀번호</span>
+          <input name="password" type="password" autocomplete="current-password" required minlength="6" />
+        </label>
+        <p class="modal-error" id="modal-error" hidden></p>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close>취소</button>
+          <button type="submit" class="cta" id="submit-btn">로그인</button>
+        </div>
+      </form>
+    </div>
+
     <section class="hero">
-      <h1>코딩테스트,<br/>지식에서 스킬로.</h1>
+      <h1>자신의 실력을<br/>시험해보세요.</h1>
       <p>
         코딩테스트에 통하는 모든 문제 풀이 스킬,<br/>
-        코드트리에서 만나보세요.
+        Codenergy에서 만나보세요.
       </p>
       <button class="pill" data-tilt>
         <span>나에게 딱 맞는 학습이 궁금하다면?</span>
         <span class="pill-cta">시작하기 →</span>
       </button>
+
+      <div class="mascot" aria-hidden="true">
+        <svg class="mascot__svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
+          <ellipse cx="100" cy="270" rx="58" ry="6" fill="#94a3b8" opacity="0.28"/>
+          <rect x="78" y="2" width="44" height="20" rx="7" fill="#7c3aed"/>
+          <rect x="28" y="20" width="144" height="240" rx="32" fill="#ffffff" stroke="#7c3aed" stroke-width="5"/>
+          <circle id="mascot-eye" cx="100" cy="100" r="38" fill="#ffffff" stroke="#a855f7" stroke-width="4"/>
+          <g id="mascot-pupil">
+            <circle cx="100" cy="100" r="20" fill="#3a2a4a"/>
+            <circle cx="108" cy="92" r="6" fill="#ffffff"/>
+          </g>
+          <path d="M 113 158 L 86 200 L 102 200 L 88 234 L 118 188 L 100 188 Z"
+                fill="#22c55e" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round"/>
+        </svg>
+      </div>
     </section>
 
     <section class="cards-section">
@@ -72,6 +129,7 @@
           </ul>
         </article>
       </div>
+
     </section>
 
     <script type="module" src="/src/main.js"></script>
