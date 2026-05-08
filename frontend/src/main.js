@@ -3,6 +3,205 @@ import "./style.css";
 const API_BASE = "http://localhost:3000";
 const MAX_TILT = 14;
 
+// ---------------- i18n ----------------
+const TRANSLATIONS = {
+  en: {
+    "title": "Codenergy — From Knowledge to Skill",
+    "nav.codetrail": "Code Trail",
+    "nav.pricing": "Pricing",
+    "nav.reviews": "Reviews",
+    "nav.invite": "Invite",
+    "nav.universities": "Universities",
+    "action.login": "Log in",
+    "action.signup": "Sign up",
+    "action.my": "My",
+    "action.cta": "Start Learning →",
+    "action.cancel": "Cancel",
+    "action.close": "Close",
+    "my.name": "User Name",
+    "my.mypage": "My Page",
+    "my.history": "Learning History",
+    "my.subscription": "Billing & Subscription",
+    "my.invite": "Invite Friends",
+    "my.settings": "Settings",
+    "my.logout": "Log out",
+    "auth.login": "Log in",
+    "auth.signup": "Sign up",
+    "auth.findId": "Find ID",
+    "auth.findPw": "Find Password",
+    "auth.username": "Username",
+    "auth.password": "Password",
+    "auth.submit": "Submit",
+    "auth.signupSuccess": "Sign up complete. Please log in.",
+    "auth.findIdSuccess": "ID recovery instructions sent to your Gmail.",
+    "auth.findPwSuccess": "Password reset instructions sent to your Gmail.",
+    "auth.fail": "Request failed",
+    "auth.serverError": "Cannot connect to server.",
+    "auth.logoutDone": "You have been logged out.",
+    "pricing.pageTitle": "Codenergy — Pricing",
+    "pricing.heading": "Access every problem-solving principle.",
+    "pricing.secure": "Secure payment",
+    "pricing.monthly": "Monthly (1 month)",
+    "pricing.monthlyTagline": "Target your weakest spots with focus",
+    "pricing.normal": "Regular price",
+    "pricing.subscribe": "Start Subscription",
+    "pricing.quarterly": "Quarterly (3 months)",
+    "pricing.quarterlyTagline": "Reset everything in 100 days",
+    "pricing.discount48": "48% off",
+    "pricing.yearly": "Yearly (12 months)",
+    "pricing.yearlyTagline": "Aim for your dream stage",
+    "pricing.discount64": "64% off",
+    "pricing.student": "Are you a student?",
+    "pricing.companies3m": "Hired in 3 months",
+    "pricing.companies1y": "Hired in 1 year",
+    "pricing.realData": "Based on real hire data.",
+    "pricing.won": "KRW",
+    "pricing.title": "Choose a Plan",
+    "pricing.free": "Free",
+    "pricing.freeF1": "50 basic problems",
+    "pricing.freeF2": "Basic explanations",
+    "pricing.freeF3": "Community access",
+    "pricing.freeBtn": "Current plan",
+    "pricing.popular": "Popular",
+    "pricing.premium": "Premium",
+    "pricing.perMonth": "/mo",
+    "pricing.premiumF1": "Unlimited problem solving",
+    "pricing.premiumF2": "Detailed solutions and walkthroughs",
+    "pricing.premiumF3": "Practice mock exams",
+    "pricing.premiumF4": "Progress analytics",
+    "pricing.premiumBtn": "Get started",
+    "pricing.pro": "Pro",
+    "pricing.proF1": "All Premium features",
+    "pricing.proF2": "1-on-1 expert coaching",
+    "pricing.proF3": "Company-tailored problems",
+    "pricing.proF4": "Career consulting",
+    "pricing.proF5": "Priority application alerts",
+    "pricing.proBtn": "Start Pro",
+    "reviews.title": "⭐ User Reviews",
+    "reviews.r1Text": "\"It was crucial in passing my coding tests. The realistic problems gave me confidence.\"",
+    "reviews.r1Name": "Kim Dev",
+    "reviews.r1Co": "Hired at Samsung",
+    "reviews.r2Text": "\"The step-by-step learning system was excellent. I could learn systematically from basics to advanced.\"",
+    "reviews.r2Name": "Park Coding",
+    "reviews.r2Co": "Hired at Naver",
+    "reviews.r3Text": "\"I started after a friend recommended it — no regrets. I even landed a job!\"",
+    "reviews.r3Name": "Lee Programmer",
+    "reviews.r3Co": "Hired at Kakao",
+    "invite.title": "🎁 Invite Friends",
+    "invite.hero": "Grow together with friends!",
+    "invite.heroSub": "Invite friends and you both get rewards",
+    "invite.b1": "When your friend signs up",
+    "invite.b1Desc": "1 month free Premium pass",
+    "invite.b2": "When your friend pays",
+    "invite.b2Desc": "Earn 5,000 KRW in points",
+    "invite.link": "Invite link",
+    "invite.copy": "Copy",
+    "invite.gmailLabel": "Friend's Gmail address",
+    "invite.gmailCopy": "Copy address",
+    "invite.share": "Share via KakaoTalk",
+    "uni.title": "🎓 Partner Universities",
+    "uni.intro": "We offer special benefits in partnership with these universities:",
+    "uni.snuLogo": "SNU",
+    "uni.snu": "Seoul National University",
+    "uni.snuDept": "Computer Science & Engineering",
+    "uni.kaistDept": "School of Computing",
+    "uni.postechLogo": "POSTECH",
+    "uni.postech": "POSTECH",
+    "uni.postechDept": "Computer Science",
+    "uni.yonseiLogo": "Yonsei",
+    "uni.yonsei": "Yonsei University",
+    "uni.yonseiDept": "Computer Science",
+    "uni.koreaLogo": "Korea U",
+    "uni.korea": "Korea University",
+    "uni.koreaDept": "Computer Science",
+    "uni.hanyangLogo": "Hanyang",
+    "uni.hanyang": "Hanyang University",
+    "uni.hanyangDept": "Computer Software",
+    "uni.d30": "30% student discount",
+    "uni.d25": "25% student discount",
+    "uni.d20": "20% student discount",
+    "uni.note": "✨ Verified students can receive special discounts via school email verification.",
+    "uni.verify": "Verify school",
+    "hero.title": "Test your<br/>skills.",
+    "hero.subtitle": "All the problem-solving skills for coding tests,<br/>find them at Codenergy.",
+    "hero.pill": "Curious about what's right for you?",
+    "hero.pillCta": "Get started →",
+    "cards.title": "There's a specific skill<br/>for sharpening problem-solving.",
+    "cards.subtitle": "Most learners are at this stage.",
+    "cards.c1Title": "Need confidence turning<br/>thoughts into code?",
+    "cards.c1L1Title": "Recursion",
+    "cards.c1L1Sub": "Recursion without return values",
+    "cards.c1L2Title": "Simulation I",
+    "cards.c1L2Sub": "Range painting",
+    "cards.c1L3Title": "Simulation II",
+    "cards.c1L3Sub": "dx dy technique",
+    "cards.c1L4Title": "Brute Force III",
+    "cards.c1L4Sub": "Brute force by enumerating cases",
+    "cards.c2Title": "Want to tackle unfamiliar<br/>problems with confidence?",
+    "cards.c2L1Sub": "Pop and drop in a grid",
+    "cards.c2L2Sub": "Moving a single object in a grid",
+    "cards.c2L3Sub": "Pick one of K, N times (Conditional)",
+    "cards.c2L4Sub": "Pick M out of N (Simple)",
+    "cards.c2L5Sub": "Breadth-first search",
+    "cards.c3Title": "Want to leap to<br/>top-tier skill?",
+    "cards.c3L1Sub": "Use strings like array indices",
+    "cards.c3L2Sub": "Find adjacent numbers quickly",
+    "cards.c3L3Sub": "+1 -1 Technique",
+    "cards.c3L4Sub": "Shortest path from all points to one",
+    "alert.codetrail": "🚀 Code Trail is coming soon!\n\nFollow a step-by-step learning path from algorithm practice\nto real coding tests.",
+    "alert.inviteLogin": "Please log in to use the invite friends feature.",
+    "alert.linkCopied": "Invite link copied!",
+    "alert.emailCopied": "Gmail address copied!",
+    "alert.emailEmpty": "Please enter a Gmail address.",
+    "lang.label": "English",
+  },
+};
+
+let currentLang = localStorage.getItem("lang") === "en" ? "en" : "ko";
+
+function t(key) {
+  if (currentLang === "ko") return null;
+  return TRANSLATIONS[currentLang]?.[key] ?? null;
+}
+
+function applyLang(lang) {
+  currentLang = lang;
+  localStorage.setItem("lang", lang);
+  document.documentElement.lang = lang === "en" ? "en" : "ko";
+
+  document.querySelectorAll("[data-i18n]").forEach((el) => {
+    const key = el.dataset.i18n;
+    if (!el.dataset.i18nOriginal) el.dataset.i18nOriginal = el.textContent;
+    if (lang === "ko") {
+      el.textContent = el.dataset.i18nOriginal;
+    } else {
+      const val = TRANSLATIONS[lang]?.[key];
+      if (typeof val === "string") el.textContent = val;
+    }
+  });
+  document.querySelectorAll("[data-i18n-html]").forEach((el) => {
+    const key = el.dataset.i18nHtml;
+    if (!el.dataset.i18nOriginal) el.dataset.i18nOriginal = el.innerHTML;
+    if (lang === "ko") {
+      el.innerHTML = el.dataset.i18nOriginal;
+    } else {
+      const val = TRANSLATIONS[lang]?.[key];
+      if (typeof val === "string") el.innerHTML = val;
+    }
+  });
+
+  const titleEl = document.querySelector("title[data-i18n]");
+  if (titleEl) document.title = titleEl.textContent;
+
+  const langCurrent = document.getElementById("lang-current");
+  if (langCurrent) {
+    langCurrent.textContent = lang === "en" ? "English" : "한국어";
+  }
+  document.querySelectorAll(".lang-menu__item").forEach((btn) => {
+    btn.classList.toggle("is-active", btn.dataset.lang === lang);
+  });
+}
+
 function attachTilt(el) {
   const baseTransform = getComputedStyle(el).transform;
   const base = baseTransform && baseTransform !== "none" ? baseTransform : "";
@@ -31,36 +230,140 @@ function attachTilt(el) {
 
 document.querySelectorAll("[data-tilt]").forEach(attachTilt);
 
+// ---------------- Page fade transition ----------------
+const pageFade = document.getElementById("page-fade");
+const PAGE_FADE_MS = 180;
+
+if (pageFade) {
+  // fade out the white overlay on initial load
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => pageFade.classList.add("is-hidden"));
+  });
+
+  // fade in the overlay before navigating to another internal HTML page
+  document.addEventListener(
+    "click",
+    (e) => {
+      const link = e.target.closest("a");
+      if (!link) return;
+      const href = link.getAttribute("href");
+      if (!href || !href.endsWith(".html")) return;
+      if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      if (link.target && link.target !== "_self") return;
+      const target = new URL(href, window.location.href);
+      if (
+        target.pathname === window.location.pathname &&
+        target.search === window.location.search
+      ) {
+        return;
+      }
+      e.preventDefault();
+      e.stopPropagation();
+      pageFade.classList.remove("is-hidden");
+      setTimeout(() => {
+        window.location.href = href;
+      }, PAGE_FADE_MS);
+    },
+    true
+  );
+
+  // restore overlay state when returning via browser back/forward (bfcache)
+  window.addEventListener("pageshow", (e) => {
+    if (e.persisted) {
+      pageFade.classList.add("is-hidden");
+    }
+  });
+}
+
+// ---------------- Hamburger menu ----------------
+const hamburger = document.getElementById("hamburger");
+const navCollapse = document.getElementById("nav-collapse");
+
+function closeMenu() {
+  hamburger.classList.remove("open");
+  navCollapse.classList.remove("open");
+  hamburger.setAttribute("aria-expanded", "false");
+}
+
+if (hamburger && navCollapse) {
+  hamburger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const willOpen = !navCollapse.classList.contains("open");
+    hamburger.classList.toggle("open", willOpen);
+    navCollapse.classList.toggle("open", willOpen);
+    hamburger.setAttribute("aria-expanded", willOpen ? "true" : "false");
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!navCollapse.classList.contains("open")) return;
+    if (navCollapse.contains(e.target) || hamburger.contains(e.target)) return;
+    closeMenu();
+  });
+
+  navCollapse.addEventListener("click", (e) => {
+    if (e.target.tagName === "A") closeMenu();
+  });
+
+  let resizeTimer;
+  window.addEventListener("resize", () => {
+    document.documentElement.classList.add("nav-resizing");
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      document.documentElement.classList.remove("nav-resizing");
+    }, 120);
+    if (window.innerWidth > 1000) closeMenu();
+  });
+}
+
+// ---------------- Language dropdown ----------------
+const langWrap = document.getElementById("lang-wrap");
+const langBtn = document.getElementById("lang-btn");
+const langMenu = document.getElementById("lang-menu");
+
+if (langWrap && langBtn && langMenu) {
+  langBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    langMenu.hidden = !langMenu.hidden;
+  });
+  document.addEventListener("click", (e) => {
+    if (langMenu.hidden) return;
+    if (langWrap.contains(e.target)) return;
+    langMenu.hidden = true;
+  });
+  langMenu.querySelectorAll(".lang-menu__item").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      applyLang(btn.dataset.lang);
+      langMenu.hidden = true;
+    });
+  });
+}
+
+// initial language application
+applyLang(currentLang);
+
 // ---------------- Navigation Menu ----------------
 const menuLinks = document.querySelectorAll('.menu a');
-const pricingModal = document.getElementById('pricing-modal');
-const challengeModal = document.getElementById('challenge-modal');
 const reviewsModal = document.getElementById('reviews-modal');
 const inviteModal = document.getElementById('invite-modal');
 const universitiesModal = document.getElementById('universities-modal');
 
 menuLinks.forEach(link => {
   link.addEventListener('click', (e) => {
+    const action = link.dataset.action;
+    if (!action) return; // navigate naturally to href
     e.preventDefault();
-    const menuText = link.textContent.trim().split(' ')[0]; // Remove "New" badge text
 
-    switch(menuText) {
-      case '코드트레일':
+    switch(action) {
+      case 'codetrail':
         showCodeTrail();
         break;
-      case '요금제':
-        showPricing();
-        break;
-      case '청약챌린지':
-        showChallenge();
-        break;
-      case '후기':
+      case 'reviews':
         showReviews();
         break;
-      case '친구초대':
+      case 'invite':
         showInvite();
         break;
-      case '제휴대학':
+      case 'universities':
         showUniversities();
         break;
     }
@@ -68,30 +371,25 @@ menuLinks.forEach(link => {
 });
 
 function showCodeTrail() {
-  alert('🚀 코드트레일 기능이 곧 제공됩니다!\n\n알고리즘 문제 풀이부터 실전 코딩 테스트까지,\n단계별 학습 경로를 따라 실력을 키워보세요.');
-}
-
-function showPricing() {
-  pricingModal.hidden = false;
-}
-
-function showChallenge() {
-  challengeModal.hidden = false;
+  alert(t('alert.codetrail') || '🚀 코드트레일 기능이 곧 제공됩니다!\n\n알고리즘 문제 풀이부터 실전 코딩 테스트까지,\n단계별 학습 경로를 따라 실력을 키워보세요.');
 }
 
 function showReviews() {
+  if (!reviewsModal) { window.location.href = 'index.html'; return; }
   reviewsModal.hidden = false;
 }
 
 function showInvite() {
+  if (!inviteModal) { window.location.href = 'index.html'; return; }
   if (!document.getElementById('my-wrap').hidden) {
     inviteModal.hidden = false;
   } else {
-    alert('로그인 후 친구 초대 기능을 이용할 수 있습니다.');
+    alert(t('alert.inviteLogin') || '로그인 후 친구 초대 기능을 이용할 수 있습니다.');
   }
 }
 
 function showUniversities() {
+  if (!universitiesModal) { window.location.href = 'index.html'; return; }
   universitiesModal.hidden = false;
 }
 
@@ -108,7 +406,7 @@ function copyInviteLink() {
   const linkInput = document.getElementById('invite-link');
   linkInput.select();
   document.execCommand('copy');
-  alert('초대 링크가 복사되었습니다!');
+  alert(t('alert.linkCopied') || '초대 링크가 복사되었습니다!');
 }
 
 // Copy Gmail address function
@@ -117,15 +415,15 @@ function copyGmailAddress() {
   const email = gmailInput.value.trim();
   if (email) {
     navigator.clipboard.writeText(email).then(() => {
-      alert('Gmail 주소가 복사되었습니다!');
+      alert(t('alert.emailCopied') || 'Gmail 주소가 복사되었습니다!');
     }).catch(() => {
       // Fallback for older browsers
       gmailInput.select();
       document.execCommand('copy');
-      alert('Gmail 주소가 복사되었습니다!');
+      alert(t('alert.emailCopied') || 'Gmail 주소가 복사되었습니다!');
     });
   } else {
-    alert('Gmail 주소를 입력해주세요.');
+    alert(t('alert.emailEmpty') || 'Gmail 주소를 입력해주세요.');
   }
 }
 const loginBtn = document.getElementById("login-btn");
@@ -158,6 +456,7 @@ function setLoggedIn(user) {
     signupBtn.hidden = true;
     myWrap.hidden = false;
     myName.textContent = user.username;
+    myName.dataset.i18nOriginal = user.username;
     myEmail.textContent = `${user.username}@example.com`;
   } else {
     loginBtn.hidden = false;
@@ -185,25 +484,35 @@ logoutBtn.addEventListener("click", async () => {
     });
   } catch (_) {}
   setLoggedIn(null);
-  alert("로그아웃되었습니다");
+  alert(t("auth.logoutDone") || "로그아웃되었습니다");
 });
 
 function setMode(nextMode) {
   mode = nextMode;
-  modalTitle.textContent =
-    nextMode === "signup"
-      ? "회원가입"
-      : nextMode === "find-id"
-      ? "아이디 찾기"
-      : nextMode === "find-password"
-      ? "비밀번호 찾기"
-      : "로그인";
-  submitBtn.textContent =
-    nextMode === "signup"
-      ? "회원가입"
-      : nextMode === "login"
-      ? "로그인"
-      : "전송";
+  const titleKey =
+    nextMode === "signup" ? "auth.signup"
+    : nextMode === "find-id" ? "auth.findId"
+    : nextMode === "find-password" ? "auth.findPw"
+    : "auth.login";
+  const submitKey =
+    nextMode === "signup" ? "auth.signup"
+    : nextMode === "login" ? "auth.login"
+    : "auth.submit";
+  const titleKo =
+    nextMode === "signup" ? "회원가입"
+    : nextMode === "find-id" ? "아이디 찾기"
+    : nextMode === "find-password" ? "비밀번호 찾기"
+    : "로그인";
+  const submitKo =
+    nextMode === "signup" ? "회원가입"
+    : nextMode === "login" ? "로그인"
+    : "전송";
+  modalTitle.textContent = t(titleKey) || titleKo;
+  modalTitle.dataset.i18n = titleKey;
+  modalTitle.dataset.i18nOriginal = titleKo;
+  submitBtn.textContent = t(submitKey) || submitKo;
+  submitBtn.dataset.i18n = submitKey;
+  submitBtn.dataset.i18nOriginal = submitKo;
 
   const usernameLabel = form.querySelector(".field-username");
   const passwordLabel = form.querySelector(".field-password");
@@ -221,9 +530,9 @@ function setMode(nextMode) {
   recoveryLinks.hidden = !showRecovery;
   recoveryLinksAlt.hidden = !showRecoveryAlt;
 
-  usernameLabel.style.display = showUsername ? "block" : "none";
-  passwordLabel.style.display = showPassword ? "block" : "none";
-  emailLabel.style.display = showEmail ? "block" : "none";
+  usernameLabel.style.display = showUsername ? "flex" : "none";
+  passwordLabel.style.display = showPassword ? "flex" : "none";
+  emailLabel.style.display = showEmail ? "flex" : "none";
   recoveryLinks.style.display = showRecovery ? "flex" : "none";
   recoveryLinksAlt.style.display = showRecoveryAlt ? "flex" : "none";
 
@@ -298,26 +607,26 @@ form.addEventListener("submit", async (e) => {
     const body = await res.json().catch(() => ({}));
 
     if (!res.ok) {
-      errorEl.textContent = body.error || "요청 실패";
+      errorEl.textContent = body.error || t("auth.fail") || "요청 실패";
       errorEl.hidden = false;
       return;
     }
 
     if (mode === "signup") {
       openModal("login");
-      infoEl.textContent = "회원가입이 완료되었습니다. 이제 로그인해주세요.";
+      infoEl.textContent = t("auth.signupSuccess") || "회원가입이 완료되었습니다. 이제 로그인해주세요.";
       infoEl.hidden = false;
       return;
     }
 
     if (mode === "find-id") {
-      infoEl.textContent = body.message || "아이디 찾기 안내를 Gmail로 보냈습니다.";
+      infoEl.textContent = body.message || t("auth.findIdSuccess") || "아이디 찾기 안내를 Gmail로 보냈습니다.";
       infoEl.hidden = false;
       return;
     }
 
     if (mode === "find-password") {
-      infoEl.textContent = body.message || "비밀번호 재설정 안내를 Gmail로 보냈습니다.";
+      infoEl.textContent = body.message || t("auth.findPwSuccess") || "비밀번호 재설정 안내를 Gmail로 보냈습니다.";
       infoEl.hidden = false;
       return;
     }
@@ -325,7 +634,7 @@ form.addEventListener("submit", async (e) => {
     setLoggedIn(body);
     closeModal();
   } catch (err) {
-    errorEl.textContent = err?.message || "서버에 연결할 수 없습니다.";
+    errorEl.textContent = err?.message || t("auth.serverError") || "서버에 연결할 수 없습니다.";
     errorEl.hidden = false;
   } finally {
     submitBtn.disabled = false;

@@ -3,59 +3,79 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Codenergy — 지식에서 스킬로</title>
+    <title data-i18n="title">Codenergy — 지식에서 스킬로</title>
+    <style>
+      .page-fade {
+        position: fixed; inset: 0; background: #fff;
+        z-index: 9999; opacity: 1; pointer-events: auto;
+      }
+      .mascot { opacity: 0; }
+    </style>
   </head>
   <body>
+    <div class="page-fade" id="page-fade"></div>
     <header class="nav">
       <div class="logo">Codenergy ▲</div>
-      <nav class="menu">
-        <a href="#">코드트레일</a>
-        <a href="#">요금제</a>
-        <a href="#">청약 챌린지 <span class="badge">New</span></a>
-        <a href="#">후기</a>
-        <a href="#">친구 초대</a>
-        <a href="#">제휴 대학</a>
-      </nav>
-      <div class="actions">
-        <button class="ghost">🌐 한국어 ▾</button>
-        <button class="icon">🔔</button>
-        <button class="ghost" id="login-btn">로그인</button>
-        <button class="ghost" id="signup-btn">회원가입</button>
-        <div class="my-wrap" id="my-wrap" hidden>
-          <button class="ghost" id="my-btn">My</button>
-          <div class="my-menu" id="my-menu" hidden>
-            <div class="my-menu__profile">
-              <div class="my-menu__avatar" aria-hidden="true">👤</div>
-              <div class="my-menu__user">
-                <div class="my-menu__name" id="my-name">사용자 이름</div>
-                <div class="my-menu__email" id="my-email">user@example.com</div>
-              </div>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-collapse">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-collapse" id="nav-collapse">
+        <nav class="menu" id="menu">
+          <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
+          <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
+          <a href="#" data-action="reviews" data-i18n="nav.reviews">후기</a>
+          <a href="#" data-action="invite" data-i18n="nav.invite">친구 초대</a>
+          <a href="#" data-action="universities" data-i18n="nav.universities">제휴 대학</a>
+        </nav>
+        <div class="actions">
+          <div class="lang-wrap" id="lang-wrap">
+            <button class="ghost" id="lang-btn" type="button">🌐 <span id="lang-current">한국어</span> ▾</button>
+            <div class="lang-menu" id="lang-menu" hidden>
+              <button type="button" class="lang-menu__item" data-lang="ko">한국어</button>
+              <button type="button" class="lang-menu__item" data-lang="en">English</button>
             </div>
-            <ul class="my-menu__list">
-              <li><button type="button" class="my-menu__item">마이페이지</button></li>
-              <li><button type="button" class="my-menu__item">학습 기록</button></li>
-              <li><button type="button" class="my-menu__item">결제/구독 관리</button></li>
-              <li><button type="button" class="my-menu__item">친구 초대</button></li>
-              <li><button type="button" class="my-menu__item">설정</button></li>
-            </ul>
-            <div class="my-menu__divider"></div>
-            <button type="button" class="my-menu__item my-menu__logout" id="logout-btn">로그아웃</button>
           </div>
+          <button class="icon">🔔</button>
+          <button class="ghost" id="login-btn" data-i18n="action.login">로그인</button>
+          <button class="ghost" id="signup-btn" data-i18n="action.signup">회원가입</button>
+          <div class="my-wrap" id="my-wrap" hidden>
+            <button class="ghost" id="my-btn" data-i18n="action.my">My</button>
+            <div class="my-menu" id="my-menu" hidden>
+              <div class="my-menu__profile">
+                <div class="my-menu__avatar" aria-hidden="true">👤</div>
+                <div class="my-menu__user">
+                  <div class="my-menu__name" id="my-name" data-i18n="my.name">사용자 이름</div>
+                  <div class="my-menu__email" id="my-email">user@example.com</div>
+                </div>
+              </div>
+              <ul class="my-menu__list">
+                <li><button type="button" class="my-menu__item" data-i18n="my.mypage">마이페이지</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.invite">친구 초대</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.settings">설정</button></li>
+              </ul>
+              <div class="my-menu__divider"></div>
+              <button type="button" class="my-menu__item my-menu__logout" id="logout-btn" data-i18n="my.logout">로그아웃</button>
+            </div>
+          </div>
+          <button class="cta" data-i18n="action.cta">학습하기 →</button>
         </div>
-        <button class="cta">학습하기 →</button>
       </div>
     </header>
 
     <div id="auth-modal" class="modal" hidden>
       <div class="modal-backdrop" data-close></div>
       <form class="modal-card" id="auth-form">
-        <h3 id="modal-title">로그인</h3>
+        <h3 id="modal-title" data-i18n="auth.login">로그인</h3>
         <label class="field-username">
-          <span>아이디</span>
+          <span data-i18n="auth.username">아이디</span>
           <input name="username" autocomplete="username" required minlength="2" />
         </label>
         <label class="field-password">
-          <span>비밀번호</span>
+          <span data-i18n="auth.password">비밀번호</span>
           <input name="password" type="password" autocomplete="current-password" required minlength="6" />
         </label>
         <label class="field-email" id="email-field" hidden>
@@ -65,150 +85,62 @@
         <p class="modal-info" id="modal-info" hidden></p>
         <p class="modal-error" id="modal-error" hidden></p>
         <div class="modal-recovery" id="modal-recovery">
-          <button type="button" class="link-button" id="find-id-btn">아이디 찾기</button>
-          <button type="button" class="link-button" id="find-password-btn">비밀번호 찾기</button>
+          <button type="button" class="link-button" id="find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
         </div>
         <div class="modal-recovery-alt" id="modal-recovery-alt" hidden>
-          <button type="button" class="link-button" id="alt-find-id-btn">아이디 찾기</button>
-          <button type="button" class="link-button" id="alt-find-password-btn">비밀번호 찾기</button>
+          <button type="button" class="link-button" id="alt-find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="alt-find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
         </div>
         <div class="modal-actions">
-          <button type="button" class="ghost" data-close>취소</button>
-          <button type="submit" class="cta" id="submit-btn">로그인</button>
+          <button type="button" class="ghost" data-close data-i18n="action.cancel">취소</button>
+          <button type="submit" class="cta" id="submit-btn" data-i18n="auth.login">로그인</button>
         </div>
       </form>
     </div>
 
     <!-- Feature Modals -->
-    <div id="pricing-modal" class="modal" hidden>
-      <div class="modal-backdrop" data-close></div>
-      <div class="modal-card pricing-modal">
-        <h3>요금제 선택</h3>
-        <div class="pricing-plans">
-          <div class="plan plan-free">
-            <h4>무료</h4>
-            <div class="price">₩0</div>
-            <ul>
-              <li>기본 문제 50개</li>
-              <li>기본 해설</li>
-              <li>커뮤니티 접근</li>
-            </ul>
-            <button class="plan-btn ghost">현재 플랜</button>
-          </div>
-          <div class="plan plan-premium featured">
-            <div class="badge">인기</div>
-            <h4>프리미엄</h4>
-            <div class="price">₩9,900<span>/월</span></div>
-            <ul>
-              <li>무제한 문제 풀이</li>
-              <li>상세 해설 및 풀이 과정</li>
-              <li>실전 모의고사</li>
-              <li>진행 상황 분석</li>
-            </ul>
-            <button class="plan-btn cta">시작하기</button>
-          </div>
-          <div class="plan plan-pro">
-            <h4>프로</h4>
-            <div class="price">₩19,900<span>/월</span></div>
-            <ul>
-              <li>프리미엄의 모든 기능</li>
-              <li>1:1 전문 코칭</li>
-              <li>기업 맞춤 문제</li>
-              <li>취업 컨설팅</li>
-              <li>우선 지원 알림</li>
-            </ul>
-            <button class="plan-btn cta">프로 시작</button>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="ghost" data-close>닫기</button>
-        </div>
-      </div>
-    </div>
-
-    <div id="challenge-modal" class="modal" hidden>
-      <div class="modal-backdrop" data-close></div>
-      <div class="modal-card challenge-modal">
-        <h3>🏆 청약 챌린지</h3>
-        <div class="challenge-content">
-          <div class="challenge-hero">
-            <h4>매월 새로운 도전, 새로운 기회!</h4>
-            <p>실전 코딩테스트를 대비하는 최고의 방법</p>
-          </div>
-          <div class="challenge-features">
-            <div class="feature">
-              <div class="feature-icon">🏅</div>
-              <h5>상위 랭커 혜택</h5>
-              <p>상위 10% 참가자에게 기업 인턴십 기회 제공</p>
-            </div>
-            <div class="feature">
-              <div class="feature-icon">📊</div>
-              <h5>실시간 랭킹</h5>
-              <p>참가자들과 실시간 경쟁하며 성장하세요</p>
-            </div>
-            <div class="feature">
-              <div class="feature-icon">🎯</div>
-              <h5>주간 문제</h5>
-              <p>매주 새로운 알고리즘 문제 도전</p>
-            </div>
-          </div>
-          <div class="current-challenge">
-            <h4>이번 달 챌린지: "알고리즘 마스터"</h4>
-            <p>다양한 알고리즘 유형을 마스터하세요</p>
-            <div class="progress">
-              <div class="progress-bar" style="width: 65%"></div>
-              <span>65% 완료</span>
-            </div>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="cta">챌린지 참여하기</button>
-          <button type="button" class="ghost" data-close>닫기</button>
-        </div>
-      </div>
-    </div>
-
     <div id="reviews-modal" class="modal" hidden>
       <div class="modal-backdrop" data-close></div>
       <div class="modal-card reviews-modal">
-        <h3>⭐ 사용자 후기</h3>
+        <h3 data-i18n="reviews.title">⭐ 사용자 후기</h3>
         <div class="reviews-grid">
           <div class="review-card">
             <div class="review-stars">★★★★★</div>
-            <p>"코딩테스트 합격에 결정적인 도움이 되었습니다. 실전 같은 문제들로 자신감을 얻었어요."</p>
+            <p data-i18n="reviews.r1Text">"코딩테스트 합격에 결정적인 도움이 되었습니다. 실전 같은 문제들로 자신감을 얻었어요."</p>
             <div class="review-author">
               <div class="author-avatar">김</div>
               <div class="author-info">
-                <div class="author-name">김개발</div>
-                <div class="author-company">삼성전자 합격</div>
+                <div class="author-name" data-i18n="reviews.r1Name">김개발</div>
+                <div class="author-company" data-i18n="reviews.r1Co">삼성전자 합격</div>
               </div>
             </div>
           </div>
           <div class="review-card">
             <div class="review-stars">★★★★★</div>
-            <p>"단계별 학습 시스템이 정말 좋았습니다. 기초부터 실전까지 체계적으로 배울 수 있었어요."</p>
+            <p data-i18n="reviews.r2Text">"단계별 학습 시스템이 정말 좋았습니다. 기초부터 실전까지 체계적으로 배울 수 있었어요."</p>
             <div class="review-author">
               <div class="author-avatar">박</div>
               <div class="author-info">
-                <div class="author-name">박코딩</div>
-                <div class="author-company">네이버 합격</div>
+                <div class="author-name" data-i18n="reviews.r2Name">박코딩</div>
+                <div class="author-company" data-i18n="reviews.r2Co">네이버 합격</div>
               </div>
             </div>
           </div>
           <div class="review-card">
             <div class="review-stars">★★★★★</div>
-            <p>"친구 추천으로 시작했는데, 정말 후회 없는 선택이었습니다. 취업까지 성공했어요!"</p>
+            <p data-i18n="reviews.r3Text">"친구 추천으로 시작했는데, 정말 후회 없는 선택이었습니다. 취업까지 성공했어요!"</p>
             <div class="review-author">
               <div class="author-avatar">이</div>
               <div class="author-info">
-                <div class="author-name">이프로그래머</div>
-                <div class="author-company">카카오 합격</div>
+                <div class="author-name" data-i18n="reviews.r3Name">이프로그래머</div>
+                <div class="author-company" data-i18n="reviews.r3Co">카카오 합격</div>
               </div>
             </div>
           </div>
         </div>
         <div class="modal-actions">
-          <button type="button" class="ghost" data-close>닫기</button>
+          <button type="button" class="ghost" data-close data-i18n="action.close">닫기</button>
         </div>
       </div>
     </div>
@@ -216,42 +148,42 @@
     <div id="invite-modal" class="modal" hidden>
       <div class="modal-backdrop" data-close></div>
       <div class="modal-card invite-modal">
-        <h3>🎁 친구 초대하기</h3>
+        <h3 data-i18n="invite.title">🎁 친구 초대하기</h3>
         <div class="invite-content">
           <div class="invite-hero">
-            <h4>친구와 함께 성장하세요!</h4>
-            <p>친구를 초대하면 서로 혜택을 받아요</p>
+            <h4 data-i18n="invite.hero">친구와 함께 성장하세요!</h4>
+            <p data-i18n="invite.heroSub">친구를 초대하면 서로 혜택을 받아요</p>
           </div>
           <div class="invite-benefits">
             <div class="benefit">
               <div class="benefit-icon">🎁</div>
-              <h5>친구 가입 시</h5>
-              <p>1개월 프리미엄 무료 이용권</p>
+              <h5 data-i18n="invite.b1">친구 가입 시</h5>
+              <p data-i18n="invite.b1Desc">1개월 프리미엄 무료 이용권</p>
             </div>
             <div class="benefit">
               <div class="benefit-icon">💰</div>
-              <h5>친구 결제 시</h5>
-              <p>₩5,000 포인트 적립</p>
+              <h5 data-i18n="invite.b2">친구 결제 시</h5>
+              <p data-i18n="invite.b2Desc">₩5,000 포인트 적립</p>
             </div>
           </div>
           <div class="invite-link">
-            <label>초대 링크</label>
+            <label data-i18n="invite.link">초대 링크</label>
             <div class="link-input-group">
               <input type="text" value="https://codenergy.com/invite/your-code" readonly id="invite-link" />
-              <button class="copy-btn" onclick="copyInviteLink()">복사</button>
+              <button class="copy-btn" onclick="copyInviteLink()" data-i18n="invite.copy">복사</button>
             </div>
           </div>
           <div class="invite-gmail">
-            <label>친구 Gmail 주소</label>
+            <label data-i18n="invite.gmailLabel">친구 Gmail 주소</label>
             <div class="link-input-group">
               <input type="email" placeholder="friend@gmail.com" id="friend-gmail" />
-              <button class="copy-btn" onclick="copyGmailAddress()">주소 복사</button>
+              <button class="copy-btn" onclick="copyGmailAddress()" data-i18n="invite.gmailCopy">주소 복사</button>
             </div>
           </div>
         </div>
         <div class="modal-actions">
-          <button type="button" class="cta">카카오톡으로 공유</button>
-          <button type="button" class="ghost" data-close>닫기</button>
+          <button type="button" class="cta" data-i18n="invite.share">카카오톡으로 공유</button>
+          <button type="button" class="ghost" data-close data-i18n="action.close">닫기</button>
         </div>
       </div>
     </div>
@@ -259,68 +191,68 @@
     <div id="universities-modal" class="modal" hidden>
       <div class="modal-backdrop" data-close></div>
       <div class="modal-card universities-modal">
-        <h3>🎓 제휴 대학</h3>
+        <h3 data-i18n="uni.title">🎓 제휴 대학</h3>
         <div class="universities-content">
-          <p>다음 대학들과 제휴하여 특별 혜택을 제공합니다:</p>
+          <p data-i18n="uni.intro">다음 대학들과 제휴하여 특별 혜택을 제공합니다:</p>
           <div class="university-grid">
             <div class="university-card">
-              <div class="university-logo">서울대</div>
-              <h4>서울대학교</h4>
-              <p>컴퓨터공학과</p>
-              <span class="discount">학생 30% 할인</span>
+              <div class="university-logo" data-i18n="uni.snuLogo">서울대</div>
+              <h4 data-i18n="uni.snu">서울대학교</h4>
+              <p data-i18n="uni.snuDept">컴퓨터공학과</p>
+              <span class="discount" data-i18n="uni.d30">학생 30% 할인</span>
             </div>
             <div class="university-card">
               <div class="university-logo">KAIST</div>
               <h4>KAIST</h4>
-              <p>전산학부</p>
-              <span class="discount">학생 30% 할인</span>
+              <p data-i18n="uni.kaistDept">전산학부</p>
+              <span class="discount" data-i18n="uni.d30">학생 30% 할인</span>
             </div>
             <div class="university-card">
-              <div class="university-logo">포항공대</div>
-              <h4>포항공과대학교</h4>
-              <p>컴퓨터공학과</p>
-              <span class="discount">학생 30% 할인</span>
+              <div class="university-logo" data-i18n="uni.postechLogo">포항공대</div>
+              <h4 data-i18n="uni.postech">포항공과대학교</h4>
+              <p data-i18n="uni.postechDept">컴퓨터공학과</p>
+              <span class="discount" data-i18n="uni.d30">학생 30% 할인</span>
             </div>
             <div class="university-card">
-              <div class="university-logo">연세대</div>
-              <h4>연세대학교</h4>
-              <p>컴퓨터과학과</p>
-              <span class="discount">학생 25% 할인</span>
+              <div class="university-logo" data-i18n="uni.yonseiLogo">연세대</div>
+              <h4 data-i18n="uni.yonsei">연세대학교</h4>
+              <p data-i18n="uni.yonseiDept">컴퓨터과학과</p>
+              <span class="discount" data-i18n="uni.d25">학생 25% 할인</span>
             </div>
             <div class="university-card">
-              <div class="university-logo">고려대</div>
-              <h4>고려대학교</h4>
-              <p>컴퓨터학과</p>
-              <span class="discount">학생 25% 할인</span>
+              <div class="university-logo" data-i18n="uni.koreaLogo">고려대</div>
+              <h4 data-i18n="uni.korea">고려대학교</h4>
+              <p data-i18n="uni.koreaDept">컴퓨터학과</p>
+              <span class="discount" data-i18n="uni.d25">학생 25% 할인</span>
             </div>
             <div class="university-card">
-              <div class="university-logo">한양대</div>
-              <h4>한양대학교</h4>
-              <p>컴퓨터소프트웨어학부</p>
-              <span class="discount">학생 20% 할인</span>
+              <div class="university-logo" data-i18n="uni.hanyangLogo">한양대</div>
+              <h4 data-i18n="uni.hanyang">한양대학교</h4>
+              <p data-i18n="uni.hanyangDept">컴퓨터소프트웨어학부</p>
+              <span class="discount" data-i18n="uni.d20">학생 20% 할인</span>
             </div>
           </div>
           <div class="university-note">
-            <p>✨ 제휴 학생들은 학교 이메일 인증 후 특별 할인 혜택을 받을 수 있습니다.</p>
+            <p data-i18n="uni.note">✨ 제휴 학생들은 학교 이메일 인증 후 특별 할인 혜택을 받을 수 있습니다.</p>
           </div>
         </div>
         <div class="modal-actions">
-          <button type="button" class="cta">학교 인증하기</button>
-          <button type="button" class="ghost" data-close>닫기</button>
+          <button type="button" class="cta" data-i18n="uni.verify">학교 인증하기</button>
+          <button type="button" class="ghost" data-close data-i18n="action.close">닫기</button>
         </div>
       </div>
     </div>
 
     <section class="hero">
-      <h1>자신의 실력을<br/>시험해보세요.</h1>
-      <p>
+      <h1 data-i18n-html="hero.title">자신의 실력을<br/>시험해보세요.</h1>
+      <p data-i18n-html="hero.subtitle">
         코딩테스트에 통하는 모든 문제 풀이 스킬,<br/>
         Codenergy에서 만나보세요.
       </p>
-      <button class="pill" data-tilt>
-        <span>나에게 딱 맞는 학습이 궁금하다면?</span>
-        <span class="pill-cta">시작하기 →</span>
-      </button>
+      <a class="pill" href="survey.html" data-tilt>
+        <span data-i18n="hero.pill">나에게 딱 맞는 학습이 궁금하다면?</span>
+        <span class="pill-cta" data-i18n="hero.pillCta">시작하기 →</span>
+      </a>
 
       <div class="mascot" aria-hidden="true">
         <svg class="mascot__svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">
@@ -339,38 +271,38 @@
     </section>
 
     <section class="cards-section">
-      <h2>문제 해결력을 기르는<br/>스킬은 따로 있습니다.</h2>
-      <p class="subtitle">가장 많은 학습자가 이 단계에 있어요.</p>
+      <h2 data-i18n-html="cards.title">문제 해결력을 기르는<br/>스킬은 따로 있습니다.</h2>
+      <p class="subtitle" data-i18n="cards.subtitle">가장 많은 학습자가 이 단계에 있어요.</p>
 
       <div class="cards">
         <article class="card card--amber" data-tilt>
-          <h3>생각을 코드로 옮기는<br/>자신감이 필요하신가요?</h3>
+          <h3 data-i18n-html="cards.c1Title">생각을 코드로 옮기는<br/>자신감이 필요하신가요?</h3>
           <ul>
-            <li><b>재귀함수</b><span>값을 반환하지 않는 재귀함수</span></li>
-            <li><b>시뮬레이션 I</b><span>구간 칠하기</span></li>
-            <li><b>시뮬레이션 II</b><span>dx dy technique</span></li>
-            <li><b>완전탐색 III</b><span>상황을 일일이 가정해보고 진행하는 완전탐색</span></li>
+            <li><b data-i18n="cards.c1L1Title">재귀함수</b><span data-i18n="cards.c1L1Sub">값을 반환하지 않는 재귀함수</span></li>
+            <li><b data-i18n="cards.c1L2Title">시뮬레이션 I</b><span data-i18n="cards.c1L2Sub">구간 칠하기</span></li>
+            <li><b data-i18n="cards.c1L3Title">시뮬레이션 II</b><span data-i18n="cards.c1L3Sub">dx dy technique</span></li>
+            <li><b data-i18n="cards.c1L4Title">완전탐색 III</b><span data-i18n="cards.c1L4Sub">상황을 일일이 가정해보고 진행하는 완전탐색</span></li>
           </ul>
         </article>
 
         <article class="card card--green featured" data-tilt>
-          <h3>낯선 문제도 당황하지 않고<br/>풀어내고 싶나요?</h3>
+          <h3 data-i18n-html="cards.c2Title">낯선 문제도 당황하지 않고<br/>풀어내고 싶나요?</h3>
           <ul>
-            <li><b>Simulation I</b><span>격자 안에서 터지고 떨어지는 경우</span></li>
-            <li><b>Simulation II</b><span>격자 안에서 단일 객체를 이동</span></li>
-            <li><b>Backtracking I</b><span>K개 중 하나를 N번 선택하기(Conditional)</span></li>
-            <li><b>Backtracking II</b><span>N개 중에 M개 고르기(Simple)</span></li>
-            <li><b>BFS</b><span>너비 우선 탐색</span></li>
+            <li><b>Simulation I</b><span data-i18n="cards.c2L1Sub">격자 안에서 터지고 떨어지는 경우</span></li>
+            <li><b>Simulation II</b><span data-i18n="cards.c2L2Sub">격자 안에서 단일 객체를 이동</span></li>
+            <li><b>Backtracking I</b><span data-i18n="cards.c2L3Sub">K개 중 하나를 N번 선택하기(Conditional)</span></li>
+            <li><b>Backtracking II</b><span data-i18n="cards.c2L4Sub">N개 중에 M개 고르기(Simple)</span></li>
+            <li><b>BFS</b><span data-i18n="cards.c2L5Sub">너비 우선 탐색</span></li>
           </ul>
         </article>
 
         <article class="card card--blue" data-tilt>
-          <h3>최상위 실력으로<br/>도약하고 싶으신가요?</h3>
+          <h3 data-i18n-html="cards.c3Title">최상위 실력으로<br/>도약하고 싶으신가요?</h3>
           <ul>
-            <li><b>HashMap</b><span>문자열을 마치 Array의 Index처럼 사용하기</span></li>
-            <li><b>TreeSet</b><span>인접한 두 숫자를 빠르게 구하기</span></li>
-            <li><b>Shorten time Technique</b><span>+1 -1 Technique</span></li>
-            <li><b>Dijkstra</b><span>모든 점으로부터 특정 점까지의 최단거리</span></li>
+            <li><b>HashMap</b><span data-i18n="cards.c3L1Sub">문자열을 마치 Array의 Index처럼 사용하기</span></li>
+            <li><b>TreeSet</b><span data-i18n="cards.c3L2Sub">인접한 두 숫자를 빠르게 구하기</span></li>
+            <li><b>Shorten time Technique</b><span data-i18n="cards.c3L3Sub">+1 -1 Technique</span></li>
+            <li><b>Dijkstra</b><span data-i18n="cards.c3L4Sub">모든 점으로부터 특정 점까지의 최단거리</span></li>
           </ul>
         </article>
       </div>

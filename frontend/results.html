@@ -1,0 +1,156 @@
+  <!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codenergy — 추천 시작 방식</title>
+    <style>
+      .page-fade {
+        position: fixed; inset: 0; background: #fff;
+        z-index: 9999; opacity: 1; pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-fade" id="page-fade"></div>
+    <header class="nav">
+      <div class="logo"><a href="index.html">Codenergy ▲</a></div>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-collapse">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-collapse" id="nav-collapse">
+        <nav class="menu" id="menu">
+          <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
+          <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
+          <a href="index.html" data-action="reviews" data-i18n="nav.reviews">후기</a>
+          <a href="index.html" data-action="invite" data-i18n="nav.invite">친구 초대</a>
+          <a href="index.html" data-action="universities" data-i18n="nav.universities">제휴 대학</a>
+        </nav>
+        <div class="actions">
+          <div class="lang-wrap" id="lang-wrap">
+            <button class="ghost" id="lang-btn" type="button">🌐 <span id="lang-current">한국어</span> ▾</button>
+            <div class="lang-menu" id="lang-menu" hidden>
+              <button type="button" class="lang-menu__item" data-lang="ko">한국어</button>
+              <button type="button" class="lang-menu__item" data-lang="en">English</button>
+            </div>
+          </div>
+          <button class="icon">🔔</button>
+          <button class="ghost" id="login-btn" data-i18n="action.login">로그인</button>
+          <button class="ghost" id="signup-btn" data-i18n="action.signup">회원가입</button>
+          <div class="my-wrap" id="my-wrap" hidden>
+            <button class="ghost" id="my-btn" data-i18n="action.my">My</button>
+            <div class="my-menu" id="my-menu" hidden>
+              <div class="my-menu__profile">
+                <div class="my-menu__avatar" aria-hidden="true">👤</div>
+                <div class="my-menu__user">
+                  <div class="my-menu__name" id="my-name" data-i18n="my.name">사용자 이름</div>
+                  <div class="my-menu__email" id="my-email">user@example.com</div>
+                </div>
+              </div>
+              <ul class="my-menu__list">
+                <li><button type="button" class="my-menu__item" data-i18n="my.mypage">마이페이지</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.invite">친구 초대</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.settings">설정</button></li>
+              </ul>
+              <div class="my-menu__divider"></div>
+              <button type="button" class="my-menu__item my-menu__logout" id="logout-btn" data-i18n="my.logout">로그아웃</button>
+            </div>
+          </div>
+          <button class="cta" data-i18n="action.cta">학습하기 →</button>
+        </div>
+      </div>
+    </header>
+
+    <div id="auth-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <form class="modal-card" id="auth-form">
+        <h3 id="modal-title" data-i18n="auth.login">로그인</h3>
+        <label class="field-username">
+          <span data-i18n="auth.username">아이디</span>
+          <input name="username" autocomplete="username" required minlength="2" />
+        </label>
+        <label class="field-password">
+          <span data-i18n="auth.password">비밀번호</span>
+          <input name="password" type="password" autocomplete="current-password" required minlength="6" />
+        </label>
+        <label class="field-email" id="email-field" hidden>
+          <span>Gmail</span>
+          <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
+        </label>
+        <p class="modal-info" id="modal-info" hidden></p>
+        <p class="modal-error" id="modal-error" hidden></p>
+        <div class="modal-recovery" id="modal-recovery">
+          <button type="button" class="link-button" id="find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-recovery-alt" id="modal-recovery-alt" hidden>
+          <button type="button" class="link-button" id="alt-find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="alt-find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close data-i18n="action.cancel">취소</button>
+          <button type="submit" class="cta" id="submit-btn" data-i18n="auth.login">로그인</button>
+        </div>
+      </form>
+    </div>
+
+    <section class="results-section">
+      <h1 class="results-heading">코드트리, 어떤 방식으로 시작해볼까요?</h1>
+
+      <div class="results-grid">
+        <button type="button" class="result-card result-card--start">
+          <span class="result-badge result-badge--green">코딩을 처음 시작하신다면</span>
+          <span class="result-eyebrow result-eyebrow--green">Codetree 101</span>
+          <span class="result-title">무료로 첫 트레일<br/>시작하기</span>
+          <svg class="result-scene result-scene--sprout" viewBox="0 0 320 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <ellipse cx="160" cy="92" rx="36" ry="6" fill="#a47b58" opacity="0.55"/>
+            <path d="M160 88 C 160 70 152 60 138 56 C 150 56 158 64 160 78 Z" fill="#22c55e"/>
+            <path d="M160 88 C 160 68 168 58 184 54 C 172 54 162 62 160 80 Z" fill="#22c55e"/>
+            <path d="M160 96 L160 70" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"/>
+            <rect x="0" y="96" width="320" height="14" fill="#c2a079"/>
+          </svg>
+        </button>
+
+        <button type="button" class="result-card result-card--diagnose">
+          <span class="result-meta">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+              <circle cx="12" cy="12" r="9"/>
+              <path d="M12 7 V12 L15 14"/>
+            </svg>
+            평균 30분 소요
+          </span>
+          <span class="result-badge result-badge--purple">어디서 시작할지 막막하다면?</span>
+          <span class="result-eyebrow result-eyebrow--purple">지피지기면 백전백승, 갭체크</span>
+          <span class="result-title">맞춤 진단하고<br/>챕터 무료로 받기</span>
+          <svg class="result-scene result-scene--game" viewBox="0 0 720 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="0" y="100" width="300" height="30" fill="#5e5854"/>
+            <path d="M0 100 L20 84 L40 100 L60 84 L80 100 L100 84 L120 100 L140 84 L160 100 L180 84 L200 100 L220 84 L240 100 L260 84 L280 100 L300 84 L300 100 Z" fill="#22c55e"/>
+            <rect x="420" y="100" width="300" height="30" fill="#5e5854"/>
+            <path d="M420 100 L440 84 L460 100 L480 84 L500 100 L520 84 L540 100 L560 84 L580 100 L600 84 L620 100 L640 84 L660 100 L680 84 L700 100 L720 84 L720 100 Z" fill="#22c55e"/>
+            <g transform="rotate(20 348 70)">
+              <rect x="324" y="50" width="48" height="36" rx="6" fill="#ef6f4f" stroke="#b14a2f" stroke-width="2"/>
+            </g>
+            <g transform="translate(298 38)">
+              <path d="M0 0 L-6 -10 M0 0 L0 -12 M0 0 L6 -10" stroke="#111" stroke-width="2" stroke-linecap="round"/>
+            </g>
+            <g transform="translate(514 70)">
+              <rect x="-44" y="-20" width="88" height="32" rx="6" fill="#22c55e"/>
+              <text x="0" y="2" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#fff">Solved</text>
+              <path d="M0 14 L0 30" stroke="#16a34a" stroke-width="3"/>
+            </g>
+          </svg>
+        </button>
+      </div>
+
+      <div class="results-skip">
+        <a class="results-skip__link" href="codetrails.html">직접 둘러볼게요 →</a>
+      </div>
+    </section>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
