@@ -31,7 +31,103 @@ function attachTilt(el) {
 
 document.querySelectorAll("[data-tilt]").forEach(attachTilt);
 
-// ---------------- Auth ----------------
+// ---------------- Navigation Menu ----------------
+const menuLinks = document.querySelectorAll('.menu a');
+const pricingModal = document.getElementById('pricing-modal');
+const challengeModal = document.getElementById('challenge-modal');
+const reviewsModal = document.getElementById('reviews-modal');
+const inviteModal = document.getElementById('invite-modal');
+const universitiesModal = document.getElementById('universities-modal');
+
+menuLinks.forEach(link => {
+  link.addEventListener('click', (e) => {
+    e.preventDefault();
+    const menuText = link.textContent.trim().split(' ')[0]; // Remove "New" badge text
+
+    switch(menuText) {
+      case '코드트레일':
+        showCodeTrail();
+        break;
+      case '요금제':
+        showPricing();
+        break;
+      case '청약챌린지':
+        showChallenge();
+        break;
+      case '후기':
+        showReviews();
+        break;
+      case '친구초대':
+        showInvite();
+        break;
+      case '제휴대학':
+        showUniversities();
+        break;
+    }
+  });
+});
+
+function showCodeTrail() {
+  alert('🚀 코드트레일 기능이 곧 제공됩니다!\n\n알고리즘 문제 풀이부터 실전 코딩 테스트까지,\n단계별 학습 경로를 따라 실력을 키워보세요.');
+}
+
+function showPricing() {
+  pricingModal.hidden = false;
+}
+
+function showChallenge() {
+  challengeModal.hidden = false;
+}
+
+function showReviews() {
+  reviewsModal.hidden = false;
+}
+
+function showInvite() {
+  if (!document.getElementById('my-wrap').hidden) {
+    inviteModal.hidden = false;
+  } else {
+    alert('로그인 후 친구 초대 기능을 이용할 수 있습니다.');
+  }
+}
+
+function showUniversities() {
+  universitiesModal.hidden = false;
+}
+
+// Close modals when clicking backdrop
+document.addEventListener('click', (e) => {
+  if (e.target.matches('[data-close]')) {
+    const modal = e.target.closest('.modal');
+    if (modal) modal.hidden = true;
+  }
+});
+
+// Copy invite link function
+function copyInviteLink() {
+  const linkInput = document.getElementById('invite-link');
+  linkInput.select();
+  document.execCommand('copy');
+  alert('초대 링크가 복사되었습니다!');
+}
+
+// Copy Gmail address function
+function copyGmailAddress() {
+  const gmailInput = document.getElementById('friend-gmail');
+  const email = gmailInput.value.trim();
+  if (email) {
+    navigator.clipboard.writeText(email).then(() => {
+      alert('Gmail 주소가 복사되었습니다!');
+    }).catch(() => {
+      // Fallback for older browsers
+      gmailInput.select();
+      document.execCommand('copy');
+      alert('Gmail 주소가 복사되었습니다!');
+    });
+  } else {
+    alert('Gmail 주소를 입력해주세요.');
+  }
+}
 const loginBtn = document.getElementById("login-btn");
 const signupBtn = document.getElementById("signup-btn");
 const myWrap = document.getElementById("my-wrap");
@@ -45,6 +141,14 @@ const form = document.getElementById("auth-form");
 const modalTitle = document.getElementById("modal-title");
 const submitBtn = document.getElementById("submit-btn");
 const errorEl = document.getElementById("modal-error");
+const infoEl = document.getElementById("modal-info");
+const emailField = document.getElementById("email-field");
+const recoveryLinks = document.getElementById("modal-recovery");
+const recoveryLinksAlt = document.getElementById("modal-recovery-alt");
+const findIdBtn = document.getElementById("find-id-btn");
+const findPasswordBtn = document.getElementById("find-password-btn");
+const altFindIdBtn = document.getElementById("alt-find-id-btn");
+const altFindPasswordBtn = document.getElementById("alt-find-password-btn");
 
 let mode = "login";
 
@@ -84,15 +188,75 @@ logoutBtn.addEventListener("click", async () => {
   alert("로그아웃되었습니다");
 });
 
-function openModal(nextMode) {
+function setMode(nextMode) {
   mode = nextMode;
-  modalTitle.textContent = nextMode === "signup" ? "회원가입" : "로그인";
-  submitBtn.textContent = nextMode === "signup" ? "회원가입" : "로그인";
-  form.reset();
+  modalTitle.textContent =
+    nextMode === "signup"
+      ? "회원가입"
+      : nextMode === "find-id"
+      ? "아이디 찾기"
+      : nextMode === "find-password"
+      ? "비밀번호 찾기"
+      : "로그인";
+  submitBtn.textContent =
+    nextMode === "signup"
+      ? "회원가입"
+      : nextMode === "login"
+      ? "로그인"
+      : "전송";
+
+  const usernameLabel = form.querySelector(".field-username");
+  const passwordLabel = form.querySelector(".field-password");
+  const emailLabel = emailField;
+
+  const showEmail = nextMode !== "login";
+  const showRecovery = nextMode === "login";
+  const showRecoveryAlt = nextMode === "find-id" || nextMode === "find-password";
+  const showUsername = nextMode === "login" || nextMode === "signup";
+  const showPassword = nextMode === "login" || nextMode === "signup";
+
+  usernameLabel.hidden = !showUsername;
+  passwordLabel.hidden = !showPassword;
+  emailLabel.hidden = !showEmail;
+  recoveryLinks.hidden = !showRecovery;
+  recoveryLinksAlt.hidden = !showRecoveryAlt;
+
+  usernameLabel.style.display = showUsername ? "block" : "none";
+  passwordLabel.style.display = showPassword ? "block" : "none";
+  emailLabel.style.display = showEmail ? "block" : "none";
+  recoveryLinks.style.display = showRecovery ? "flex" : "none";
+  recoveryLinksAlt.style.display = showRecoveryAlt ? "flex" : "none";
+
+  // 각 모드에서 특정 버튼만 표시
+  if (nextMode === "find-id") {
+    altFindIdBtn.style.display = "none";
+    altFindPasswordBtn.style.display = "block";
+  } else if (nextMode === "find-password") {
+    altFindIdBtn.style.display = "block";
+    altFindPasswordBtn.style.display = "none";
+  }
+
+  form.querySelector("input[name=username]").required = showUsername;
+  form.querySelector("input[name=password]").required = showPassword;
+  form.querySelector("input[name=email]").required = showEmail;
+
   errorEl.hidden = true;
   errorEl.textContent = "";
+  infoEl.hidden = true;
+  form.reset();
+  if (!emailLabel.hidden) {
+    form.querySelector("input[name=email]").value = "";
+  }
+  if (!usernameLabel.hidden) {
+    form.querySelector("input[name=username]").focus();
+  } else {
+    form.querySelector("input[name=email]").focus();
+  }
+}
+
+function openModal(nextMode) {
+  setMode(nextMode);
   modal.hidden = false;
-  form.querySelector("input[name=username]").focus();
 }
 
 function closeModal() {
@@ -101,6 +265,10 @@ function closeModal() {
 
 loginBtn.addEventListener("click", () => openModal("login"));
 signupBtn.addEventListener("click", () => openModal("signup"));
+findIdBtn.addEventListener("click", () => openModal("find-id"));
+findPasswordBtn.addEventListener("click", () => openModal("find-password"));
+altFindIdBtn.addEventListener("click", () => openModal("find-id"));
+altFindPasswordBtn.addEventListener("click", () => openModal("find-password"));
 modal.addEventListener("click", (e) => {
   if (e.target.matches("[data-close]")) closeModal();
 });
@@ -113,23 +281,51 @@ form.addEventListener("submit", async (e) => {
   const data = Object.fromEntries(new FormData(form));
   submitBtn.disabled = true;
   errorEl.hidden = true;
+  infoEl.hidden = true;
+
   try {
-    const res = await fetch(`${API_BASE}/api/${mode === "signup" ? "signup" : "login"}`, {
+    let endpoint = "login";
+    if (mode === "signup") endpoint = "signup";
+    if (mode === "find-id") endpoint = "find-username";
+    if (mode === "find-password") endpoint = "forgot-password";
+
+    const res = await fetch(`${API_BASE}/api/${endpoint}`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
     const body = await res.json().catch(() => ({}));
+
     if (!res.ok) {
       errorEl.textContent = body.error || "요청 실패";
       errorEl.hidden = false;
       return;
     }
+
+    if (mode === "signup") {
+      openModal("login");
+      infoEl.textContent = "회원가입이 완료되었습니다. 이제 로그인해주세요.";
+      infoEl.hidden = false;
+      return;
+    }
+
+    if (mode === "find-id") {
+      infoEl.textContent = body.message || "아이디 찾기 안내를 Gmail로 보냈습니다.";
+      infoEl.hidden = false;
+      return;
+    }
+
+    if (mode === "find-password") {
+      infoEl.textContent = body.message || "비밀번호 재설정 안내를 Gmail로 보냈습니다.";
+      infoEl.hidden = false;
+      return;
+    }
+
     setLoggedIn(body);
     closeModal();
   } catch (err) {
-    errorEl.textContent = "서버에 연결할 수 없습니다.";
+    errorEl.textContent = err?.message || "서버에 연결할 수 없습니다.";
     errorEl.hidden = false;
   } finally {
     submitBtn.disabled = false;

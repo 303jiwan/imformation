@@ -326,7 +326,39 @@ html, body {
   background: var(--purple);
   color: #fff;
 }
-.modal-actions .cta:disabled { opacity: 0.6; cursor: not-allowed; }
+..modal-actions .cta:disabled { opacity: 0.6; cursor: not-allowed; }
+.modal-info {
+  color: #0d6f18;
+  font-size: 13px;
+  margin: -4px 0 0;
+}
+.modal-recovery,
+.modal-recovery-alt {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 2px;
+}
+.link-button {
+  border: none;
+  background: transparent;
+  color: #6b21a8;
+  cursor: pointer;
+  font-size: 13px;
+  padding: 0;
+  text-decoration: underline;
+}
+.link-button:hover {
+  color: #4c1d95;
+}
+.field-username,
+.field-password,
+.field-email {
+  display: block;
+}
+.field-email {
+  transition: max-height 200ms ease, opacity 200ms ease;
+}
 
 /* ---------- My dropdown ---------- */
 .my-wrap {
@@ -445,4 +477,328 @@ html, body {
 @keyframes mascot-bob {
   0%, 100% { transform: translateY(0); }
   50%      { transform: translateY(-6px); }
+}
+
+/* ---------- Feature Modals ---------- */
+.pricing-modal {
+  max-width: 600px;
+  width: 90vw;
+}
+
+.pricing-plans {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.plan {
+  border: 2px solid #e5e5e5;
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  position: relative;
+}
+
+.plan.featured {
+  border-color: var(--purple);
+  transform: scale(1.05);
+}
+
+.plan .badge {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--purple);
+  color: white;
+  padding: 4px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.plan h4 {
+  font-size: 18px;
+  margin-bottom: 8px;
+}
+
+.plan .price {
+  font-size: 32px;
+  font-weight: 700;
+  color: var(--purple);
+  margin-bottom: 16px;
+}
+
+.plan .price span {
+  font-size: 16px;
+  font-weight: 400;
+  color: #666;
+}
+
+.plan ul {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0;
+  text-align: left;
+}
+
+.plan li {
+  padding: 4px 0;
+  color: #555;
+}
+
+.plan-btn {
+  width: 100%;
+  margin-top: 16px;
+}
+
+.challenge-modal,
+.reviews-modal,
+.invite-modal,
+.universities-modal {
+  max-width: 600px;
+  width: 90vw;
+}
+
+.challenge-content,
+.reviews-grid,
+.invite-content,
+.universities-content {
+  margin: 20px 0;
+}
+
+.challenge-hero h4 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+
+.challenge-hero p {
+  color: #666;
+  margin-bottom: 24px;
+}
+
+.challenge-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.feature {
+  text-align: center;
+}
+
+.feature-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.feature h5 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.feature p {
+  font-size: 14px;
+  color: #666;
+}
+
+.current-challenge {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 16px;
+}
+
+.progress {
+  margin-top: 8px;
+  background: #e5e5e5;
+  height: 8px;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  background: var(--green);
+  height: 100%;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.reviews-grid {
+  display: grid;
+  gap: 16px;
+}
+
+.review-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 16px;
+}
+
+.review-stars {
+  color: #fbbf24;
+  margin-bottom: 8px;
+}
+
+.review-author {
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+  gap: 12px;
+}
+
+.author-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--purple);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+}
+
+.author-name {
+  font-weight: 600;
+}
+
+.author-company {
+  font-size: 12px;
+  color: #666;
+}
+
+.invite-benefits {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.benefit {
+  text-align: center;
+}
+
+.benefit-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.benefit h5 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.benefit p {
+  font-size: 14px;
+  color: #666;
+}
+
+.invite-link {
+  margin: 20px 0;
+}
+
+.invite-link label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.link-input-group {
+  display: flex;
+  gap: 8px;
+}
+
+.link-input-group input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.copy-btn {
+  padding: 8px 16px;
+  background: var(--purple);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.copy-btn:hover {
+  background: var(--purple-deep);
+}
+
+.invite-gmail {
+  margin: 20px 0;
+}
+
+.invite-gmail label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.university-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin: 20px 0;
+}
+
+.university-card {
+  border: 1px solid #e5e5e5;
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.university-logo {
+  width: 48px;
+  height: 48px;
+  border-radius: 8px;
+  background: var(--purple);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  margin: 0 auto 12px;
+}
+
+.university-card h4 {
+  font-size: 16px;
+  margin-bottom: 4px;
+}
+
+.university-card p {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 8px;
+}
+
+.discount {
+  background: var(--green);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.university-note {
+  background: #f0f9ff;
+  padding: 12px;
+  border-radius: 8px;
+  margin: 16px 0;
+}
+
+.university-note p {
+  color: #0369a1;
+  font-size: 14px;
+  margin: 0;
 }

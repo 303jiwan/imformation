@@ -1,4 +1,4 @@
-<!doctype html>
+  <!doctype html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
@@ -50,20 +50,265 @@
       <div class="modal-backdrop" data-close></div>
       <form class="modal-card" id="auth-form">
         <h3 id="modal-title">로그인</h3>
-        <label>
+        <label class="field-username">
           <span>아이디</span>
           <input name="username" autocomplete="username" required minlength="2" />
         </label>
-        <label>
+        <label class="field-password">
           <span>비밀번호</span>
           <input name="password" type="password" autocomplete="current-password" required minlength="6" />
         </label>
+        <label class="field-email" id="email-field" hidden>
+          <span>Gmail</span>
+          <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
+        </label>
+        <p class="modal-info" id="modal-info" hidden></p>
         <p class="modal-error" id="modal-error" hidden></p>
+        <div class="modal-recovery" id="modal-recovery">
+          <button type="button" class="link-button" id="find-id-btn">아이디 찾기</button>
+          <button type="button" class="link-button" id="find-password-btn">비밀번호 찾기</button>
+        </div>
+        <div class="modal-recovery-alt" id="modal-recovery-alt" hidden>
+          <button type="button" class="link-button" id="alt-find-id-btn">아이디 찾기</button>
+          <button type="button" class="link-button" id="alt-find-password-btn">비밀번호 찾기</button>
+        </div>
         <div class="modal-actions">
           <button type="button" class="ghost" data-close>취소</button>
           <button type="submit" class="cta" id="submit-btn">로그인</button>
         </div>
       </form>
+    </div>
+
+    <!-- Feature Modals -->
+    <div id="pricing-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card pricing-modal">
+        <h3>요금제 선택</h3>
+        <div class="pricing-plans">
+          <div class="plan plan-free">
+            <h4>무료</h4>
+            <div class="price">₩0</div>
+            <ul>
+              <li>기본 문제 50개</li>
+              <li>기본 해설</li>
+              <li>커뮤니티 접근</li>
+            </ul>
+            <button class="plan-btn ghost">현재 플랜</button>
+          </div>
+          <div class="plan plan-premium featured">
+            <div class="badge">인기</div>
+            <h4>프리미엄</h4>
+            <div class="price">₩9,900<span>/월</span></div>
+            <ul>
+              <li>무제한 문제 풀이</li>
+              <li>상세 해설 및 풀이 과정</li>
+              <li>실전 모의고사</li>
+              <li>진행 상황 분석</li>
+            </ul>
+            <button class="plan-btn cta">시작하기</button>
+          </div>
+          <div class="plan plan-pro">
+            <h4>프로</h4>
+            <div class="price">₩19,900<span>/월</span></div>
+            <ul>
+              <li>프리미엄의 모든 기능</li>
+              <li>1:1 전문 코칭</li>
+              <li>기업 맞춤 문제</li>
+              <li>취업 컨설팅</li>
+              <li>우선 지원 알림</li>
+            </ul>
+            <button class="plan-btn cta">프로 시작</button>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close>닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="challenge-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card challenge-modal">
+        <h3>🏆 청약 챌린지</h3>
+        <div class="challenge-content">
+          <div class="challenge-hero">
+            <h4>매월 새로운 도전, 새로운 기회!</h4>
+            <p>실전 코딩테스트를 대비하는 최고의 방법</p>
+          </div>
+          <div class="challenge-features">
+            <div class="feature">
+              <div class="feature-icon">🏅</div>
+              <h5>상위 랭커 혜택</h5>
+              <p>상위 10% 참가자에게 기업 인턴십 기회 제공</p>
+            </div>
+            <div class="feature">
+              <div class="feature-icon">📊</div>
+              <h5>실시간 랭킹</h5>
+              <p>참가자들과 실시간 경쟁하며 성장하세요</p>
+            </div>
+            <div class="feature">
+              <div class="feature-icon">🎯</div>
+              <h5>주간 문제</h5>
+              <p>매주 새로운 알고리즘 문제 도전</p>
+            </div>
+          </div>
+          <div class="current-challenge">
+            <h4>이번 달 챌린지: "알고리즘 마스터"</h4>
+            <p>다양한 알고리즘 유형을 마스터하세요</p>
+            <div class="progress">
+              <div class="progress-bar" style="width: 65%"></div>
+              <span>65% 완료</span>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cta">챌린지 참여하기</button>
+          <button type="button" class="ghost" data-close>닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="reviews-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card reviews-modal">
+        <h3>⭐ 사용자 후기</h3>
+        <div class="reviews-grid">
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p>"코딩테스트 합격에 결정적인 도움이 되었습니다. 실전 같은 문제들로 자신감을 얻었어요."</p>
+            <div class="review-author">
+              <div class="author-avatar">김</div>
+              <div class="author-info">
+                <div class="author-name">김개발</div>
+                <div class="author-company">삼성전자 합격</div>
+              </div>
+            </div>
+          </div>
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p>"단계별 학습 시스템이 정말 좋았습니다. 기초부터 실전까지 체계적으로 배울 수 있었어요."</p>
+            <div class="review-author">
+              <div class="author-avatar">박</div>
+              <div class="author-info">
+                <div class="author-name">박코딩</div>
+                <div class="author-company">네이버 합격</div>
+              </div>
+            </div>
+          </div>
+          <div class="review-card">
+            <div class="review-stars">★★★★★</div>
+            <p>"친구 추천으로 시작했는데, 정말 후회 없는 선택이었습니다. 취업까지 성공했어요!"</p>
+            <div class="review-author">
+              <div class="author-avatar">이</div>
+              <div class="author-info">
+                <div class="author-name">이프로그래머</div>
+                <div class="author-company">카카오 합격</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close>닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="invite-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card invite-modal">
+        <h3>🎁 친구 초대하기</h3>
+        <div class="invite-content">
+          <div class="invite-hero">
+            <h4>친구와 함께 성장하세요!</h4>
+            <p>친구를 초대하면 서로 혜택을 받아요</p>
+          </div>
+          <div class="invite-benefits">
+            <div class="benefit">
+              <div class="benefit-icon">🎁</div>
+              <h5>친구 가입 시</h5>
+              <p>1개월 프리미엄 무료 이용권</p>
+            </div>
+            <div class="benefit">
+              <div class="benefit-icon">💰</div>
+              <h5>친구 결제 시</h5>
+              <p>₩5,000 포인트 적립</p>
+            </div>
+          </div>
+          <div class="invite-link">
+            <label>초대 링크</label>
+            <div class="link-input-group">
+              <input type="text" value="https://codenergy.com/invite/your-code" readonly id="invite-link" />
+              <button class="copy-btn" onclick="copyInviteLink()">복사</button>
+            </div>
+          </div>
+          <div class="invite-gmail">
+            <label>친구 Gmail 주소</label>
+            <div class="link-input-group">
+              <input type="email" placeholder="friend@gmail.com" id="friend-gmail" />
+              <button class="copy-btn" onclick="copyGmailAddress()">주소 복사</button>
+            </div>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cta">카카오톡으로 공유</button>
+          <button type="button" class="ghost" data-close>닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="universities-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card universities-modal">
+        <h3>🎓 제휴 대학</h3>
+        <div class="universities-content">
+          <p>다음 대학들과 제휴하여 특별 혜택을 제공합니다:</p>
+          <div class="university-grid">
+            <div class="university-card">
+              <div class="university-logo">서울대</div>
+              <h4>서울대학교</h4>
+              <p>컴퓨터공학과</p>
+              <span class="discount">학생 30% 할인</span>
+            </div>
+            <div class="university-card">
+              <div class="university-logo">KAIST</div>
+              <h4>KAIST</h4>
+              <p>전산학부</p>
+              <span class="discount">학생 30% 할인</span>
+            </div>
+            <div class="university-card">
+              <div class="university-logo">포항공대</div>
+              <h4>포항공과대학교</h4>
+              <p>컴퓨터공학과</p>
+              <span class="discount">학생 30% 할인</span>
+            </div>
+            <div class="university-card">
+              <div class="university-logo">연세대</div>
+              <h4>연세대학교</h4>
+              <p>컴퓨터과학과</p>
+              <span class="discount">학생 25% 할인</span>
+            </div>
+            <div class="university-card">
+              <div class="university-logo">고려대</div>
+              <h4>고려대학교</h4>
+              <p>컴퓨터학과</p>
+              <span class="discount">학생 25% 할인</span>
+            </div>
+            <div class="university-card">
+              <div class="university-logo">한양대</div>
+              <h4>한양대학교</h4>
+              <p>컴퓨터소프트웨어학부</p>
+              <span class="discount">학생 20% 할인</span>
+            </div>
+          </div>
+          <div class="university-note">
+            <p>✨ 제휴 학생들은 학교 이메일 인증 후 특별 할인 혜택을 받을 수 있습니다.</p>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cta">학교 인증하기</button>
+          <button type="button" class="ghost" data-close>닫기</button>
+        </div>
+      </div>
     </div>
 
     <section class="hero">
