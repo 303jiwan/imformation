@@ -167,6 +167,43 @@ function renderPerProblem(progress, answers) {
   document.getElementById("exit-btn").addEventListener("click", exitFlow);
 }
 
+/* ---------- Summary helpers ---------- */
+
+const VERDICT_META = {
+  correct: { label: "정답",     icon: "✓", segClass: "summary-bar__seg--correct", cardClass: "summary-card--correct" },
+  wrong:   { label: "오답",     icon: "✗", segClass: "summary-bar__seg--wrong",   cardClass: "summary-card--wrong"   },
+  timeout: { label: "시간 초과", icon: "⏱", segClass: "summary-bar__seg--timeout", cardClass: "summary-card--timeout" },
+  missing: { label: "미제출",   icon: "—", segClass: "summary-bar__seg--missing", cardClass: "summary-card--missing" },
+};
+
+/**
+ * Extract concept/topic labels from a problem. PROBLEMS use a `tag` like
+ * "기초 · 산술" or "기본 · 반복문" — we treat the second token as the concept.
+ * Falls back to the full tag, then problem.title, so we always have something
+ * to show in the recommendation block.
+ */
+function conceptOf(problem) {
+  const tag = problem?.tag;
+  if (!tag) return problem?.title || `문제 ${problem?.id}`;
+  const parts = String(tag).split("·").map((s) => s.trim()).filter(Boolean);
+  return parts[1] || parts[0] || tag;
+}
+
+/**
+ * Compute weak concepts: every concept where the student got at least one
+ * non-correct verdict. Returned in problem-id order, deduplicated.
+ */
+function weakConcepts(cards) {
+  const seen = new Set();
+  const out = [];
+  for (const { p, v } of cards) {
+    if (v === "correct") continue;
+    const c = conceptOf(p);
+    if (!seen.has(c)) { seen.add(c); out.push(c); }
+  }
+  return out;
+}
+
 function renderSummary(progress, answers) {
   let correct = 0, wrong = 0, timeout = 0, missing = 0;
   const cards = PROBLEMS.map((p) => {
@@ -176,42 +213,157 @@ function renderSummary(progress, answers) {
     else if (v === "wrong") wrong++;
     else if (v === "timeout") timeout++;
     else missing++;
-    return { p, v };
+    return { p, v, a };
   });
 
   const score = correct;
   const total = progress.total;
+  const pct = total ? Math.round((correct / total) * 100) : 0;
+
   const headlineKey =
     score === total ? "perfect" : score >= Math.ceil(total * 0.6) ? "good" : "tryAgain";
   const headlineMap = {
-    perfect: { title: "축하합니다 — 완벽해요!", sub: `5문제 모두 정답이에요. 코딩테스트 자신감을 얻으셨길 바랍니다.` },
-    good:    { title: "잘 하셨어요!",         sub: `좋은 페이스입니다. 부족한 부분은 정답 코드를 참고해 다듬어보세요.` },
+    perfect: { title: "축하합니다 — 완벽해요!",   sub: `5문제 모두 정답이에요. 코딩테스트 자신감을 얻으셨길 바랍니다.` },
+    good:    { title: "잘 하셨어요!",            sub: `좋은 페이스입니다. 부족한 부분은 정답 코드를 참고해 다듬어보세요.` },
     tryAgain:{ title: "여기서부터가 시작이에요.", sub: `오늘의 결과보다 더 중요한 건 흐름이에요. 한 번 더 도전해볼까요?` },
   };
+
+  // Concepts attempted (deduplicated). Falls back to "도전한 문제 수" if
+  // no tags resolve (defensive — current PROBLEMS all have tags).
+  const conceptSet = new Set(PROBLEMS.map(conceptOf).filter(Boolean));
+  const conceptCount = conceptSet.size;
+  const conceptStatLabel = conceptCount > 0 ? "도전한 개념 수" : "도전한 문제 수";
+  const conceptStatValue = conceptCount > 0 ? conceptCount : total;
+
+  // Stacked progress-bar segments — one per problem (5 segments) so each
+  // segment maps 1:1 onto a problem.
+  const barSegs = cards.map(({ p, v }) => {
+    const meta = VERDICT_META[v];
+    return `<span class="summary-bar__seg ${meta.segClass}" title="문제 ${p.id} — ${meta.label}"></span>`;
+  }).join("");
+
+  // Build the recommendation block from actual results.
+  const weak = weakConcepts(cards);
+  let recHtml = "";
+  if (headlineKey === "perfect") {
+    recHtml = `
+      <div class="summary-rec__row">
+        <span class="summary-rec__icon" aria-hidden="true">🚀</span>
+        <div class="summary-rec__body">
+          <h3 class="summary-rec__h">더 어려운 문제에 도전해보세요</h3>
+          <p class="summary-rec__p">기본기는 충분합니다. 한 단계 위 개념으로 시야를 넓혀볼까요?</p>
+          <a class="summary-rec__cta" href="test-concepts.html">개념 다시 보러 가기 →</a>
+        </div>
+      </div>
+    `;
+  } else if (headlineKey === "good") {
+    const focus = weak.length
+      ? weak.slice(0, 3).map((c) => `<span class="summary-rec__chip">${escapeHtml(c)}</span>`).join("")
+      : "";
+    recHtml = `
+      <div class="summary-rec__row">
+        <span class="summary-rec__icon" aria-hidden="true">🎯</span>
+        <div class="summary-rec__body">
+          <h3 class="summary-rec__h">이 개념을 더 연습해보세요</h3>
+          ${focus
+            ? `<div class="summary-rec__chips">${focus}</div>
+               <p class="summary-rec__p">위 개념을 중심으로 비슷한 문제를 한 번 더 풀어보세요.</p>`
+            : `<p class="summary-rec__p">전반적으로 잘 하셨어요. 아쉬운 문제만 다시 한 번 살펴보세요.</p>`}
+          <a class="summary-rec__cta" href="test-concepts.html">개념 다시 보러 가기 →</a>
+        </div>
+      </div>
+    `;
+  } else {
+    const focus = weak.length
+      ? weak.slice(0, 3).map((c) => `<span class="summary-rec__chip">${escapeHtml(c)}</span>`).join("")
+      : "";
+    recHtml = `
+      <div class="summary-rec__row">
+        <span class="summary-rec__icon" aria-hidden="true">📘</span>
+        <div class="summary-rec__body">
+          <h3 class="summary-rec__h">기초부터 차근차근</h3>
+          ${focus
+            ? `<div class="summary-rec__chips">${focus}</div>
+               <p class="summary-rec__p">이 개념들을 다시 익히고 비슷한 문제로 감을 잡아보세요.</p>`
+            : `<p class="summary-rec__p">개념 정리부터 다시 한 번 살펴보고 차근차근 풀어볼까요?</p>`}
+          <a class="summary-rec__cta" href="test-concepts.html">개념 다시 보러 가기 →</a>
+        </div>
+      </div>
+    `;
+  }
 
   shell.innerHTML = `
     <div class="result-hero">
       <span class="result-hero__chip result-hero__chip--correct">테스트 완료</span>
-      <div class="summary-score">${score}<span style="font-size:24px;color:#9ca3af;font-weight:800;"> / ${total}</span></div>
+      <div class="summary-score">${score}<span class="summary-score__total"> / ${total}</span></div>
       <p class="summary-score__sub">정답 ${correct} · 오답 ${wrong} · 시간 초과 ${timeout}${missing ? ` · 미제출 ${missing}` : ""}</p>
       <h1 class="result-hero__title">${headlineMap[headlineKey].title}</h1>
       <p class="result-hero__sub">${headlineMap[headlineKey].sub}</p>
     </div>
 
-    <div>
-      <h2 class="problem-panel__h" style="margin: 4px 0 12px; padding: 0;">문제별 결과</h2>
+    <div class="dash-section">
+      <div class="dash-section__head">
+        <h2 class="dash-section__h">전체 결과 한눈에 보기</h2>
+        <span class="dash-section__pct">정답률 ${pct}%</span>
+      </div>
+      <div class="summary-bar" role="img" aria-label="문제별 결과 막대">
+        ${barSegs}
+      </div>
+      <div class="summary-bar__legend">
+        <span class="summary-bar__lg"><i class="summary-bar__dot summary-bar__dot--correct"></i>정답 ${correct}</span>
+        <span class="summary-bar__lg"><i class="summary-bar__dot summary-bar__dot--wrong"></i>오답 ${wrong}</span>
+        <span class="summary-bar__lg"><i class="summary-bar__dot summary-bar__dot--timeout"></i>시간 초과 ${timeout}</span>
+        <span class="summary-bar__lg"><i class="summary-bar__dot summary-bar__dot--missing"></i>미제출 ${missing}</span>
+      </div>
+    </div>
+
+    <div class="dash-stats">
+      <div class="dash-stat">
+        <span class="dash-stat__num">${pct}<span class="dash-stat__unit">%</span></span>
+        <span class="dash-stat__label">정답률</span>
+      </div>
+      <div class="dash-stat">
+        <span class="dash-stat__num">${correct}<span class="dash-stat__unit">/${total}</span></span>
+        <span class="dash-stat__label">맞힌 문제</span>
+      </div>
+      <div class="dash-stat">
+        <span class="dash-stat__num">${conceptStatValue}</span>
+        <span class="dash-stat__label">${conceptStatLabel}</span>
+      </div>
+      <div class="dash-stat">
+        <span class="dash-stat__num">${wrong + timeout + missing}</span>
+        <span class="dash-stat__label">복습할 문제</span>
+      </div>
+    </div>
+
+    <div class="dash-section">
+      <div class="dash-section__head">
+        <h2 class="dash-section__h">문제별 결과</h2>
+        <span class="dash-section__pct">${total}문제</span>
+      </div>
       <div class="summary-grid">
         ${cards.map(({ p, v }) => {
-          const verdictText = v === "correct" ? "정답" : v === "wrong" ? "오답" : v === "timeout" ? "시간 초과" : "미제출";
+          const meta = VERDICT_META[v];
+          const concept = conceptOf(p);
           return `
-            <div class="summary-card summary-card--${v}">
+            <div class="summary-card ${meta.cardClass}">
+              <span class="summary-card__icon" aria-hidden="true">${meta.icon}</span>
               <span class="summary-card__num">문제 ${p.id}</span>
-              <span class="summary-card__title">${p.title}</span>
-              <span class="summary-card__verdict">${verdictText}</span>
+              <span class="summary-card__title">${escapeHtml(p.title)}</span>
+              <span class="summary-card__concept">${escapeHtml(concept)}</span>
+              <span class="summary-card__verdict">${meta.label}</span>
             </div>
           `;
         }).join("")}
       </div>
+    </div>
+
+    <div class="summary-rec">
+      <div class="summary-rec__head">
+        <span class="summary-rec__badge">학습 추천</span>
+        <h2 class="summary-rec__title">다음에 무엇을 해볼까요?</h2>
+      </div>
+      ${recHtml}
     </div>
 
     <div class="result-encouragement">

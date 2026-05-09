@@ -15,6 +15,7 @@ export default defineConfig({
         testGauge: resolve(__dirname, 'test-gauge.html'),
         testProblem: resolve(__dirname, 'test-problem.html'),
         testResult: resolve(__dirname, 'test-result.html'),
+        avatar: resolve(__dirname, 'avatar.html'),
       },
     },
   },

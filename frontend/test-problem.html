@@ -222,8 +222,10 @@
             </div>
           </div>
 
-          <!-- Tests mode body (editable input) -->
-          <div class="problem-dock__view problem-dock__view--tests" id="view-tests" hidden>
+          <!-- Tests mode body (editable input) — visibility controlled by
+               .problem-dock[data-mode] CSS, NOT the hidden attribute, so the
+               UA stylesheet's [hidden]{display:none} can't override it. -->
+          <div class="problem-dock__view problem-dock__view--tests" id="view-tests">
             <div class="problem-tests">
               <label class="problem-tests__label" for="case-input-edit">입력</label>
               <textarea

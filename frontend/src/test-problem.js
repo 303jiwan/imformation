@@ -1,4 +1,5 @@
 import { PROBLEMS, TOTAL_PROBLEMS, TIME_PER_PROBLEM_MS, getTestCases } from "./test-problems.js";
+import { runC, normalizeOutput, gradingSample, judgeAvailable } from "./judge.js";
 
 /* =====================================================================
    Test problem screen — Codetree-style focused workspace.
@@ -407,33 +408,131 @@ function basicSanityChecks(code) {
   return true;
 }
 
-function runAllCases() {
+function setRunLoading(isLoading) {
+  if (isLoading) {
+    actRun.disabled = true;
+    if (!actRun.dataset.prev) actRun.dataset.prev = actRun.innerHTML;
+    actRun.innerHTML = `<span class="problem-action__icon problem-action__icon--spin" aria-hidden="true">⟳</span> 실행 중…`;
+    actRun.classList.add("is-loading");
+  } else {
+    actRun.disabled = false;
+    actRun.classList.remove("is-loading");
+    if (actRun.dataset.prev) {
+      actRun.innerHTML = actRun.dataset.prev;
+      delete actRun.dataset.prev;
+    }
+  }
+}
+
+async function runAllCases() {
+  // Block the run if any case input is currently invalid — surface the error
+  // by switching to tests mode on the offending case so the user can fix it.
+  const badIdx = cases.findIndex((c) => classifyInput(c.input) !== "ok");
+  if (badIdx >= 0) {
+    activeCaseIdx = badIdx;
+    setDockMode("tests");
+    caseInputEdit.focus();
+    return;
+  }
+
   const code = editorImpl.getValue();
-  const looksReasonable = basicSanityChecks(code);
-  const startedAt = performance.now();
-  cases.forEach((c, i) => {
-    // Demo mode: when the code passes basic shape checks, treat the run as
-    // successful and surface the reference output. Otherwise, surface a
-    // mock empty stdout to convey that nothing was produced.
-    const actual = looksReasonable ? c.expected : "";
-    caseState[i] = {
-      ran: true,
-      pass: looksReasonable && actual === c.expected,
-      actual,
-    };
+
+  // Refresh expected from current input + clear any previous run state.
+  cases.forEach((c) => {
+    const A = parseAFromInput(c.input);
+    c.A = A;
+    c.expected = problem.expected(A);
+    c.ran = false;
+    c.pass = null;
+    c.actual = "";
+    delete c.verdict;
   });
-  const elapsed = Math.max(1, Math.round(performance.now() - startedAt));
-  detailTime.textContent = `${elapsed + 40}ms`;
-  detailMem.textContent  = `${(8 + Math.floor(Math.random() * 6))}MB`;
+  setDockMode("result");
+  renderCaseTabs();
+  renderCaseBody();
 
-  // Switch to result mode in dock
-  dockEl.hidden = false;
-  actResult.classList.add("is-active");
-  actCases.classList.remove("is-active");
+  if (!judgeAvailable) {
+    runMockAllCases(code);
+    return;
+  }
 
-  // Jump to first failing case (or stay on current if all pass)
-  const firstFailIdx = caseState.findIndex((s) => !s.pass);
+  setRunLoading(true);
+  let totalTimeMs = 0;
+  let maxMemKb = 0;
+
+  for (let i = 0; i < cases.length; i++) {
+    const c = cases[i];
+    let result;
+    try {
+      result = await runC(code, c.input + "\n");
+    } catch (err) {
+      result = {
+        verdict: "system",
+        stdout: "", stderr: "", compileOutput: "",
+        statusDescription: err?.message || String(err),
+        timeMs: null, memoryKb: null,
+      };
+    }
+
+    if (result.verdict === "compile") {
+      // One compile error means every case fails with the same message; skip
+      // the remaining API calls to save quota.
+      const msg = (result.compileOutput || "(컴파일 오류)").trim();
+      for (let j = i; j < cases.length; j++) {
+        cases[j].ran = true;
+        cases[j].pass = false;
+        cases[j].actual = msg;
+        cases[j].verdict = "compile";
+      }
+      break;
+    }
+
+    const actual = normalizeOutput(result.stdout);
+    const expected = normalizeOutput(c.expected);
+    const ok = result.verdict === "accepted" && actual === expected;
+
+    c.ran = true;
+    c.pass = ok;
+    c.verdict = result.verdict;
+    c.actual =
+      result.verdict === "accepted" ? actual :
+      result.verdict === "tle"     ? "(시간 초과)" :
+      result.verdict === "runtime" ? `(런타임 오류)\n${result.stderr || result.statusDescription}` :
+      result.verdict === "network" ? `(네트워크 오류)\n${result.statusDescription}` :
+      result.verdict === "system"  ? `(시스템 오류)\n${result.statusDescription}` :
+      actual || `(${result.statusDescription})`;
+
+    if (result.timeMs)   totalTimeMs += result.timeMs;
+    if (result.memoryKb) maxMemKb = Math.max(maxMemKb, result.memoryKb);
+
+    // Update the cases row so the dot color reflects the latest result.
+    renderCaseTabs();
+  }
+
+  detailTime.textContent = totalTimeMs ? `${totalTimeMs}ms (총 ${cases.length}개)` : "—";
+  detailMem.textContent  = maxMemKb ? `${(maxMemKb / 1024).toFixed(1)}MB` : "—";
+
+  setRunLoading(false);
+
+  const firstFailIdx = cases.findIndex((c) => !c.pass);
   if (firstFailIdx >= 0) activeCaseIdx = firstFailIdx;
+  renderCaseTabs();
+  renderCaseBody();
+}
+
+/** Demo-mode fallback used when no Judge0 key is configured. */
+function runMockAllCases(code) {
+  const looksReasonable = basicSanityChecks(code);
+  cases.forEach((c) => {
+    c.actual = looksReasonable ? c.expected : "";
+    c.ran = true;
+    c.pass = looksReasonable && c.actual === c.expected;
+  });
+  detailTime.textContent = `${Math.round(40 + Math.random() * 80)}ms`;
+  detailMem.textContent  = `${(8 + Math.floor(Math.random() * 6))}MB`;
+  const firstFailIdx = cases.findIndex((c) => !c.pass);
+  if (firstFailIdx >= 0) activeCaseIdx = firstFailIdx;
+  setDockMode("result");
   renderCaseTabs();
   renderCaseBody();
 }
@@ -448,43 +547,90 @@ async function submitTest(reason = "manual") {
   clearInterval(timerInterval);
 
   const code = editorImpl.getValue();
-  const fullCases = [];
-  for (let A = problem.aMin; A <= problem.aMax; A++) {
-    fullCases.push({ A, expected: problem.expected(A) });
-  }
-  const looksReasonable = basicSanityChecks(code);
-  const verdict = reason === "timeout"
-    ? "timeout"
-    : looksReasonable ? "correct" : "wrong";
-
-  saveAnswer(problem.id, {
-    code,
-    verdict,
-    cases: fullCases,
-    submittedAt: Date.now(),
-    reason,
-  });
 
   overlay.classList.add("is-visible");
   overlay.setAttribute("aria-hidden", "false");
   overlayTitle.textContent = reason === "timeout" ? "시간 초과 — 자동 제출" : "채점 중…";
-  overlaySub.textContent = `테스트 케이스 ${fullCases.length}개를 검증하고 있어요.`;
 
-  let i = 0;
-  const stepEvery = Math.max(40, Math.min(400, Math.floor(1400 / fullCases.length)));
-  const animator = setInterval(() => {
-    if (i >= fullCases.length) { clearInterval(animator); return; }
-    overlaySub.textContent =
-      `A = ${fullCases[i].A} → 기대 출력 ${fullCases[i].expected}` +
-      (i === fullCases.length - 1 ? " · 검증 완료" : "");
-    i++;
-  }, stepEvery);
+  // Pick test inputs to grade against. With Judge0 we use a small sample
+  // (10 reps) to stay within RapidAPI's free quota; mock mode walks the
+  // full A range since it costs nothing.
+  const sampleAs = judgeAvailable
+    ? gradingSample(problem, 10)
+    : (() => {
+        const arr = [];
+        for (let A = problem.aMin; A <= problem.aMax; A++) arr.push(A);
+        return arr;
+      })();
+
+  overlaySub.textContent = `테스트 케이스 ${sampleAs.length}개를 검증하고 있어요.`;
+
+  let verdict;
+  if (reason === "timeout") {
+    verdict = "timeout";
+  } else if (!judgeAvailable) {
+    // Mock grading — sweep through samples for visual rhythm
+    let idx = 0;
+    const stepEvery = Math.max(40, Math.min(200, Math.floor(1200 / sampleAs.length)));
+    await new Promise((resolve) => {
+      const animator = setInterval(() => {
+        if (idx >= sampleAs.length) { clearInterval(animator); resolve(); return; }
+        const A = sampleAs[idx];
+        overlaySub.textContent = `A = ${A} → 기대 출력 ${problem.expected(A)}`;
+        idx++;
+      }, stepEvery);
+    });
+    verdict = basicSanityChecks(code) ? "correct" : "wrong";
+  } else {
+    // Real Judge0 grading — sequential, short-circuit on first failure
+    let allPass = true;
+    let stoppedReason = null;
+    for (let i = 0; i < sampleAs.length; i++) {
+      const A = sampleAs[i];
+      overlaySub.textContent = `A = ${A} 검증 중… (${i + 1}/${sampleAs.length})`;
+      let result;
+      try {
+        result = await runC(code, String(A) + "\n");
+      } catch (err) {
+        allPass = false;
+        stoppedReason = `네트워크 오류: ${err?.message || err}`;
+        break;
+      }
+      if (result.verdict === "compile") {
+        allPass = false;
+        stoppedReason = "컴파일 오류";
+        break;
+      }
+      if (result.verdict !== "accepted") {
+        allPass = false;
+        stoppedReason = result.statusDescription;
+        break;
+      }
+      const actual = normalizeOutput(result.stdout);
+      const expected = normalizeOutput(problem.expected(A));
+      if (actual !== expected) {
+        allPass = false;
+        stoppedReason = `A = ${A}에서 출력 불일치`;
+        break;
+      }
+    }
+    verdict = allPass ? "correct" : "wrong";
+    if (stoppedReason) overlaySub.textContent = `${stoppedReason} — 채점 종료`;
+  }
+
+  saveAnswer(problem.id, {
+    code,
+    verdict,
+    cases: sampleAs.map((A) => ({ A, expected: problem.expected(A) })),
+    submittedAt: Date.now(),
+    reason,
+  });
 
   try { sessionStorage.removeItem(TIMER_KEY); } catch (_) {}
   setTimeout(() => {
     if (fade) fade.classList.remove("is-hidden");
     setTimeout(() => { window.location.href = NEXT_PAGE; }, 200);
-  }, 1500);
+  }, 800);
 }
 
 actSubmit.addEventListener("click", () => submitTest("manual"));
