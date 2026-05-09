@@ -133,8 +133,7 @@ examplesEl.innerHTML = problem.examples.map((ex, i) => `
 
 /* ---------- Cases dock setup ---------- */
 
-// Per-case state: { ran: boolean, pass: boolean|null, actual: string }
-const caseState = cases.map(() => ({ ran: false, pass: null, actual: "" }));
+const MAX_CASES = 10;
 let activeCaseIdx = 0;
 
 function renderCaseTabs() {
@@ -144,23 +143,22 @@ function renderCaseTabs() {
     btn.type = "button";
     btn.className = "problem-case";
     if (i === activeCaseIdx) btn.classList.add("is-active");
-    if (caseState[i].ran) {
-      btn.classList.add(caseState[i].pass ? "is-pass" : "is-fail");
-    }
+    if (c.ran) btn.classList.add(c.pass ? "is-pass" : "is-fail");
     btn.textContent = `Case${c.id}`;
     btn.addEventListener("click", () => selectCase(i));
     dockCases.appendChild(btn);
   });
+  dockAdd.disabled = cases.length >= MAX_CASES;
 }
 
-function renderCaseBody() {
+function renderResultBody() {
   const c = cases[activeCaseIdx];
-  const s = caseState[activeCaseIdx];
+  if (!c) return;
   caseInputEl.textContent = c.input;
   caseExpectedEl.textContent = c.expected;
-  if (s.ran) {
-    caseActualEl.textContent = s.actual;
-    if (s.pass) {
+  if (c.ran) {
+    caseActualEl.textContent = c.actual || "";
+    if (c.pass) {
       verdictEl.className = "problem-verdict is-pass";
       verdictEl.textContent = "맞았습니다";
     } else {
@@ -174,6 +172,70 @@ function renderCaseBody() {
   }
 }
 
+/* ---------- Input parsing & validation ---------- */
+
+function parseAFromInput(value) {
+  const trimmed = (value || "").trim();
+  if (!trimmed) return null;
+  const first = trimmed.split(/\s+/)[0];
+  const n = Number(first);
+  if (!Number.isInteger(n)) return null;
+  return n;
+}
+
+/** Returns "ok" | "empty" | "out-of-range" */
+function classifyInput(value) {
+  const trimmed = (value || "").trim();
+  if (!trimmed) return "empty";
+  const A = parseAFromInput(value);
+  if (A === null) return "out-of-range"; // non-integer
+  if (A < problem.aMin || A > problem.aMax) return "out-of-range";
+  return "ok";
+}
+
+function refreshActiveCaseFromTextarea() {
+  const c = cases[activeCaseIdx];
+  if (!c) return;
+  c.input = caseInputEdit.value;
+  c.ran = false;
+  c.pass = null;
+  c.actual = "";
+
+  const status = classifyInput(c.input);
+  if (status === "ok") {
+    const A = parseAFromInput(c.input);
+    c.A = A;
+    c.expected = problem.expected(A);
+    caseInputEdit.classList.remove("is-error");
+    caseInputErr.hidden = true;
+  } else if (status === "out-of-range") {
+    c.A = null;
+    c.expected = "";
+    caseInputEdit.classList.add("is-error");
+    caseInputErr.hidden = false;
+  } else { // empty
+    c.A = null;
+    c.expected = "";
+    caseInputEdit.classList.remove("is-error");
+    caseInputErr.hidden = true;
+  }
+  renderCaseTabs(); // refresh dot color (cleared after edit)
+}
+
+function renderTestsBody() {
+  const c = cases[activeCaseIdx];
+  if (!c) return;
+  caseInputEdit.value = c.input ?? "";
+  caseInputHint.textContent = `허용 범위: ${problem.aMin} ~ ${problem.aMax} 사이의 정수`;
+  // Re-run validation against the synced value so the error styling stays correct.
+  refreshActiveCaseFromTextarea();
+}
+
+function renderCaseBody() {
+  if (dockEl.dataset.mode === "tests") renderTestsBody();
+  else renderResultBody();
+}
+
 function selectCase(idx) {
   activeCaseIdx = idx;
   renderCaseTabs();
@@ -183,21 +245,53 @@ function selectCase(idx) {
 renderCaseTabs();
 renderCaseBody();
 
+caseInputEdit.addEventListener("input", refreshActiveCaseFromTextarea);
+
+/* ---------- Dock open / close / mode ---------- */
+
+function setDockMode(mode) {
+  dockEl.dataset.mode = mode;
+  dockEl.hidden = false;
+  actCases.classList.toggle("is-active", mode === "tests");
+  actResult.classList.toggle("is-active", mode === "result");
+  renderCaseBody();
+}
+
 dockClose.addEventListener("click", () => {
   dockEl.hidden = true;
   actResult.classList.remove("is-active");
   actCases.classList.remove("is-active");
 });
 
-actCases.addEventListener("click", () => {
-  dockEl.hidden = false;
-  actCases.classList.add("is-active");
-  actResult.classList.remove("is-active");
+actCases.addEventListener("click", () => setDockMode("tests"));
+actResult.addEventListener("click", () => setDockMode("result"));
+
+/* ---------- Add / reset cases ---------- */
+
+dockAdd.addEventListener("click", () => {
+  if (cases.length >= MAX_CASES) return;
+  const nextId = (cases[cases.length - 1]?.id || 0) + 1;
+  const A = problem.aMin;
+  cases.push({
+    id: nextId,
+    input: String(A),
+    expected: problem.expected(A),
+    A,
+    ran: false,
+    pass: null,
+    actual: "",
+  });
+  activeCaseIdx = cases.length - 1;
+  renderCaseTabs();
+  renderCaseBody();
 });
-actResult.addEventListener("click", () => {
-  dockEl.hidden = false;
-  actResult.classList.add("is-active");
-  actCases.classList.remove("is-active");
+
+dockReset.addEventListener("click", () => {
+  if (!confirm("테스트 케이스를 기본값으로 되돌릴까요? 추가/수정한 케이스는 사라집니다.")) return;
+  cases = freshCases();
+  activeCaseIdx = 0;
+  renderCaseTabs();
+  renderCaseBody();
 });
 
 /* ---------- Editor ---------- */
