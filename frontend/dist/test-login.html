@@ -3,13 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Codenergy — 추천 시작 방식</title>
+    <title>Codenergy — 로그인</title>
     <style>
       .page-fade {
         position: fixed; inset: 0; background: #fff;
         z-index: 9999; opacity: 1; pointer-events: auto;
       }
     </style>
+    <script type="module" crossorigin src="/assets/testLogin-B4SSRjoK.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/main-DzKWXlj2.js">
+    <link rel="stylesheet" crossorigin href="/assets/main-BEu8Di3s.css">
   </head>
   <body>
     <div class="page-fade" id="page-fade"></div>
@@ -98,71 +101,75 @@
       </form>
     </div>
 
-    <section class="results-section">
-      <h1 class="results-heading">코드트리, 어떤 방식으로 시작해볼까요?</h1>
+    <section class="login-section">
+      <div class="login-shell">
+        <div class="login-header">
+          <span class="login-eyebrow">3 / 5 · 로그인</span>
+          <h1 class="login-title">결과를 받아볼 방법을<br/>선택해주세요.</h1>
+          <p class="login-subtitle">
+            이메일로 결과만 받아보거나, 로그인하면 풀이 기록과
+            진행 상황까지 저장돼요.
+          </p>
+        </div>
 
-      <div class="results-grid">
-        <button type="button" class="result-card result-card--start">
-          <span class="result-badge result-badge--green">코딩을 처음 시작하신다면</span>
-          <span class="result-eyebrow result-eyebrow--green">Codetree 101</span>
-          <span class="result-title">무료로 첫 트레일<br/>시작하기</span>
-          <svg class="result-scene result-scene--sprout" viewBox="0 0 320 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <ellipse cx="160" cy="92" rx="36" ry="6" fill="#a47b58" opacity="0.55"/>
-            <path d="M160 88 C 160 70 152 60 138 56 C 150 56 158 64 160 78 Z" fill="#22c55e"/>
-            <path d="M160 88 C 160 68 168 58 184 54 C 172 54 162 62 160 80 Z" fill="#22c55e"/>
-            <path d="M160 96 L160 70" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"/>
-            <rect x="0" y="96" width="320" height="14" fill="#c2a079"/>
-          </svg>
-        </button>
-
-        <button type="button" class="result-card result-card--diagnose">
-          <span class="result-meta">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <circle cx="12" cy="12" r="9"/>
-              <path d="M12 7 V12 L15 14"/>
-            </svg>
-            평균 30분 소요
+        <div class="login-status" id="login-status" hidden>
+          <span class="login-status__text">
+            <span class="login-status__check" aria-hidden="true">✓</span>
+            <strong id="login-status-name">사용자</strong> 님으로 로그인되어 있어요. 바로 진행할 수 있습니다.
           </span>
-          <span class="result-badge result-badge--purple">어디서 시작할지 막막하다면?</span>
-          <span class="result-eyebrow result-eyebrow--purple">지피지기면 백전백승, 갭체크</span>
-          <span class="result-title">맞춤 진단하고<br/>챕터 무료로 받기</span>
-          <svg class="result-scene result-scene--game" viewBox="0 0 720 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="0" y="100" width="300" height="30" fill="#5e5854"/>
-            <path d="M0 100 L20 84 L40 100 L60 84 L80 100 L100 84 L120 100 L140 84 L160 100 L180 84 L200 100 L220 84 L240 100 L260 84 L280 100 L300 84 L300 100 Z" fill="#22c55e"/>
-            <rect x="420" y="100" width="300" height="30" fill="#5e5854"/>
-            <path d="M420 100 L440 84 L460 100 L480 84 L500 100 L520 84 L540 100 L560 84 L580 100 L600 84 L620 100 L640 84 L660 100 L680 84 L700 100 L720 84 L720 100 Z" fill="#22c55e"/>
-            <g transform="rotate(20 348 70)">
-              <rect x="324" y="50" width="48" height="36" rx="6" fill="#ef6f4f" stroke="#b14a2f" stroke-width="2"/>
-            </g>
-            <g transform="translate(298 38)">
-              <path d="M0 0 L-6 -10 M0 0 L0 -12 M0 0 L6 -10" stroke="#111" stroke-width="2" stroke-linecap="round"/>
-            </g>
-            <g transform="translate(514 70)">
-              <rect x="-44" y="-20" width="88" height="32" rx="6" fill="#22c55e"/>
-              <text x="0" y="2" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#fff">Solved</text>
-              <path d="M0 14 L0 30" stroke="#16a34a" stroke-width="3"/>
-            </g>
-          </svg>
-        </button>
-      </div>
+          <button type="button" class="login-status__btn" id="continue-btn">
+            이어서 진행하기 →
+          </button>
+        </div>
 
-      <div class="results-skip">
-        <a class="results-skip__link" href="codetrails.html">직접 둘러볼게요 →</a>
+        <div class="login-grid">
+          <article class="login-card login-card--featured">
+            <span class="login-card__icon" aria-hidden="true">📬</span>
+            <h2 class="login-card__title">이메일로 결과만 받기</h2>
+            <p class="login-card__desc">
+              회원가입 없이 Gmail만 입력하면 진단 결과를 보내드려요.
+              가장 빠른 시작 방법입니다.
+            </p>
+            <form class="login-card__form" id="email-form" novalidate>
+              <input
+                type="email"
+                class="login-input"
+                id="email-input"
+                name="email"
+                placeholder="example@gmail.com"
+                autocomplete="email"
+                required
+              />
+              <p class="login-error" id="email-error" hidden></p>
+              <p class="login-success" id="email-success" hidden></p>
+              <button type="submit" class="login-cta" id="email-submit">
+                이메일로 시작하기 →
+              </button>
+            </form>
+          </article>
+
+          <article class="login-card">
+            <span class="login-card__icon" aria-hidden="true">🔐</span>
+            <h2 class="login-card__title">로그인하고 시작</h2>
+            <p class="login-card__desc">
+              기존 계정으로 로그인하면 풀이 기록·진행 상황·결과를
+              모두 저장할 수 있어요.
+            </p>
+            <div class="login-card__form">
+              <button type="button" class="login-cta" id="open-login">
+                로그인
+              </button>
+              <div class="login-divider">또는</div>
+              <button type="button" class="login-cta login-cta--ghost" id="open-signup">
+                회원가입
+              </button>
+            </div>
+          </article>
+        </div>
+
+        <a href="test-intro.html" class="login-back">← 안내로 돌아가기</a>
       </div>
     </section>
 
-    <script type="module" src="/src/main.js"></script>
-    <script type="module">
-      // Wire the right-side "맞춤 진단하고 챕터 무료로 받기" card to the
-      // coding-test concept-selection screen.
-      const fade = document.getElementById('page-fade');
-      const diagnoseBtn = document.querySelector('.result-card--diagnose');
-      if (diagnoseBtn) {
-        diagnoseBtn.addEventListener('click', () => {
-          if (fade) fade.classList.remove('is-hidden');
-          setTimeout(() => { window.location.href = 'test-concepts.html'; }, 180);
-        });
-      }
-    </script>
   </body>
 </html>

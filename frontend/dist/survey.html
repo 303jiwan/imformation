@@ -3,8 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title data-i18n="pricing.pageTitle">Codenergy — 요금제</title>
-    <script type="module" crossorigin src="/assets/main-DzKWXlj2.js"></script>
+    <title>Codenergy — 학습 진단 설문</title>
+    <style>
+      .page-fade {
+        position: fixed; inset: 0; background: #fff;
+        z-index: 9999; opacity: 1; pointer-events: auto;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/survey-Damr7041.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/main-DzKWXlj2.js">
     <link rel="stylesheet" crossorigin href="/assets/main-BEu8Di3s.css">
   </head>
   <body>
@@ -94,85 +101,100 @@
       </form>
     </div>
 
-    <section class="pricing-section pricing-page" id="pricing-section">
-      <div class="pricing-secure">
-        <span data-i18n="pricing.secure">안전한 결제 진행</span>
-        <span class="tosspay">toss pay</span>
+    <section class="survey-section">
+      <div class="survey-header">
+        <h1 class="survey-title">학습 진단 설문</h1>
+        <p class="survey-subtitle">3가지 질문에 답하면 딱 맞는 학습 경로를 추천해드릴게요.</p>
       </div>
-      <h2 data-i18n="pricing.heading">모든 출제 원리에 액세스하세요.</h2>
 
-      <div class="pricing-cards">
-        <article class="plan-card plan-monthly">
-          <header class="plan-card__head">
-            <h3 data-i18n="pricing.monthly">월간(1개월)</h3>
-            <p class="plan-tagline" data-i18n="pricing.monthlyTagline">명확한 약점을 집중 공략하고 싶다면</p>
-          </header>
-          <div class="plan-price">
-            <span class="price-label" data-i18n="pricing.normal">정상가</span>
-            <div class="price-row">
-              <span class="price-amount">109,000<span class="price-unit" data-i18n="pricing.won">원</span></span>
-            </div>
+      <form class="survey-form" id="survey-form">
+        <fieldset class="survey-question">
+          <legend class="survey-step">Q1</legend>
+          <h2 class="survey-prompt">코딩에 어느 정도 관심이 있으신가요?</h2>
+          <div class="survey-options">
+            <label class="survey-option">
+              <input type="radio" name="interest" value="curious" required />
+              <span class="survey-option__title">처음 접해봐요</span>
+              <span class="survey-option__desc">아직 한 번도 해본 적 없어요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="interest" value="light" />
+              <span class="survey-option__title">가볍게 관심 있어요</span>
+              <span class="survey-option__desc">기회가 되면 배워보고 싶어요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="interest" value="serious" />
+              <span class="survey-option__title">진지하게 배우고 싶어요</span>
+              <span class="survey-option__desc">취업·이직 등 목표가 분명해요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="interest" value="passionate" />
+              <span class="survey-option__title">이미 열정적으로 학습 중이에요</span>
+              <span class="survey-option__desc">매일 꾸준히 공부하고 있어요</span>
+            </label>
           </div>
-          <button type="button" class="plan-cta plan-cta--white" data-i18n="pricing.subscribe">구독 시작하기</button>
-        </article>
+        </fieldset>
 
-        <article class="plan-card plan-quarterly">
-          <header class="plan-card__head">
-            <h3 data-i18n="pricing.quarterly">분기(3개월)</h3>
-            <p class="plan-tagline" data-i18n="pricing.quarterlyTagline">100일로 모든걸 새롭게 쓰고 싶다면</p>
-          </header>
-          <div class="plan-price">
-            <div class="price-original">327,000</div>
-            <div class="price-row">
-              <span class="price-amount">169,000<span class="price-unit" data-i18n="pricing.won">원</span></span>
-              <span class="price-discount price-discount--blue" data-i18n="pricing.discount48">48% 할인가</span>
-            </div>
+        <fieldset class="survey-question">
+          <legend class="survey-step">Q2</legend>
+          <h2 class="survey-prompt">코딩에 대해 얼마나 알고 계신가요?</h2>
+          <div class="survey-options">
+            <label class="survey-option">
+              <input type="radio" name="level" value="none" required />
+              <span class="survey-option__title">전혀 몰라요</span>
+              <span class="survey-option__desc">변수, 함수 같은 개념도 처음이에요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="level" value="basic" />
+              <span class="survey-option__title">기초 문법은 알아요</span>
+              <span class="survey-option__desc">조건문·반복문 정도는 짤 수 있어요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="level" value="intermediate" />
+              <span class="survey-option__title">간단한 프로젝트는 만들 수 있어요</span>
+              <span class="survey-option__desc">함수·클래스 활용에 익숙해요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="level" value="advanced" />
+              <span class="survey-option__title">알고리즘과 자료구조에 익숙해요</span>
+              <span class="survey-option__desc">코딩테스트도 풀어본 적이 있어요</span>
+            </label>
           </div>
-          <button type="button" class="plan-cta plan-cta--blue" data-i18n="pricing.subscribe">구독 시작하기</button>
-          <div class="plan-companies">
-            <p class="companies-label" data-i18n="pricing.companies3m">3개월 뒤 합격 기업</p>
-            <div class="company-logos">
-              <span class="logo-samsung">SAMSUNG</span>
-              <span class="logo-hyundai">HYUNDAI</span>
-              <span class="logo-naver">NAVER</span>
-            </div>
-            <div class="company-logos">
-              <span class="logo-kt">kt</span>
-              <span class="logo-toss">toss</span>
-            </div>
-            <p class="companies-note" data-i18n="pricing.realData">실제 합격자 데이터입니다.</p>
-          </div>
-        </article>
+        </fieldset>
 
-        <article class="plan-card plan-yearly">
-          <header class="plan-card__head">
-            <h3 data-i18n="pricing.yearly">연간(12개월)</h3>
-            <p class="plan-tagline" data-i18n="pricing.yearlyTagline">꿈의 무대를 넓히고 싶다면</p>
-          </header>
-          <div class="plan-price">
-            <div class="price-original">1,308,000</div>
-            <div class="price-row">
-              <span class="price-amount">469,000<span class="price-unit" data-i18n="pricing.won">원</span></span>
-              <span class="price-discount price-discount--green" data-i18n="pricing.discount64">64% 할인가</span>
-            </div>
+        <fieldset class="survey-question">
+          <legend class="survey-step">Q3</legend>
+          <h2 class="survey-prompt">하루에 어느 정도 시간을 투자할 수 있나요?</h2>
+          <div class="survey-options">
+            <label class="survey-option">
+              <input type="radio" name="time" value="under30" required />
+              <span class="survey-option__title">30분 미만</span>
+              <span class="survey-option__desc">짧게 짬짬이 들여다볼래요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="time" value="30to60" />
+              <span class="survey-option__title">30분 ~ 1시간</span>
+              <span class="survey-option__desc">매일 꾸준히 가능한 분량이에요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="time" value="1to2" />
+              <span class="survey-option__title">1 ~ 2시간</span>
+              <span class="survey-option__desc">집중해서 본격적으로 학습할래요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="time" value="over2" />
+              <span class="survey-option__title">2시간 이상</span>
+              <span class="survey-option__desc">합격이 목표라 시간을 충분히 쓸 수 있어요</span>
+            </label>
           </div>
-          <button type="button" class="plan-cta plan-cta--green" data-i18n="pricing.subscribe">구독 시작하기</button>
-          <button type="button" class="plan-secondary" data-i18n="pricing.student">학생이신가요?</button>
-          <div class="plan-companies">
-            <p class="companies-label" data-i18n="pricing.companies1y">1년 뒤 합격 기업</p>
-            <div class="company-logos">
-              <span class="logo-google">Google</span>
-              <span class="logo-microsoft">Microsoft</span>
-            </div>
-            <div class="company-logos">
-              <span class="logo-meta">Meta</span>
-              <span class="logo-amazon">amazon</span>
-            </div>
-            <p class="companies-note" data-i18n="pricing.realData">실제 합격자 데이터입니다.</p>
-          </div>
-        </article>
-      </div>
+        </fieldset>
+
+        <div class="survey-actions">
+          <a class="survey-back" href="index.html">← 돌아가기</a>
+          <button type="submit" class="survey-submit">결과 보기 →</button>
+        </div>
+      </form>
     </section>
-
+
   </body>
 </html>

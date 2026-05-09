@@ -1,0 +1,235 @@
+  <!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codenergy — 문제 풀이</title>
+    <style>
+      .page-fade {
+        position: fixed; inset: 0; background: #fff;
+        z-index: 9999; opacity: 1; pointer-events: auto;
+      }
+    </style>
+    <!-- Monaco editor (loaded via AMD from CDN) -->
+    <link
+      rel="stylesheet"
+      data-name="vs/editor/editor.main"
+      href="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.css"
+    />
+    <script type="module" crossorigin src="/assets/testProblem-Dj2EI-bs.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/main-DzKWXlj2.js">
+    <link rel="modulepreload" crossorigin href="/assets/test-problems-CENnPdFg.js">
+    <link rel="stylesheet" crossorigin href="/assets/main-BEu8Di3s.css">
+  </head>
+  <body class="problem-page">
+    <div class="page-fade" id="page-fade"></div>
+    <header class="nav">
+      <div class="logo"><a href="index.html">Codenergy ▲</a></div>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-collapse">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-collapse" id="nav-collapse">
+        <nav class="menu" id="menu">
+          <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
+          <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
+          <a href="index.html" data-action="reviews" data-i18n="nav.reviews">후기</a>
+          <a href="index.html" data-action="invite" data-i18n="nav.invite">친구 초대</a>
+          <a href="index.html" data-action="universities" data-i18n="nav.universities">제휴 대학</a>
+        </nav>
+        <div class="actions">
+          <div class="lang-wrap" id="lang-wrap">
+            <button class="ghost" id="lang-btn" type="button">🌐 <span id="lang-current">한국어</span> ▾</button>
+            <div class="lang-menu" id="lang-menu" hidden>
+              <button type="button" class="lang-menu__item" data-lang="ko">한국어</button>
+              <button type="button" class="lang-menu__item" data-lang="en">English</button>
+            </div>
+          </div>
+          <button class="icon">🔔</button>
+          <button class="ghost" id="login-btn" data-i18n="action.login">로그인</button>
+          <button class="ghost" id="signup-btn" data-i18n="action.signup">회원가입</button>
+          <div class="my-wrap" id="my-wrap" hidden>
+            <button class="ghost" id="my-btn" data-i18n="action.my">My</button>
+            <div class="my-menu" id="my-menu" hidden>
+              <div class="my-menu__profile">
+                <div class="my-menu__avatar" aria-hidden="true">👤</div>
+                <div class="my-menu__user">
+                  <div class="my-menu__name" id="my-name" data-i18n="my.name">사용자 이름</div>
+                  <div class="my-menu__email" id="my-email">user@example.com</div>
+                </div>
+              </div>
+              <ul class="my-menu__list">
+                <li><button type="button" class="my-menu__item" data-i18n="my.mypage">마이페이지</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.invite">친구 초대</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.settings">설정</button></li>
+              </ul>
+              <div class="my-menu__divider"></div>
+              <button type="button" class="my-menu__item my-menu__logout" id="logout-btn" data-i18n="my.logout">로그아웃</button>
+            </div>
+          </div>
+          <button class="cta" data-i18n="action.cta">학습하기 →</button>
+        </div>
+      </div>
+    </header>
+
+    <div id="auth-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <form class="modal-card" id="auth-form">
+        <h3 id="modal-title" data-i18n="auth.login">로그인</h3>
+        <label class="field-username">
+          <span data-i18n="auth.username">아이디</span>
+          <input name="username" autocomplete="username" required minlength="2" />
+        </label>
+        <label class="field-password">
+          <span data-i18n="auth.password">비밀번호</span>
+          <input name="password" type="password" autocomplete="current-password" required minlength="6" />
+        </label>
+        <label class="field-email" id="email-field" hidden>
+          <span>Gmail</span>
+          <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
+        </label>
+        <p class="modal-info" id="modal-info" hidden></p>
+        <p class="modal-error" id="modal-error" hidden></p>
+        <div class="modal-recovery" id="modal-recovery">
+          <button type="button" class="link-button" id="find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-recovery-alt" id="modal-recovery-alt" hidden>
+          <button type="button" class="link-button" id="alt-find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="alt-find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close data-i18n="action.cancel">취소</button>
+          <button type="submit" class="cta" id="submit-btn" data-i18n="auth.login">로그인</button>
+        </div>
+      </form>
+    </div>
+
+    <div class="problem-topbar">
+      <div class="problem-topbar__indicator">
+        <span class="problem-topbar__chip" id="problem-chip">문제 1 / 5</span>
+        <span id="problem-title-mini">두 수의 합</span>
+        <span class="problem-topbar__pips" id="problem-pips" aria-hidden="true"></span>
+      </div>
+      <div class="problem-topbar__spacer"></div>
+      <div class="problem-timer" id="problem-timer" role="timer" aria-live="polite">
+        <span class="problem-timer__icon" aria-hidden="true">⏱</span>
+        <span id="timer-text">10:00</span>
+      </div>
+      <button type="button" class="problem-exit" id="exit-btn">테스트 종료</button>
+    </div>
+
+    <main class="problem-workspace">
+      <section class="problem-panel" id="problem-panel">
+        <span class="problem-panel__tag" id="problem-tag">기초 · 산술</span>
+        <h1 class="problem-panel__title" id="problem-title">두 수의 합</h1>
+        <p class="problem-panel__desc" id="problem-desc"></p>
+
+        <h2 class="problem-panel__h">예시</h2>
+        <div class="problem-panel__sample" aria-label="입출력 예시">
+          <div class="problem-panel__sample-row">
+            <div>
+              <p class="problem-panel__sample-h">입력</p>
+              <pre id="sample-input">3</pre>
+            </div>
+            <div>
+              <p class="problem-panel__sample-h">출력</p>
+              <pre id="sample-output">7</pre>
+            </div>
+          </div>
+        </div>
+
+        <h2 class="problem-panel__h">제약</h2>
+        <ul class="problem-panel__list" id="problem-constraints"></ul>
+      </section>
+
+      <section class="problem-editor" aria-label="C 코드 에디터">
+        <div class="problem-editor__head">
+          <span>solution.c</span>
+          <span class="problem-editor__lang">C</span>
+          <button type="button" class="problem-editor__reset" id="reset-btn" title="시작 코드로 초기화">↺ 초기화</button>
+        </div>
+        <div class="problem-editor__container" id="editor-container"></div>
+        <div class="problem-editor__loading" id="editor-loading">에디터를 불러오는 중…</div>
+        <textarea class="problem-editor__textarea" id="editor-fallback" hidden spellcheck="false"></textarea>
+      </section>
+    </main>
+
+    <section class="problem-dock">
+      <div class="problem-tabs" role="tablist">
+        <button type="button" class="problem-tab is-active" id="tab-tests" role="tab" aria-selected="true">테스트 케이스</button>
+        <button type="button" class="problem-tab" id="tab-output" role="tab" aria-selected="false">실행 결과</button>
+      </div>
+      <div class="problem-dock__body">
+        <div class="problem-tests" id="panel-tests">
+          <h3 class="problem-tests__h">변수 A의 값</h3>
+          <div class="problem-range">
+            <label for="a-input">A =</label>
+            <input type="number" id="a-input" min="1" max="10" value="3" />
+            <input type="range" id="a-range" min="1" max="10" value="3" />
+            <span class="problem-range__hint" id="a-hint">범위: 1 ~ 10</span>
+          </div>
+          <button type="button" class="problem-run" id="run-btn">▶ 코드 실행</button>
+        </div>
+        <div class="problem-output" id="panel-output" aria-live="polite">
+          <p class="problem-output__placeholder" id="output-placeholder">
+            "코드 실행"을 눌러 선택한 A 값으로 출력을 확인하세요.
+          </p>
+          <div id="output-content" hidden>
+            <div class="problem-output__row">
+              <p class="problem-output__h">예상 출력 (정답)</p>
+              <pre id="output-expected"></pre>
+            </div>
+            <div class="problem-output__row">
+              <p class="problem-output__h">결과</p>
+              <span id="output-status" class="problem-output__diff--ok">통과</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="problem-actions">
+      <span class="problem-actions__note">
+        ⚙ 데모 모드 · 채점은 참조 솔루션을 기준으로 수행됩니다 (백엔드 컴파일 연동 예정).
+      </span>
+      <button type="button" class="problem-submit" id="submit-test-btn">제출 및 채점 →</button>
+    </div>
+
+    <div class="grading-overlay" id="grading-overlay" aria-hidden="true">
+      <div class="grading-overlay__spinner" aria-hidden="true"></div>
+      <p class="grading-overlay__title" id="grading-title">채점 중…</p>
+      <p class="grading-overlay__sub" id="grading-sub">A 값 범위 전체로 검증하고 있어요.</p>
+    </div>
+
+    <!-- Monaco loader (AMD) -->
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.min.js"></script>
+    <script>
+      // Worker setup for cross-origin Monaco — wraps workers in a same-origin
+      // blob/data URL so the browser allows them.
+      window.MonacoEnvironment = {
+        getWorkerUrl: function () {
+          return (
+            "data:text/javascript;charset=utf-8," +
+            encodeURIComponent(
+              "self.MonacoEnvironment = { baseUrl: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/' };" +
+                "importScripts('https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/base/worker/workerMain.js');"
+            )
+          );
+        },
+      };
+      require.config({
+        paths: {
+          vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs",
+        },
+      });
+      require(["vs/editor/editor.main"], function () {
+        window.dispatchEvent(new CustomEvent("monaco-ready"));
+      });
+    </script>
+
+  </body>
+</html>

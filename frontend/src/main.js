@@ -458,11 +458,18 @@ function setLoggedIn(user) {
     myName.textContent = user.username;
     myName.dataset.i18nOriginal = user.username;
     myEmail.textContent = `${user.username}@example.com`;
+    // Notify pages (e.g. test-login.html) that auth state changed.
+    window.dispatchEvent(new CustomEvent("codenergy:auth", {
+      detail: { user, status: "logged-in" },
+    }));
   } else {
     loginBtn.hidden = false;
     signupBtn.hidden = false;
     myWrap.hidden = true;
     myMenu.hidden = true;
+    window.dispatchEvent(new CustomEvent("codenergy:auth", {
+      detail: { user: null, status: "logged-out" },
+    }));
   }
 }
 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Codenergy — 추천 시작 방식</title>
+    <title>Codenergy — 문제 출제 중</title>
     <style>
       .page-fade {
         position: fixed; inset: 0; background: #fff;
@@ -98,71 +98,73 @@
       </form>
     </div>
 
-    <section class="results-section">
-      <h1 class="results-heading">코드트리, 어떤 방식으로 시작해볼까요?</h1>
+    <section class="gauge-section">
+      <div class="gauge-shell">
+        <span class="gauge-eyebrow" id="gauge-eyebrow">문제 1 / 5 · 출제 중</span>
+        <h1 class="gauge-title" id="gauge-title">문제를 준비하고 있어요.</h1>
+        <p class="gauge-subtitle">
+          선택한 개념과 난이도에 맞춰 문제와 테스트 케이스를 생성하고 있어요.
+          잠시만 기다려주세요.
+        </p>
 
-      <div class="results-grid">
-        <button type="button" class="result-card result-card--start">
-          <span class="result-badge result-badge--green">코딩을 처음 시작하신다면</span>
-          <span class="result-eyebrow result-eyebrow--green">Codetree 101</span>
-          <span class="result-title">무료로 첫 트레일<br/>시작하기</span>
-          <svg class="result-scene result-scene--sprout" viewBox="0 0 320 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <ellipse cx="160" cy="92" rx="36" ry="6" fill="#a47b58" opacity="0.55"/>
-            <path d="M160 88 C 160 70 152 60 138 56 C 150 56 158 64 160 78 Z" fill="#22c55e"/>
-            <path d="M160 88 C 160 68 168 58 184 54 C 172 54 162 62 160 80 Z" fill="#22c55e"/>
-            <path d="M160 96 L160 70" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"/>
-            <rect x="0" y="96" width="320" height="14" fill="#c2a079"/>
+        <div class="gauge-ring" id="gauge-ring" role="progressbar"
+             aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <svg viewBox="0 0 100 100" aria-hidden="true">
+            <defs>
+              <linearGradient id="gauge-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#22c55e" />
+                <stop offset="100%" stop-color="#7c3aed" />
+              </linearGradient>
+            </defs>
+            <circle class="gauge-ring__track" cx="50" cy="50" r="42" />
+            <circle
+              id="gauge-ring-fill"
+              class="gauge-ring__fill"
+              cx="50" cy="50" r="42"
+              stroke-dasharray="263.89"
+              stroke-dashoffset="263.89"
+            />
           </svg>
-        </button>
+          <div class="gauge-ring__center">
+            <span class="gauge-ring__pct" id="gauge-pct">0<span class="pct-symbol">%</span></span>
+            <span class="gauge-ring__sub" id="gauge-stage-label">대기 중…</span>
+          </div>
+        </div>
 
-        <button type="button" class="result-card result-card--diagnose">
-          <span class="result-meta">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <circle cx="12" cy="12" r="9"/>
-              <path d="M12 7 V12 L15 14"/>
-            </svg>
-            평균 30분 소요
-          </span>
-          <span class="result-badge result-badge--purple">어디서 시작할지 막막하다면?</span>
-          <span class="result-eyebrow result-eyebrow--purple">지피지기면 백전백승, 갭체크</span>
-          <span class="result-title">맞춤 진단하고<br/>챕터 무료로 받기</span>
-          <svg class="result-scene result-scene--game" viewBox="0 0 720 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="0" y="100" width="300" height="30" fill="#5e5854"/>
-            <path d="M0 100 L20 84 L40 100 L60 84 L80 100 L100 84 L120 100 L140 84 L160 100 L180 84 L200 100 L220 84 L240 100 L260 84 L280 100 L300 84 L300 100 Z" fill="#22c55e"/>
-            <rect x="420" y="100" width="300" height="30" fill="#5e5854"/>
-            <path d="M420 100 L440 84 L460 100 L480 84 L500 100 L520 84 L540 100 L560 84 L580 100 L600 84 L620 100 L640 84 L660 100 L680 84 L700 100 L720 84 L720 100 Z" fill="#22c55e"/>
-            <g transform="rotate(20 348 70)">
-              <rect x="324" y="50" width="48" height="36" rx="6" fill="#ef6f4f" stroke="#b14a2f" stroke-width="2"/>
-            </g>
-            <g transform="translate(298 38)">
-              <path d="M0 0 L-6 -10 M0 0 L0 -12 M0 0 L6 -10" stroke="#111" stroke-width="2" stroke-linecap="round"/>
-            </g>
-            <g transform="translate(514 70)">
-              <rect x="-44" y="-20" width="88" height="32" rx="6" fill="#22c55e"/>
-              <text x="0" y="2" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#fff">Solved</text>
-              <path d="M0 14 L0 30" stroke="#16a34a" stroke-width="3"/>
-            </g>
-          </svg>
-        </button>
-      </div>
+        <div class="gauge-status" id="gauge-status">
+          <span class="gauge-status__dot" aria-hidden="true"></span>
+          <span id="gauge-status-text">출제 준비 중…</span>
+        </div>
 
-      <div class="results-skip">
-        <a class="results-skip__link" href="codetrails.html">직접 둘러볼게요 →</a>
+        <ul class="gauge-checklist" id="gauge-checklist">
+          <li class="gauge-check" data-stage="0">
+            <span class="gauge-check__mark"><span>1</span></span>
+            <span>주제 분석</span>
+          </li>
+          <li class="gauge-check" data-stage="1">
+            <span class="gauge-check__mark"><span>2</span></span>
+            <span>난이도 조정</span>
+          </li>
+          <li class="gauge-check" data-stage="2">
+            <span class="gauge-check__mark"><span>3</span></span>
+            <span>테스트 케이스 생성</span>
+          </li>
+          <li class="gauge-check" data-stage="3">
+            <span class="gauge-check__mark"><span>4</span></span>
+            <span>문제 검수</span>
+          </li>
+        </ul>
+
+        <div class="gauge-actions">
+          <button type="button" class="gauge-start" id="start-btn" disabled>
+            시작하기
+          </button>
+          <button type="button" class="gauge-cancel" id="cancel-btn">테스트 종료</button>
+        </div>
       </div>
     </section>
 
     <script type="module" src="/src/main.js"></script>
-    <script type="module">
-      // Wire the right-side "맞춤 진단하고 챕터 무료로 받기" card to the
-      // coding-test concept-selection screen.
-      const fade = document.getElementById('page-fade');
-      const diagnoseBtn = document.querySelector('.result-card--diagnose');
-      if (diagnoseBtn) {
-        diagnoseBtn.addEventListener('click', () => {
-          if (fade) fade.classList.remove('is-hidden');
-          setTimeout(() => { window.location.href = 'test-concepts.html'; }, 180);
-        });
-      }
-    </script>
+    <script type="module" src="/src/test-gauge.js"></script>
   </body>
 </html>

@@ -3,13 +3,16 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Codenergy — 추천 시작 방식</title>
+    <title>Codenergy — 테스트 안내</title>
     <style>
       .page-fade {
         position: fixed; inset: 0; background: #fff;
         z-index: 9999; opacity: 1; pointer-events: auto;
       }
     </style>
+    <script type="module" crossorigin src="/assets/testIntro-DJmEcaL4.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/main-DzKWXlj2.js">
+    <link rel="stylesheet" crossorigin href="/assets/main-BEu8Di3s.css">
   </head>
   <body>
     <div class="page-fade" id="page-fade"></div>
@@ -98,71 +101,103 @@
       </form>
     </div>
 
-    <section class="results-section">
-      <h1 class="results-heading">코드트리, 어떤 방식으로 시작해볼까요?</h1>
+    <section class="intro-section">
+      <div class="intro-shell">
+        <div class="intro-header">
+          <span class="intro-eyebrow">2 / 5 · 테스트 안내</span>
+          <h1 class="intro-title">시작하기 전에<br/>잠깐 안내드릴게요.</h1>
+          <p class="intro-subtitle">
+            선택하신 개념을 바탕으로 5문제가 순차 출제됩니다. 아래 안내를 가볍게
+            훑어보고, 더 자세한 설명이 필요하면 화살표를 눌러 펼쳐보세요.
+          </p>
+          <p class="intro-summary" id="intro-summary" hidden>
+            <strong>선택한 개념:</strong> <span id="intro-concept-list"></span>
+          </p>
+        </div>
 
-      <div class="results-grid">
-        <button type="button" class="result-card result-card--start">
-          <span class="result-badge result-badge--green">코딩을 처음 시작하신다면</span>
-          <span class="result-eyebrow result-eyebrow--green">Codetree 101</span>
-          <span class="result-title">무료로 첫 트레일<br/>시작하기</span>
-          <svg class="result-scene result-scene--sprout" viewBox="0 0 320 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <ellipse cx="160" cy="92" rx="36" ry="6" fill="#a47b58" opacity="0.55"/>
-            <path d="M160 88 C 160 70 152 60 138 56 C 150 56 158 64 160 78 Z" fill="#22c55e"/>
-            <path d="M160 88 C 160 68 168 58 184 54 C 172 54 162 62 160 80 Z" fill="#22c55e"/>
-            <path d="M160 96 L160 70" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"/>
-            <rect x="0" y="96" width="320" height="14" fill="#c2a079"/>
-          </svg>
+        <div class="intro-cards">
+          <article class="intro-card">
+            <span class="intro-card__icon" aria-hidden="true">📝</span>
+            <h3 class="intro-card__title">5문제 출제</h3>
+            <p class="intro-card__desc">
+              선택한 개념을 바탕으로 난이도를 조금씩 높여가며 5문제가 출제돼요.
+            </p>
+          </article>
+          <article class="intro-card">
+            <span class="intro-card__icon" aria-hidden="true">⏱️</span>
+            <h3 class="intro-card__title">문제당 10분</h3>
+            <p class="intro-card__desc">
+              각 문제는 10분 안에 풀이를 완성해서 제출하면 됩니다.
+            </p>
+          </article>
+          <article class="intro-card">
+            <span class="intro-card__icon" aria-hidden="true">⚙️</span>
+            <h3 class="intro-card__title">자동 채점</h3>
+            <p class="intro-card__desc">
+              테스트 케이스 통과 여부로 즉시 결과를 확인할 수 있어요.
+            </p>
+          </article>
+        </div>
+
+        <button type="button" class="intro-toggle" id="intro-toggle" aria-expanded="false" aria-controls="intro-extended">
+          <span class="intro-toggle__chev" aria-hidden="true">▾</span>
+          <span id="intro-toggle-text">더 자세한 안내 보기</span>
         </button>
 
-        <button type="button" class="result-card result-card--diagnose">
-          <span class="result-meta">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <circle cx="12" cy="12" r="9"/>
-              <path d="M12 7 V12 L15 14"/>
-            </svg>
-            평균 30분 소요
-          </span>
-          <span class="result-badge result-badge--purple">어디서 시작할지 막막하다면?</span>
-          <span class="result-eyebrow result-eyebrow--purple">지피지기면 백전백승, 갭체크</span>
-          <span class="result-title">맞춤 진단하고<br/>챕터 무료로 받기</span>
-          <svg class="result-scene result-scene--game" viewBox="0 0 720 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="0" y="100" width="300" height="30" fill="#5e5854"/>
-            <path d="M0 100 L20 84 L40 100 L60 84 L80 100 L100 84 L120 100 L140 84 L160 100 L180 84 L200 100 L220 84 L240 100 L260 84 L280 100 L300 84 L300 100 Z" fill="#22c55e"/>
-            <rect x="420" y="100" width="300" height="30" fill="#5e5854"/>
-            <path d="M420 100 L440 84 L460 100 L480 84 L500 100 L520 84 L540 100 L560 84 L580 100 L600 84 L620 100 L640 84 L660 100 L680 84 L700 100 L720 84 L720 100 Z" fill="#22c55e"/>
-            <g transform="rotate(20 348 70)">
-              <rect x="324" y="50" width="48" height="36" rx="6" fill="#ef6f4f" stroke="#b14a2f" stroke-width="2"/>
-            </g>
-            <g transform="translate(298 38)">
-              <path d="M0 0 L-6 -10 M0 0 L0 -12 M0 0 L6 -10" stroke="#111" stroke-width="2" stroke-linecap="round"/>
-            </g>
-            <g transform="translate(514 70)">
-              <rect x="-44" y="-20" width="88" height="32" rx="6" fill="#22c55e"/>
-              <text x="0" y="2" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#fff">Solved</text>
-              <path d="M0 14 L0 30" stroke="#16a34a" stroke-width="3"/>
-            </g>
-          </svg>
-        </button>
-      </div>
+        <section class="intro-extended" id="intro-extended" aria-hidden="true">
+          <h2 class="intro-extended__title">어떻게 진행되나요?</h2>
+          <ol class="intro-steps">
+            <li class="intro-step">
+              <span class="intro-step__num">1</span>
+              <div>
+                <h4 class="intro-step__title">출제 게이지가 가득 차면 시작</h4>
+                <p class="intro-step__desc">
+                  AI가 문제를 준비하는 동안 게이지가 차오릅니다. 가득 차면
+                  <strong>시작하기</strong> 버튼이 활성화돼요.
+                </p>
+              </div>
+            </li>
+            <li class="intro-step">
+              <span class="intro-step__num">2</span>
+              <div>
+                <h4 class="intro-step__title">왼쪽 문제, 오른쪽 코드 입력</h4>
+                <p class="intro-step__desc">
+                  좌측에 문제 설명, 우측에 C 코드 에디터가 나타납니다.
+                </p>
+              </div>
+            </li>
+            <li class="intro-step">
+              <span class="intro-step__num">3</span>
+              <div>
+                <h4 class="intro-step__title">테스트 케이스로 빠르게 확인</h4>
+                <p class="intro-step__desc">
+                  변수 A의 값 범위를 선택하고 <strong>코드 실행</strong>으로 출력을 확인할 수 있어요.
+                </p>
+              </div>
+            </li>
+            <li class="intro-step">
+              <span class="intro-step__num">4</span>
+              <div>
+                <h4 class="intro-step__title">제출 후 모든 케이스 채점</h4>
+                <p class="intro-step__desc">
+                  <strong>제출 및 채점</strong>을 누르면 범위 내 모든 값으로 검증해서
+                  정답 여부를 알려드립니다.
+                </p>
+              </div>
+            </li>
+          </ol>
+          <p class="intro-callout">
+            ✓ 모든 테스트 케이스를 통과해야 <strong>정답</strong>으로 인정됩니다.
+            중간에 멈춰도 진행 상황은 자동 저장돼요.
+          </p>
+        </section>
 
-      <div class="results-skip">
-        <a class="results-skip__link" href="codetrails.html">직접 둘러볼게요 →</a>
+        <div class="intro-actions">
+          <button type="button" class="intro-skip" id="skip-btn">설명 건너뛰기 →</button>
+          <button type="button" class="intro-next" id="next-btn">로그인하고 시작하기 →</button>
+        </div>
       </div>
     </section>
 
-    <script type="module" src="/src/main.js"></script>
-    <script type="module">
-      // Wire the right-side "맞춤 진단하고 챕터 무료로 받기" card to the
-      // coding-test concept-selection screen.
-      const fade = document.getElementById('page-fade');
-      const diagnoseBtn = document.querySelector('.result-card--diagnose');
-      if (diagnoseBtn) {
-        diagnoseBtn.addEventListener('click', () => {
-          if (fade) fade.classList.remove('is-hidden');
-          setTimeout(() => { window.location.href = 'test-concepts.html'; }, 180);
-        });
-      }
-    </script>
   </body>
 </html>
