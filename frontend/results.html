@@ -26,7 +26,7 @@
           <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
           <a href="index.html" data-action="reviews" data-i18n="nav.reviews">후기</a>
           <a href="index.html" data-action="invite" data-i18n="nav.invite">친구 초대</a>
-          <a href="index.html" data-action="universities" data-i18n="nav.universities">제휴 대학</a>
+          <a href="#" data-action="avatar" data-i18n="nav.avatar">아바타</a>
         </nav>
         <div class="actions">
           <div class="lang-wrap" id="lang-wrap">
@@ -152,5 +152,17 @@
     </section>
 
     <script type="module" src="/src/main.js"></script>
+    <script type="module">
+      // Wire the right-side "맞춤 진단하고 챕터 무료로 받기" card to the
+      // coding-test concept-selection screen.
+      const fade = document.getElementById('page-fade');
+      const diagnoseBtn = document.querySelector('.result-card--diagnose');
+      if (diagnoseBtn) {
+        diagnoseBtn.addEventListener('click', () => {
+          if (fade) fade.classList.remove('is-hidden');
+          setTimeout(() => { window.location.href = 'test-concepts.html'; }, 180);
+        });
+      }
+    </script>
   </body>
 </html>

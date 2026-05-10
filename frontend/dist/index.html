@@ -4,8 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title data-i18n="title">Codenergy — 지식에서 스킬로</title>
-    <script type="module" crossorigin src="/assets/main-Cza3RMWx.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/main-BFV1CW_Y.css">
+    <style>
+      .page-fade {
+        position: fixed; inset: 0; background: #fff;
+        z-index: 9999; opacity: 1; pointer-events: auto;
+      }
+      .mascot { opacity: 0; }
+    </style>
+    <script type="module" crossorigin src="/assets/main-TLNagZOl.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/main-FUWuwIHT.css">
   </head>
   <body>
     <div class="page-fade" id="page-fade"></div>
@@ -18,12 +25,11 @@
       </button>
       <div class="nav-collapse" id="nav-collapse">
         <nav class="menu" id="menu">
-          <a href="#" data-action="codetrail" data-i18n="nav.codetrail">코드트레일</a>
+          <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
           <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
-          <a href="#" data-action="challenge"><span data-i18n="nav.challenge">청약 챌린지</span> <span class="badge" data-i18n="nav.new">New</span></a>
           <a href="#" data-action="reviews" data-i18n="nav.reviews">후기</a>
           <a href="#" data-action="invite" data-i18n="nav.invite">친구 초대</a>
-          <a href="#" data-action="universities" data-i18n="nav.universities">제휴 대학</a>
+          <a href="#" data-action="avatar" data-i18n="nav.avatar">아바타</a>
         </nav>
         <div class="actions">
           <div class="lang-wrap" id="lang-wrap">
@@ -96,48 +102,6 @@
     </div>
 
     <!-- Feature Modals -->
-    <div id="challenge-modal" class="modal" hidden>
-      <div class="modal-backdrop" data-close></div>
-      <div class="modal-card challenge-modal">
-        <h3 data-i18n="challenge.title">🏆 청약 챌린지</h3>
-        <div class="challenge-content">
-          <div class="challenge-hero">
-            <h4 data-i18n="challenge.hero">매월 새로운 도전, 새로운 기회!</h4>
-            <p data-i18n="challenge.heroSub">실전 코딩테스트를 대비하는 최고의 방법</p>
-          </div>
-          <div class="challenge-features">
-            <div class="feature">
-              <div class="feature-icon">🏅</div>
-              <h5 data-i18n="challenge.f1">상위 랭커 혜택</h5>
-              <p data-i18n="challenge.f1Desc">상위 10% 참가자에게 기업 인턴십 기회 제공</p>
-            </div>
-            <div class="feature">
-              <div class="feature-icon">📊</div>
-              <h5 data-i18n="challenge.f2">실시간 랭킹</h5>
-              <p data-i18n="challenge.f2Desc">참가자들과 실시간 경쟁하며 성장하세요</p>
-            </div>
-            <div class="feature">
-              <div class="feature-icon">🎯</div>
-              <h5 data-i18n="challenge.f3">주간 문제</h5>
-              <p data-i18n="challenge.f3Desc">매주 새로운 알고리즘 문제 도전</p>
-            </div>
-          </div>
-          <div class="current-challenge">
-            <h4 data-i18n="challenge.current">이번 달 챌린지: "알고리즘 마스터"</h4>
-            <p data-i18n="challenge.currentDesc">다양한 알고리즘 유형을 마스터하세요</p>
-            <div class="progress">
-              <div class="progress-bar" style="width: 65%"></div>
-              <span data-i18n="challenge.progress">65% 완료</span>
-            </div>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="cta" data-i18n="challenge.join">챌린지 참여하기</button>
-          <button type="button" class="ghost" data-close data-i18n="action.close">닫기</button>
-        </div>
-      </div>
-    </div>
-
     <div id="reviews-modal" class="modal" hidden>
       <div class="modal-backdrop" data-close></div>
       <div class="modal-card reviews-modal">
@@ -287,10 +251,10 @@
         코딩테스트에 통하는 모든 문제 풀이 스킬,<br/>
         Codenergy에서 만나보세요.
       </p>
-      <button class="pill" data-tilt>
+      <a class="pill" href="survey.html" data-tilt>
         <span data-i18n="hero.pill">나에게 딱 맞는 학습이 궁금하다면?</span>
         <span class="pill-cta" data-i18n="hero.pillCta">시작하기 →</span>
-      </button>
+      </a>
 
       <div class="mascot" aria-hidden="true">
         <svg class="mascot__svg" viewBox="0 0 200 280" xmlns="http://www.w3.org/2000/svg">

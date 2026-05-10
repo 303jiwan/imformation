@@ -3,6 +3,66 @@ import "./style.css";
 const API_BASE = "http://localhost:3000";
 const MAX_TILT = 14;
 
+// ---------------- Demo-mode fallback ----------------
+// When the backend at API_BASE is unreachable (TypeError on fetch — typically
+// "Failed to fetch"), we let the user continue in a stub demo session that is
+// stored locally. Compare with `judgeAvailable` in src/judge.js: same shape —
+// detect missing remote, fall back to a local mock so the UI keeps working.
+const DEMO_USER_KEY = "codenergy:demo:user";
+const REDIRECT_AFTER_LOGIN_KEY = "codenergy:redirectAfterLogin";
+
+/** Whitelist of pages we allow redirecting to after login. Keeps the
+ *  sessionStorage value from being abused as an open-redirect vector. */
+const REDIRECT_TARGETS = new Set(["avatar.html"]);
+
+function readRedirectIntent() {
+  try {
+    const raw = sessionStorage.getItem(REDIRECT_AFTER_LOGIN_KEY);
+    if (raw && REDIRECT_TARGETS.has(raw)) return raw;
+    return null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function clearRedirectIntent() {
+  try { sessionStorage.removeItem(REDIRECT_AFTER_LOGIN_KEY); } catch (_) {}
+}
+
+/** Network errors from `fetch` surface as TypeError in every browser. */
+function isNetworkError(err) {
+  return err instanceof TypeError;
+}
+
+/** SHA-256 hex of a string (best-effort; returns "" if subtle crypto fails). */
+async function sha256Hex(str) {
+  try {
+    const buf = new TextEncoder().encode(String(str ?? ""));
+    const hash = await crypto.subtle.digest("SHA-256", buf);
+    return Array.from(new Uint8Array(hash))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  } catch (_) {
+    return "";
+  }
+}
+
+function readDemoUser() {
+  try {
+    const raw = localStorage.getItem(DEMO_USER_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (parsed && typeof parsed.username === "string") return parsed;
+    return null;
+  } catch (_) {
+    return null;
+  }
+}
+
+function clearDemoUser() {
+  try { localStorage.removeItem(DEMO_USER_KEY); } catch (_) {}
+}
+
 // ---------------- i18n ----------------
 const TRANSLATIONS = {
   en: {
@@ -12,6 +72,7 @@ const TRANSLATIONS = {
     "nav.reviews": "Reviews",
     "nav.invite": "Invite",
     "nav.universities": "Universities",
+    "nav.avatar": "Avatar",
     "action.login": "Log in",
     "action.signup": "Sign up",
     "action.my": "My",
@@ -38,6 +99,9 @@ const TRANSLATIONS = {
     "auth.fail": "Request failed",
     "auth.serverError": "Cannot connect to server.",
     "auth.logoutDone": "You have been logged out.",
+    "auth.offlinePrompt": "Cannot reach the server. Continue in demo mode?",
+    "auth.demoContinue": "Continue in demo mode",
+    "auth.demoBadge": "(demo)",
     "pricing.pageTitle": "Codenergy — Pricing",
     "pricing.heading": "Access every problem-solving principle.",
     "pricing.secure": "Secure payment",
@@ -366,9 +430,36 @@ menuLinks.forEach(link => {
       case 'universities':
         showUniversities();
         break;
+      case 'avatar':
+        goAvatar();
+        break;
     }
   });
 });
+
+function goAvatar() {
+  // Auth detection: #my-wrap is visible (not hidden) when the user is logged in.
+  // (See setLoggedIn in this file — it toggles myWrap.hidden based on session.)
+  const myWrapEl = document.getElementById('my-wrap');
+  const isLoggedIn = !!(myWrapEl && !myWrapEl.hidden);
+  if (isLoggedIn) {
+    if (pageFade) pageFade.classList.remove('is-hidden');
+    setTimeout(() => {
+      window.location.href = 'avatar.html';
+    }, PAGE_FADE_MS);
+  } else {
+    // Mark the redirect intent BEFORE the modal opens. setLoggedIn() reads this
+    // on a logged-out -> logged-in transition and will navigate to avatar.html.
+    try {
+      sessionStorage.setItem(REDIRECT_AFTER_LOGIN_KEY, 'avatar.html');
+    } catch (_) {}
+    // Open the existing login modal via the same path as the header login button.
+    const headerLoginBtn = document.getElementById('login-btn');
+    if (headerLoginBtn && !headerLoginBtn.hidden) {
+      headerLoginBtn.click();
+    }
+  }
+}
 
 function showCodeTrail() {
   alert(t('alert.codetrail') || '🚀 코드트레일 기능이 곧 제공됩니다!\n\n알고리즘 문제 풀이부터 실전 코딩 테스트까지,\n단계별 학습 경로를 따라 실력을 키워보세요.');
@@ -449,20 +540,59 @@ const altFindIdBtn = document.getElementById("alt-find-id-btn");
 const altFindPasswordBtn = document.getElementById("alt-find-password-btn");
 
 let mode = "login";
+// Tracks the most recent auth state so we can detect a logged-out -> logged-in
+// transition. Starts as null so a real login (not page-load auto-restore) is
+// the only thing that fires the post-login redirect. The initial /api/me
+// resolver bumps this to whatever the backend says before any user-driven
+// login can happen, preventing the redirect from running on page reload.
+let lastAuthState = null;
 
 function setLoggedIn(user) {
+  const wasLoggedIn = lastAuthState === "logged-in";
   if (user) {
     loginBtn.hidden = true;
     signupBtn.hidden = true;
     myWrap.hidden = false;
-    myName.textContent = user.username;
-    myName.dataset.i18nOriginal = user.username;
-    myEmail.textContent = `${user.username}@example.com`;
+    const isDemo = !!user.demo;
+    const demoBadge = isDemo ? ` ${t("auth.demoBadge") || "(데모)"}` : "";
+    myName.textContent = `${user.username}${demoBadge}`;
+    myName.dataset.i18nOriginal = `${user.username}${demoBadge}`;
+    myEmail.textContent = user.email || `${user.username}@example.com`;
+    myWrap.dataset.demo = isDemo ? "true" : "false";
+    lastAuthState = "logged-in";
+    // Notify pages (e.g. test-login.html) that auth state changed.
+    window.dispatchEvent(new CustomEvent("codenergy:auth", {
+      detail: { user, status: "logged-in" },
+    }));
+    // Post-login redirect: only on an actual logged-out -> logged-in
+    // transition AND only when the auth modal is currently open. This guards
+    // against:
+    //   - Initial /api/me / demo-restore at page load (modal is hidden, so no
+    //     redirect even if a stale intent is in sessionStorage from a prior
+    //     reload-while-modal-open).
+    //   - The narrower case where lastAuthState was logged-out (e.g. user
+    //     just logged out, then reloaded) but the intent is stale.
+    const modalOpen = modal && !modal.hidden;
+    if (!wasLoggedIn && modalOpen) {
+      const target = readRedirectIntent();
+      if (target) {
+        clearRedirectIntent();
+        if (pageFade) pageFade.classList.remove("is-hidden");
+        setTimeout(() => {
+          window.location.href = target;
+        }, PAGE_FADE_MS);
+      }
+    }
   } else {
     loginBtn.hidden = false;
     signupBtn.hidden = false;
     myWrap.hidden = true;
     myMenu.hidden = true;
+    delete myWrap.dataset.demo;
+    lastAuthState = "logged-out";
+    window.dispatchEvent(new CustomEvent("codenergy:auth", {
+      detail: { user: null, status: "logged-out" },
+    }));
   }
 }
 
@@ -477,12 +607,20 @@ document.addEventListener("click", (e) => {
 });
 logoutBtn.addEventListener("click", async () => {
   myMenu.hidden = true;
+  let networkFailed = false;
   try {
     await fetch(`${API_BASE}/api/logout`, {
       method: "POST",
       credentials: "include",
     });
-  } catch (_) {}
+  } catch (err) {
+    if (isNetworkError(err)) networkFailed = true;
+  }
+  // If the backend was unreachable but we still have a demo session stored,
+  // remove it so the user really logs out instead of auto-restoring on reload.
+  if (networkFailed && readDemoUser()) clearDemoUser();
+  // Always clear demo creds on explicit logout — mirrors the backend wipe.
+  clearDemoUser();
   setLoggedIn(null);
   alert(t("auth.logoutDone") || "로그아웃되었습니다");
 });
@@ -549,8 +687,19 @@ function setMode(nextMode) {
   form.querySelector("input[name=password]").required = showPassword;
   form.querySelector("input[name=email]").required = showEmail;
 
+  // Tell the browser/password manager whether this is sign-in vs sign-up so
+  // it doesn't surface a "save existing password" popup over a fresh signup
+  // (which can synthesize stray click events that look like backdrop clicks).
+  const pwInput = form.querySelector("input[name=password]");
+  if (pwInput) {
+    pwInput.autocomplete = nextMode === "signup" ? "new-password" : "current-password";
+  }
+
+  // Reset error region (also strips any demo-fallback button if present).
   errorEl.hidden = true;
   errorEl.textContent = "";
+  errorEl.innerHTML = "";
+  errorEl.classList.remove("modal-error--offline");
   infoEl.hidden = true;
   form.reset();
   if (!emailLabel.hidden) {
@@ -570,6 +719,12 @@ function openModal(nextMode) {
 
 function closeModal() {
   modal.hidden = true;
+  // If the user dismisses the modal (cancel button, backdrop, ESC) without
+  // logging in, drop the avatar redirect intent — otherwise a later, unrelated
+  // login (header login button) would surprise them by jumping to avatar.html.
+  // The successful-login path clears the intent itself before calling
+  // closeModal(), so this clear is a no-op on that path.
+  clearRedirectIntent();
 }
 
 loginBtn.addEventListener("click", () => openModal("login"));
@@ -585,11 +740,76 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape" && !modal.hidden) closeModal();
 });
 
+// Defensive: clicks anywhere inside the auth FORM must not bubble to the
+// document-level outside-click handlers (hamburger / lang / my-menu close,
+// data-close matcher, etc.). Browser-injected UI — password manager popups,
+// autofill overlays, IME composition on Korean input — can synthesize click
+// events that hit unexpected DOM positions, and several users have reported
+// the modal disappearing when they click into the password field. The
+// cancel/backdrop close paths are preserved by letting [data-close] clicks
+// bubble through normally.
+form.addEventListener("click", (e) => {
+  if (e.target.closest("[data-close]")) return;
+  e.stopPropagation();
+});
+form.addEventListener("mousedown", (e) => {
+  if (e.target.closest("[data-close]")) return;
+  e.stopPropagation();
+});
+
+/**
+ * Render a demo-mode prompt inside `#modal-error`. Shown when fetch itself
+ * threw (server unreachable). Clicking the inline button promotes the user
+ * to a local demo session — same effect as a successful /api/login.
+ */
+function showDemoFallback(data) {
+  errorEl.innerHTML = "";
+  errorEl.classList.add("modal-error--offline");
+
+  const msg = document.createElement("span");
+  msg.className = "modal-error__msg";
+  msg.textContent = t("auth.offlinePrompt") || "서버에 연결할 수 없어요. 데모 모드로 진행할까요?";
+
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "modal-error__demo-btn";
+  btn.textContent = t("auth.demoContinue") || "데모 모드로 계속하기";
+  btn.addEventListener("click", async () => {
+    const username = (data.username || data.email || "demo").toString().trim() || "demo";
+    const email = (data.email || "").toString().trim() || `${username}@example.com`;
+    const passwordHash = data.password ? await sha256Hex(data.password) : "";
+    const demoUser = {
+      username,
+      email,
+      passwordHash,           // hashed only — never store the plaintext password
+      demo: true,
+      createdAt: Date.now(),
+    };
+    try {
+      localStorage.setItem(DEMO_USER_KEY, JSON.stringify(demoUser));
+    } catch (_) {}
+    setLoggedIn(demoUser);
+    closeModal();
+  });
+
+  errorEl.appendChild(msg);
+  errorEl.appendChild(btn);
+  errorEl.hidden = false;
+}
+
+/** Reset the error element back to a plain text message slot. */
+function resetErrorEl() {
+  errorEl.classList.remove("modal-error--offline");
+  errorEl.innerHTML = "";
+  errorEl.textContent = "";
+  errorEl.hidden = true;
+}
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(form));
   submitBtn.disabled = true;
-  errorEl.hidden = true;
+  resetErrorEl();
   infoEl.hidden = true;
 
   try {
@@ -598,12 +818,33 @@ form.addEventListener("submit", async (e) => {
     if (mode === "find-id") endpoint = "find-username";
     if (mode === "find-password") endpoint = "forgot-password";
 
-    const res = await fetch(`${API_BASE}/api/${endpoint}`, {
-      method: "POST",
-      credentials: "include",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data),
-    });
+    let res;
+    try {
+      res = await fetch(`${API_BASE}/api/${endpoint}`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+    } catch (netErr) {
+      // TypeError === network-level failure (DNS, connection refused, CORS
+      // preflight blocked, offline). The backend wasn't reached at all, so we
+      // offer the user a local demo session instead of a dead-end error.
+      if (isNetworkError(netErr)) {
+        if (mode === "login" || mode === "signup") {
+          showDemoFallback(data);
+        } else {
+          // find-id / find-password require real email delivery; demo cannot help.
+          errorEl.textContent = t("auth.serverError") || "서버에 연결할 수 없습니다.";
+          errorEl.hidden = false;
+        }
+        return;
+      }
+      throw netErr;
+    }
+
+    // From here on, the server responded — could still be 4xx/5xx but it's
+    // a real response, so we treat it as a normal "request failed" path.
     const body = await res.json().catch(() => ({}));
 
     if (!res.ok) {
@@ -631,6 +872,9 @@ form.addEventListener("submit", async (e) => {
       return;
     }
 
+    // Successful real login — the backend is up, so any stale demo creds
+    // should be cleared so we never auto-fall-back on next reload.
+    clearDemoUser();
     setLoggedIn(body);
     closeModal();
   } catch (err) {
@@ -642,10 +886,31 @@ form.addEventListener("submit", async (e) => {
 });
 
 // initial session check
+//
+// Three-way outcome:
+//   1. backend up + has session         -> setLoggedIn(real user); clear demo creds
+//   2. backend up + no session          -> setLoggedIn(null); clear demo creds
+//   3. backend unreachable (TypeError)  -> if a demo user is stored locally,
+//                                          restore that session so the user
+//                                          stays logged in across reloads while
+//                                          the backend is offline.
 fetch(`${API_BASE}/api/me`, { credentials: "include" })
   .then((r) => (r.ok ? r.json() : null))
-  .then((u) => setLoggedIn(u))
-  .catch(() => setLoggedIn(null));
+  .then((u) => {
+    // Backend responded — authoritative answer. Drop any stale demo creds.
+    clearDemoUser();
+    setLoggedIn(u);
+  })
+  .catch((err) => {
+    if (isNetworkError(err)) {
+      const demo = readDemoUser();
+      if (demo) {
+        setLoggedIn(demo);
+        return;
+      }
+    }
+    setLoggedIn(null);
+  });
 
 // ---------------- Mascot eye tracking ----------------
 const eye = document.getElementById("mascot-eye");
