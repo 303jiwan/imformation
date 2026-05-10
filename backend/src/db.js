@@ -71,6 +71,13 @@ db.exec(`
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
   );
+
+  CREATE TABLE IF NOT EXISTS avatars (
+    user_id    INTEGER PRIMARY KEY,
+    config     TEXT NOT NULL,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
 `);
 
 // --- Prepared statements ----------------------------------------------------
@@ -130,6 +137,18 @@ export const stmts = {
   // email samples
   insertEmailSample: db.prepare(
     "INSERT INTO email_samples (email, user_id) VALUES (?, ?)"
+  ),
+
+  // avatars
+  getAvatar: db.prepare(
+    "SELECT config, updated_at FROM avatars WHERE user_id = ?"
+  ),
+  upsertAvatar: db.prepare(
+    `INSERT INTO avatars (user_id, config, updated_at)
+     VALUES (?, ?, CURRENT_TIMESTAMP)
+     ON CONFLICT(user_id) DO UPDATE SET
+       config = excluded.config,
+       updated_at = CURRENT_TIMESTAMP`
   ),
 };
 

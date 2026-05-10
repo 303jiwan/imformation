@@ -10,6 +10,17 @@ const MAX_TILT = 14;
 // detect missing remote, fall back to a local mock so the UI keeps working.
 const DEMO_USER_KEY = "codenergy:demo:user";
 const REDIRECT_AFTER_LOGIN_KEY = "codenergy:redirectAfterLogin";
+// Persisted across page loads so other pages (e.g. avatar.js) can make a fast
+// initial render decision without waiting for /api/me to resolve in main.js.
+const AUTH_HINT_KEY = "codenergy:auth:hint";
+
+function writeAuthHint(state) {
+  try { localStorage.setItem(AUTH_HINT_KEY, state); } catch (_) {}
+}
+
+function readAuthHint() {
+  try { return localStorage.getItem(AUTH_HINT_KEY); } catch (_) { return null; }
+}
 
 /** Whitelist of pages we allow redirecting to after login. Keeps the
  *  sessionStorage value from being abused as an open-redirect vector. */
@@ -438,27 +449,78 @@ menuLinks.forEach(link => {
 });
 
 function goAvatar() {
-  // Auth detection: #my-wrap is visible (not hidden) when the user is logged in.
-  // (See setLoggedIn in this file — it toggles myWrap.hidden based on session.)
-  const myWrapEl = document.getElementById('my-wrap');
-  const isLoggedIn = !!(myWrapEl && !myWrapEl.hidden);
-  if (isLoggedIn) {
+  const navigateToAvatar = () => {
     if (pageFade) pageFade.classList.remove('is-hidden');
     setTimeout(() => {
       window.location.href = 'avatar.html';
     }, PAGE_FADE_MS);
-  } else {
-    // Mark the redirect intent BEFORE the modal opens. setLoggedIn() reads this
-    // on a logged-out -> logged-in transition and will navigate to avatar.html.
+  };
+  const openLoginModal = () => {
     try {
       sessionStorage.setItem(REDIRECT_AFTER_LOGIN_KEY, 'avatar.html');
     } catch (_) {}
-    // Open the existing login modal via the same path as the header login button.
     const headerLoginBtn = document.getElementById('login-btn');
     if (headerLoginBtn && !headerLoginBtn.hidden) {
       headerLoginBtn.click();
     }
+  };
+  const decideFromDom = () => {
+    const myWrapEl = document.getElementById('my-wrap');
+    const domLoggedIn = !!(myWrapEl && !myWrapEl.hidden);
+    if (domLoggedIn || readDemoUser()) {
+      navigateToAvatar();
+    } else {
+      openLoginModal();
+    }
+  };
+
+  if (lastAuthState === 'logged-in') {
+    navigateToAvatar();
+    return;
   }
+  if (lastAuthState === 'logged-out') {
+    if (readDemoUser()) {
+      navigateToAvatar();
+    } else {
+      openLoginModal();
+    }
+    return;
+  }
+  // Auth not yet resolved — try the persisted hint for an instant decision.
+  const hint = readAuthHint();
+  if (hint === 'logged-in' || readDemoUser()) {
+    navigateToAvatar();
+    return;
+  }
+  if (hint === 'logged-out') {
+    openLoginModal();
+    return;
+  }
+  // No hint either — fall back to waiting for the next codenergy:auth event.
+  if (pageFade) pageFade.classList.remove('is-hidden');
+  let settled = false;
+  const onAuth = (e) => {
+    if (settled) return;
+    settled = true;
+    clearTimeout(timer);
+    window.removeEventListener('codenergy:auth', onAuth);
+    if (e && e.detail && e.detail.status === 'logged-in') {
+      setTimeout(() => { window.location.href = 'avatar.html'; }, PAGE_FADE_MS);
+    } else if (readDemoUser()) {
+      setTimeout(() => { window.location.href = 'avatar.html'; }, PAGE_FADE_MS);
+    } else {
+      if (pageFade) pageFade.classList.add('is-hidden');
+      openLoginModal();
+    }
+  };
+  const timer = setTimeout(() => {
+    if (settled) return;
+    settled = true;
+    window.removeEventListener('codenergy:auth', onAuth);
+    if (pageFade) pageFade.classList.add('is-hidden');
+    decideFromDom();
+  }, 2000);
+  window.addEventListener('codenergy:auth', onAuth);
 }
 
 function showCodeTrail() {
@@ -560,6 +622,7 @@ function setLoggedIn(user) {
     myEmail.textContent = user.email || `${user.username}@example.com`;
     myWrap.dataset.demo = isDemo ? "true" : "false";
     lastAuthState = "logged-in";
+    writeAuthHint("logged-in");
     // Notify pages (e.g. test-login.html) that auth state changed.
     window.dispatchEvent(new CustomEvent("codenergy:auth", {
       detail: { user, status: "logged-in" },
@@ -590,6 +653,7 @@ function setLoggedIn(user) {
     myMenu.hidden = true;
     delete myWrap.dataset.demo;
     lastAuthState = "logged-out";
+    writeAuthHint("logged-out");
     window.dispatchEvent(new CustomEvent("codenergy:auth", {
       detail: { user: null, status: "logged-out" },
     }));
@@ -1007,4 +1071,125 @@ if (eye && pupil) {
     requestAnimationFrame(animate);
   }
   requestAnimationFrame(animate);
+}
+
+// ---------------- Notification dropdown ----------------
+const notifBtn = document.getElementById("notif-btn");
+const notifMenu = document.getElementById("notif-menu");
+const notifList = document.getElementById("notif-list");
+const notifEmpty = document.getElementById("notif-empty");
+const notifSignin = document.getElementById("notif-signin");
+const notifWrap = document.getElementById("notif-wrap");
+
+const NOTIFICATIONS_KEY = "codenergy:notifications";
+
+const DEFAULT_NOTIFICATIONS = [
+  { id: "n1", title: "오늘 학습 챌린지가 시작됐어요",
+    body: "30분만 투자해서 새로운 문제 한 개를 풀어보세요.",
+    createdAt: Date.now() - 1000 * 60 * 14, read: false },
+  { id: "n2", title: "친구가 회원가입했어요",
+    body: "초대 보상으로 7일 프리미엄이 적립됐습니다.",
+    createdAt: Date.now() - 1000 * 60 * 60 * 3, read: false },
+  { id: "n3", title: "학습 리포트가 준비됐어요",
+    body: "지난 주 진척도를 마이페이지에서 확인해 보세요.",
+    createdAt: Date.now() - 1000 * 60 * 60 * 26, read: true },
+];
+
+function loadNotifications() {
+  try {
+    const raw = localStorage.getItem(NOTIFICATIONS_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed)) return parsed;
+    }
+  } catch (_) {}
+  return DEFAULT_NOTIFICATIONS.slice();
+}
+
+function saveNotifications(list) {
+  try { localStorage.setItem(NOTIFICATIONS_KEY, JSON.stringify(list)); } catch (_) {}
+}
+
+function formatRelativeTime(ts) {
+  const diff = Date.now() - ts;
+  if (diff < 60_000) return "방금 전";
+  if (diff < 3_600_000) return `${Math.floor(diff / 60_000)}분 전`;
+  if (diff < 86_400_000) return `${Math.floor(diff / 3_600_000)}시간 전`;
+  const days = Math.floor(diff / 86_400_000);
+  if (days < 7) return `${days}일 전`;
+  return new Date(ts).toLocaleDateString();
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+let notifications = loadNotifications();
+
+function renderNotifications() {
+  if (!notifList || !notifEmpty || !notifSignin) return;
+  const loggedIn = !!(myWrap && !myWrap.hidden);
+  if (!loggedIn) {
+    notifList.innerHTML = "";
+    notifEmpty.hidden = true;
+    notifSignin.hidden = false;
+    return;
+  }
+  notifSignin.hidden = true;
+  if (!notifications.length) {
+    notifList.innerHTML = "";
+    notifEmpty.hidden = false;
+    return;
+  }
+  notifEmpty.hidden = true;
+  notifList.innerHTML = notifications.map((n) => `
+    <li class="notif-item ${n.read ? "is-read" : "is-unread"}" data-id="${escapeHtml(n.id)}">
+      <span class="notif-item__title">${escapeHtml(n.title || "")}</span>
+      <span class="notif-item__body">${escapeHtml(n.body || "")}</span>
+      <span class="notif-item__time">${escapeHtml(formatRelativeTime(n.createdAt))}</span>
+    </li>
+  `).join("");
+}
+
+if (notifBtn && notifMenu && notifWrap) {
+  notifBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const willOpen = notifMenu.hidden;
+    notifMenu.hidden = !willOpen;
+    notifBtn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+    if (willOpen) renderNotifications();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (notifMenu.hidden) return;
+    if (notifWrap.contains(e.target)) return;
+    notifMenu.hidden = true;
+    notifBtn.setAttribute("aria-expanded", "false");
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !notifMenu.hidden) {
+      notifMenu.hidden = true;
+      notifBtn.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  if (notifList) {
+    notifList.addEventListener("click", (e) => {
+      const li = e.target.closest(".notif-item");
+      if (!li) return;
+      const item = notifications.find((n) => n.id === li.dataset.id);
+      if (item && !item.read) {
+        item.read = true;
+        saveNotifications(notifications);
+        renderNotifications();
+      }
+    });
+  }
+
+  window.addEventListener("codenergy:auth", () => {
+    if (!notifMenu.hidden) renderNotifications();
+  });
 }

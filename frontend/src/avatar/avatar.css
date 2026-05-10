@@ -1,13 +1,10 @@
 /* =============================================================
    Codenergy avatar feature styles
-   Imported by Agent C from avatar.js. All classes are scoped
-   under `.avatar-page` to avoid colliding with the rest of the
-   site. Tokens used: --purple, --purple-deep, --green, --green-deep
-   (defined in style.css). Hex fallbacks are inlined where the
-   tokens may not be available (e.g. legacy contexts).
+   Tokens used: --purple, --purple-deep, --green, --green-deep
+   (defined in style.css). Layout is a vertical stack on mobile
+   (stage on top, editor on bottom) and side-by-side >=900px.
    ============================================================= */
 
-/* ---------- Page wrapper ---------- */
 .avatar-page {
   --avatar-purple: var(--purple, #a855f7);
   --avatar-purple-deep: var(--purple-deep, #7c3aed);
@@ -20,75 +17,96 @@
   --avatar-muted: #6b7280;
   --avatar-border: #e5e7eb;
   --avatar-hover: #faf5ff;
+  --avatar-radius: 14px;
+  --avatar-radius-lg: 20px;
+  --avatar-shadow: 0 4px 14px rgba(31, 41, 55, 0.08);
+  --avatar-shadow-lg: 0 12px 32px -16px rgba(124, 58, 237, 0.28);
 
   min-height: calc(100vh - 80px);
-  padding: 32px 24px 64px;
-  background: linear-gradient(180deg, #faf5ff 0%, #ffffff 240px);
+  padding: 24px 20px 120px;
+  background: linear-gradient(180deg, #faf5ff 0%, #ffffff 320px);
   color: var(--avatar-text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard",
     "Apple SD Gothic Neo", Roboto, sans-serif;
-}
-
-.avatar-page__inner {
-  max-width: 1100px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 1200px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 420px);
-  gap: 32px;
-  align-items: start;
 }
 
-.avatar-page__title {
-  grid-column: 1 / -1;
-  font-size: 28px;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  margin-bottom: 4px;
-}
-.avatar-page__subtitle {
-  grid-column: 1 / -1;
-  color: var(--avatar-muted);
-  margin-bottom: 16px;
-  font-size: 15px;
-}
-
-@media (max-width: 880px) {
-  .avatar-page__inner {
-    grid-template-columns: minmax(0, 1fr);
+@media (min-width: 900px) {
+  .avatar-page {
+    flex-direction: row;
+    align-items: stretch;
+    gap: 28px;
+    padding: 32px 24px 64px;
   }
 }
 
 /* ---------- Stage ---------- */
 .avatar-stage {
-  background: var(--avatar-card);
+  background: linear-gradient(180deg, #ffffff 0%, #f5efff 100%);
   border: 1px solid var(--avatar-border);
-  border-radius: 24px;
+  border-radius: var(--avatar-radius-lg);
   padding: 28px 24px 32px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 560px;
-  box-shadow: 0 8px 24px -16px rgba(124, 58, 237, 0.25);
+  min-height: 360px;
+  box-shadow: var(--avatar-shadow-lg);
   position: relative;
   overflow: hidden;
 }
 .avatar-stage::before {
   content: "";
   position: absolute;
-  inset: -40% -10% auto -10%;
-  height: 60%;
-  background: radial-gradient(closest-side, rgba(168, 85, 247, 0.12), transparent 70%);
+  inset: -30% -10% auto -10%;
+  height: 70%;
+  background: radial-gradient(closest-side, rgba(168, 85, 247, 0.16), transparent 70%);
   pointer-events: none;
+}
+.avatar-stage::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: 28px;
+  width: min(280px, 60%);
+  height: 18px;
+  transform: translateX(-50%);
+  background: radial-gradient(ellipse, rgba(31, 41, 55, 0.18), transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Stage background variants — applied as inline class by Agent 2 */
+.avatar-stage[data-bg="sky"]      { background: linear-gradient(180deg, #e0f2fe 0%, #f0f9ff 100%); }
+.avatar-stage[data-bg="sunset"]   { background: linear-gradient(180deg, #ffe4e6 0%, #fef3c7 100%); }
+.avatar-stage[data-bg="mint"]     { background: linear-gradient(180deg, #d1fae5 0%, #ecfdf5 100%); }
+.avatar-stage[data-bg="lavender"] { background: linear-gradient(180deg, #ede9fe 0%, #f5f3ff 100%); }
+
+@media (min-width: 900px) {
+  .avatar-stage {
+    flex: 1 1 0;
+    min-height: 620px;
+    position: sticky;
+    top: 24px;
+    align-self: flex-start;
+  }
 }
 
 .avatar-character {
-  width: min(360px, 86%);
+  width: min(360px, 80%);
   max-width: 360px;
   height: auto;
   position: relative;
   z-index: 1;
   filter: drop-shadow(0 18px 22px rgba(31, 41, 55, 0.18));
   transition: transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  aspect-ratio: 3 / 4;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 .avatar-character svg {
   width: 100%;
@@ -99,90 +117,89 @@
   transform: translateY(-4px);
 }
 
-/* ---------- Wardrobe panel ---------- */
-.avatar-wardrobe {
+/* ---------- Editor panel ---------- */
+.avatar-editor {
   background: var(--avatar-card);
   border: 1px solid var(--avatar-border);
-  border-radius: 24px;
-  padding: 20px 20px 24px;
-  box-shadow: 0 8px 24px -16px rgba(34, 197, 94, 0.18);
+  border-radius: var(--avatar-radius-lg);
+  padding: 18px 18px 20px;
+  box-shadow: var(--avatar-shadow);
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-height: 560px;
+  min-height: 480px;
+  position: relative;
 }
 
-.avatar-wardrobe__header {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-}
-.avatar-wardrobe__title {
-  font-size: 18px;
-  font-weight: 800;
-  letter-spacing: -0.01em;
-}
-.avatar-wardrobe__hint {
-  font-size: 12px;
-  color: var(--avatar-muted);
+@media (min-width: 900px) {
+  .avatar-editor {
+    flex: 0 0 440px;
+    width: 440px;
+    min-height: 620px;
+    padding: 22px 22px 24px;
+  }
 }
 
 /* ---------- Tabs ---------- */
 .avatar-tabs {
   display: flex;
-  gap: 4px;
-  background: #f9fafb;
-  border: 1px solid var(--avatar-border);
-  border-radius: 14px;
-  padding: 4px;
+  gap: 6px;
+  overflow-x: auto;
+  padding: 4px 2px;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  scroll-snap-type: x proximity;
 }
+.avatar-tabs::-webkit-scrollbar { display: none; }
+
 .avatar-tab {
-  flex: 1;
   appearance: none;
-  border: none;
-  background: transparent;
+  border: 1px solid var(--avatar-border);
+  background: #ffffff;
   font: inherit;
   font-weight: 600;
-  font-size: 14px;
-  color: var(--avatar-muted);
-  padding: 10px 8px;
-  border-radius: 10px;
+  font-size: 13px;
+  color: var(--avatar-text);
+  padding: 8px 16px;
+  border-radius: 999px;
   cursor: pointer;
-  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+  white-space: nowrap;
+  flex: 0 0 auto;
+  scroll-snap-align: start;
+  transition: background 160ms ease, color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
 }
 .avatar-tab:hover {
   background: var(--avatar-hover);
   color: var(--avatar-purple-deep);
+  border-color: var(--avatar-purple);
 }
 .avatar-tab.is-active {
-  background: var(--avatar-purple);
+  background: linear-gradient(135deg, var(--avatar-purple) 0%, var(--avatar-purple-deep) 100%);
   color: #ffffff;
-  box-shadow: 0 4px 10px -4px rgba(168, 85, 247, 0.7);
+  border-color: var(--avatar-purple-deep);
+  box-shadow: 0 6px 14px -6px rgba(168, 85, 247, 0.65);
 }
 .avatar-tab.is-active:hover {
-  background: var(--avatar-purple-deep);
   color: #ffffff;
+  transform: translateY(-1px);
 }
 
-/* ---------- Grid ---------- */
+/* ---------- Item grid ---------- */
 .avatar-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
   overflow-y: auto;
-  max-height: 460px;
-  padding: 4px 2px 4px 2px;
+  padding: 4px 2px;
+  flex: 1 1 auto;
+  min-height: 220px;
+  max-height: 440px;
 }
-@media (max-width: 880px) {
-  .avatar-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    max-height: none;
-  }
+@media (min-width: 600px) and (max-width: 899px) {
+  .avatar-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
-@media (max-width: 540px) {
-  .avatar-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+@media (min-width: 900px) {
+  .avatar-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); max-height: 380px; }
 }
 
 /* ---------- Item ---------- */
@@ -190,7 +207,7 @@
   appearance: none;
   border: 2px solid var(--avatar-border);
   background: #ffffff;
-  border-radius: 14px;
+  border-radius: var(--avatar-radius);
   padding: 8px 6px 10px;
   cursor: pointer;
   display: flex;
@@ -201,6 +218,7 @@
               transform 160ms ease, box-shadow 160ms ease;
   font: inherit;
   color: var(--avatar-text);
+  position: relative;
 }
 .avatar-item:hover {
   border-color: var(--avatar-purple);
@@ -218,6 +236,19 @@
 .avatar-item.is-equipped::after {
   content: "✓";
   position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--avatar-purple-deep);
+  color: #ffffff;
+  font-size: 11px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  line-height: 1;
 }
 .avatar-item__thumb {
   width: 100%;
@@ -248,7 +279,7 @@
   color: var(--avatar-purple-deep);
 }
 
-/* "None" / unequip cell variant — Agent C may add this for hat/face etc. */
+/* "None" / unequip cell variant */
 .avatar-item--none .avatar-item__thumb {
   color: var(--avatar-muted);
   font-size: 24px;
@@ -273,15 +304,81 @@
               0 0 0 2px rgba(168, 85, 247, 0.25);
 }
 
-/* ---------- Actions ---------- */
-.avatar-actions {
+/* ---------- Color row ---------- */
+.avatar-color-row {
   display: flex;
-  justify-content: flex-end;
+  flex-wrap: wrap;
   gap: 8px;
-  padding-top: 8px;
+  padding: 10px 4px;
   border-top: 1px solid var(--avatar-border);
 }
-.avatar-actions button,
+.avatar-color-chip {
+  appearance: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  cursor: pointer;
+  padding: 0;
+  position: relative;
+  transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
+}
+.avatar-color-chip:hover {
+  transform: scale(1.1);
+  border-color: var(--avatar-purple);
+}
+.avatar-color-chip.is-selected {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 2px var(--avatar-purple-deep),
+              0 4px 8px -2px rgba(168, 85, 247, 0.5);
+  transform: scale(1.08);
+}
+
+/* ---------- Actions / Save CTA ---------- */
+.avatar-actions {
+  display: flex;
+  justify-content: stretch;
+  gap: 8px;
+  padding-top: 12px;
+  margin-top: auto;
+  border-top: 1px solid var(--avatar-border);
+}
+
+.avatar-save-btn {
+  appearance: none;
+  border: none;
+  background: linear-gradient(135deg, var(--avatar-purple) 0%, var(--avatar-purple-deep) 100%);
+  color: #ffffff;
+  font: inherit;
+  font-weight: 700;
+  font-size: 15px;
+  padding: 14px 24px;
+  border-radius: 14px;
+  cursor: pointer;
+  flex: 1 1 auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 8px 18px -8px rgba(168, 85, 247, 0.6);
+  transition: background 160ms ease, transform 160ms ease, box-shadow 160ms ease, opacity 160ms ease;
+  letter-spacing: -0.01em;
+}
+.avatar-save-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 22px -8px rgba(168, 85, 247, 0.7);
+}
+.avatar-save-btn:active {
+  transform: translateY(0);
+}
+.avatar-save-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+/* Secondary action button (e.g. reset) — reuses .avatar-actions button pattern */
+.avatar-actions button:not(.avatar-save-btn),
 .avatar-actions .btn {
   appearance: none;
   border: 1px solid var(--avatar-border);
@@ -290,31 +387,54 @@
   font: inherit;
   font-weight: 600;
   font-size: 13px;
-  padding: 8px 14px;
-  border-radius: 10px;
+  padding: 10px 16px;
+  border-radius: 12px;
   cursor: pointer;
   transition: background 160ms ease, color 160ms ease, border-color 160ms ease;
 }
-.avatar-actions button:hover,
+.avatar-actions button:not(.avatar-save-btn):hover,
 .avatar-actions .btn:hover {
   background: var(--avatar-hover);
   border-color: var(--avatar-purple);
   color: var(--avatar-purple-deep);
 }
-.avatar-actions .btn-primary {
-  background: var(--avatar-purple);
+
+/* ---------- Toast ---------- */
+.avatar-toast {
+  position: fixed;
+  left: 50%;
+  bottom: 32px;
+  transform: translateX(-50%) translateY(20px);
+  background: linear-gradient(135deg, var(--avatar-green) 0%, var(--avatar-green-deep) 100%);
   color: #ffffff;
-  border-color: var(--avatar-purple);
+  font-weight: 600;
+  font-size: 14px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  box-shadow: 0 12px 28px -8px rgba(34, 197, 94, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 220ms ease, transform 220ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 1000;
+  max-width: calc(100vw - 32px);
+  text-align: center;
 }
-.avatar-actions .btn-primary:hover {
-  background: var(--avatar-purple-deep);
-  border-color: var(--avatar-purple-deep);
-  color: #ffffff;
+.avatar-toast.is-show {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+.avatar-toast.is-error {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  box-shadow: 0 12px 28px -8px rgba(239, 68, 68, 0.45);
+}
+.avatar-toast[hidden] {
+  display: none;
 }
 
 /* ---------- Empty / not-logged-in state ---------- */
 .avatar-empty {
-  grid-column: 1 / -1;
+  flex: 1 1 100%;
   min-height: 60vh;
   display: flex;
   flex-direction: column;
@@ -352,7 +472,7 @@
 .avatar-empty__login {
   appearance: none;
   border: none;
-  background: var(--avatar-purple);
+  background: linear-gradient(135deg, var(--avatar-purple) 0%, var(--avatar-purple-deep) 100%);
   color: #ffffff;
   font: inherit;
   font-weight: 700;
@@ -369,7 +489,6 @@
   margin-top: 8px;
 }
 .avatar-empty__login:hover {
-  background: var(--avatar-purple-deep);
   transform: translateY(-2px);
 }
 

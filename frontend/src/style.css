@@ -626,6 +626,107 @@ html.nav-resizing .nav-collapse {
   color: #b22b2b;
 }
 
+/* ---------- Notification dropdown ---------- */
+.notif-wrap {
+  position: relative;
+  display: inline-block;
+}
+.notif-btn-badge {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 8px;
+  height: 8px;
+  background: #ef4444;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  pointer-events: none;
+}
+
+.notif-menu {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 320px;
+  max-height: 420px;
+  display: flex;
+  flex-direction: column;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.18),
+              0 0 0 1px rgba(0, 0, 0, 0.05);
+  padding: 8px;
+  z-index: 60;
+}
+.notif-menu[hidden] { display: none; }
+
+.notif-menu__header {
+  font-weight: 700;
+  font-size: 14px;
+  color: #111;
+  padding: 10px 12px 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.notif-menu__list {
+  list-style: none;
+  margin: 0;
+  padding: 4px 0;
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+
+.notif-menu__empty,
+.notif-menu__signin {
+  margin: 0;
+  padding: 24px 12px;
+  text-align: center;
+  font-size: 13px;
+  color: #888;
+}
+
+.notif-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 10px 14px 10px 28px;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+.notif-item:hover { background: #f4f1ff; }
+
+.notif-item.is-unread::before {
+  content: "";
+  position: absolute;
+  top: 16px;
+  left: 12px;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--purple-deep, #7c3aed);
+}
+
+.notif-item__title {
+  font-weight: 600;
+  font-size: 13px;
+  color: #111;
+}
+.notif-item.is-read .notif-item__title { color: #555; font-weight: 500; }
+
+.notif-item__body {
+  font-size: 12px;
+  color: #666;
+  line-height: 1.4;
+}
+
+.notif-item__time {
+  font-size: 11px;
+  color: #aaa;
+  margin-top: 2px;
+}
+
 /* ---------- Mascot (battery character) ---------- */
 .mascot {
   position: absolute;

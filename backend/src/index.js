@@ -10,6 +10,7 @@ import cookieParser from "cookie-parser";
 
 import { authRouter, loadSession } from "./auth.js";
 import { testRouter } from "./test.js";
+import { avatarRouter } from "./avatar.js";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -45,6 +46,7 @@ app.get("/", (_req, res) => {
 // Mount feature routers
 app.use("/api", authRouter);
 app.use("/api/test", testRouter);
+app.use("/api/avatar", avatarRouter);
 
 // 404 (JSON)
 app.use((req, res) => {

@@ -38,7 +38,15 @@
               <button type="button" class="lang-menu__item" data-lang="en">English</button>
             </div>
           </div>
-          <button class="icon">🔔</button>
+          <div class="notif-wrap" id="notif-wrap">
+            <button class="icon" id="notif-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="알림">🔔</button>
+            <div class="notif-menu" id="notif-menu" hidden>
+              <div class="notif-menu__header">알림</div>
+              <ul class="notif-menu__list" id="notif-list"></ul>
+              <p class="notif-menu__empty" id="notif-empty" hidden>새 알림이 없어요</p>
+              <p class="notif-menu__signin" id="notif-signin" hidden>로그인 후 확인할 수 있어요</p>
+            </div>
+          </div>
           <button class="ghost" id="login-btn">로그인</button>
           <button class="ghost" id="signup-btn">회원가입</button>
           <div class="my-wrap" id="my-wrap" hidden>
