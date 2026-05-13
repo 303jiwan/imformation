@@ -4,6 +4,12 @@
    by main.js on this page).
    ===================================================================== */
 
+import {
+  buildProblemQueue,
+  saveProblemQueue,
+  TOTAL_PROBLEMS,
+} from "./test-problems.js";
+
 const CONCEPTS = [
   { id: "vars",       name: "변수와 자료형",   tag: "기초",   desc: "int, float, char, 형변환 등 기본 자료형" },
   { id: "operators",  name: "연산자",         tag: "기초",   desc: "산술·논리·비트 연산자, 우선순위" },
@@ -88,6 +94,17 @@ function saveAndNavigate(ids) {
       STORAGE_KEY,
       JSON.stringify({ concepts: ids, savedAt: Date.now() })
     );
+    // Build the problem queue here so the gauge/problem screens immediately
+    // know the correct total. Reset prior progress + answers so a new
+    // selection always starts a fresh attempt.
+    const queue = buildProblemQueue(ids, TOTAL_PROBLEMS);
+    saveProblemQueue(queue);
+    sessionStorage.setItem(
+      "codenergy:test:progress",
+      JSON.stringify({ current: 1, total: queue.length })
+    );
+    sessionStorage.removeItem("codenergy:test:answers");
+    sessionStorage.removeItem("codenergy:test:timer");
   } catch (_) {}
   if (fade) fade.classList.remove("is-hidden");
   setTimeout(() => {

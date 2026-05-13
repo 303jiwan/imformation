@@ -1,4 +1,13 @@
-import { PROBLEMS, TOTAL_PROBLEMS, TIME_PER_PROBLEM_MS, getTestCases } from "./test-problems.js";
+import {
+  PROBLEMS,
+  TOTAL_PROBLEMS,
+  TIME_PER_PROBLEM_MS,
+  getTestCases,
+  buildProblemQueue,
+  loadProblemQueue,
+  saveProblemQueue,
+  QUEUE_KEY,
+} from "./test-problems.js";
 import { runC, normalizeOutput, gradingSample, judgeAvailable } from "./judge.js";
 
 /* =====================================================================
@@ -16,6 +25,7 @@ import { runC, normalizeOutput, gradingSample, judgeAvailable } from "./judge.js
 const PROGRESS_KEY = "codenergy:test:progress";
 const ANSWERS_KEY  = "codenergy:test:answers";
 const TIMER_KEY    = "codenergy:test:timer";
+const CONCEPTS_KEY = "codenergy:test:concepts";
 const NEXT_PAGE    = "test-result.html";
 
 /* ---------- Storage ---------- */
@@ -47,8 +57,33 @@ function saveAnswer(problemId, payload) {
   try { sessionStorage.setItem(ANSWERS_KEY, JSON.stringify(all)); } catch (_) {}
 }
 
+function loadSelectedConcepts() {
+  try {
+    const raw = sessionStorage.getItem(CONCEPTS_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed?.concepts) ? parsed.concepts : [];
+  } catch (_) { return []; }
+}
+
+// Resolve the queue lazily — concepts page normally builds it, but this guards
+// against direct navigation to test-problem.html with no queue saved.
+let queue = loadProblemQueue();
+if (!queue) {
+  queue = buildProblemQueue(loadSelectedConcepts(), TOTAL_PROBLEMS);
+  saveProblemQueue(queue);
+}
+
 const progress = loadProgress();
-const problem = PROBLEMS.find((p) => p.id === progress.current) ?? PROBLEMS[0];
+if (progress.total !== queue.length || progress.current > queue.length || progress.current < 1) {
+  progress.total = queue.length;
+  if (progress.current < 1) progress.current = 1;
+  if (progress.current > queue.length) progress.current = queue.length;
+  saveProgress(progress);
+}
+
+const problemId = queue[progress.current - 1];
+const problem = PROBLEMS.find((p) => p.id === problemId) ?? PROBLEMS[0];
 
 /**
  * Per-case state (editable). Each entry tracks both the user-supplied input
@@ -654,7 +689,7 @@ skipBtn.addEventListener("click", () => {
 
 exitBtn.addEventListener("click", () => {
   if (!confirm("정말 갭체크를 종료할까요? 진행 상황이 사라집니다.")) return;
-  for (const k of [PROGRESS_KEY, ANSWERS_KEY, TIMER_KEY]) {
+  for (const k of [PROGRESS_KEY, ANSWERS_KEY, TIMER_KEY, QUEUE_KEY]) {
     try { sessionStorage.removeItem(k); } catch (_) {}
   }
   window.location.href = "index.html";

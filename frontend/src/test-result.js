@@ -1,4 +1,4 @@
-import { PROBLEMS, TOTAL_PROBLEMS } from "./test-problems.js";
+import { PROBLEMS, TOTAL_PROBLEMS, loadProblemQueue, QUEUE_KEY } from "./test-problems.js";
 
 /* =====================================================================
    Test result screen — Step 6 of the coding-test flow.
@@ -89,8 +89,9 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;");
 }
 
-function renderPerProblem(progress, answers) {
-  const problem = PROBLEMS.find((p) => p.id === progress.current) ?? PROBLEMS[0];
+function renderPerProblem(progress, answers, queue) {
+  const problemId = queue[progress.current - 1] ?? queue[0];
+  const problem = PROBLEMS.find((p) => p.id === problemId) ?? PROBLEMS[0];
   const answer = answers[problem.id];
   const verdict = answer?.verdict || "missing";
   const copy = COPY[verdict];
@@ -106,7 +107,7 @@ function renderPerProblem(progress, answers) {
       <h1 class="result-hero__title">${pick(copy.title)}</h1>
       <p class="result-hero__sub">${copy.sub}</p>
       <div class="result-hero__meta">
-        <span>문제 <strong>${problem.id} / ${progress.total}</strong></span>
+        <span>문제 <strong>${progress.current} / ${progress.total}</strong></span>
         <span>·</span>
         <span><strong>${problem.title}</strong></span>
         ${verdict === "correct"
@@ -152,7 +153,7 @@ function renderPerProblem(progress, answers) {
   document.getElementById("next-btn").addEventListener("click", () => {
     if (isLast) {
       // Stay on this page but switch to summary mode.
-      renderSummary(progress, answers);
+      renderSummary(progress, answers, queue);
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -204,16 +205,17 @@ function weakConcepts(cards) {
   return out;
 }
 
-function renderSummary(progress, answers) {
+function renderSummary(progress, answers, queue) {
   let correct = 0, wrong = 0, timeout = 0, missing = 0;
-  const cards = PROBLEMS.map((p) => {
+  const cards = queue.map((id, idx) => {
+    const p = PROBLEMS.find((pp) => pp.id === id) ?? PROBLEMS[0];
     const a = answers[p.id];
     const v = a?.verdict || "missing";
     if (v === "correct") correct++;
     else if (v === "wrong") wrong++;
     else if (v === "timeout") timeout++;
     else missing++;
-    return { p, v, a };
+    return { p, v, a, slot: idx + 1 };
   });
 
   const score = correct;
@@ -229,17 +231,17 @@ function renderSummary(progress, answers) {
   };
 
   // Concepts attempted (deduplicated). Falls back to "도전한 문제 수" if
-  // no tags resolve (defensive — current PROBLEMS all have tags).
-  const conceptSet = new Set(PROBLEMS.map(conceptOf).filter(Boolean));
+  // no tags resolve (defensive — queued problems all have tags).
+  const conceptSet = new Set(cards.map(({ p }) => conceptOf(p)).filter(Boolean));
   const conceptCount = conceptSet.size;
   const conceptStatLabel = conceptCount > 0 ? "도전한 개념 수" : "도전한 문제 수";
   const conceptStatValue = conceptCount > 0 ? conceptCount : total;
 
-  // Stacked progress-bar segments — one per problem (5 segments) so each
-  // segment maps 1:1 onto a problem.
-  const barSegs = cards.map(({ p, v }) => {
+  // Stacked progress-bar segments — one per queued problem so each segment
+  // maps 1:1 onto the user's actual lineup.
+  const barSegs = cards.map(({ slot, v }) => {
     const meta = VERDICT_META[v];
-    return `<span class="summary-bar__seg ${meta.segClass}" title="문제 ${p.id} — ${meta.label}"></span>`;
+    return `<span class="summary-bar__seg ${meta.segClass}" title="문제 ${slot} — ${meta.label}"></span>`;
   }).join("");
 
   // Build the recommendation block from actual results.
@@ -342,13 +344,13 @@ function renderSummary(progress, answers) {
         <span class="dash-section__pct">${total}문제</span>
       </div>
       <div class="summary-grid">
-        ${cards.map(({ p, v }) => {
+        ${cards.map(({ p, v, slot }) => {
           const meta = VERDICT_META[v];
           const concept = conceptOf(p);
           return `
             <div class="summary-card ${meta.cardClass}">
               <span class="summary-card__icon" aria-hidden="true">${meta.icon}</span>
-              <span class="summary-card__num">문제 ${p.id}</span>
+              <span class="summary-card__num">문제 ${slot}</span>
               <span class="summary-card__title">${escapeHtml(p.title)}</span>
               <span class="summary-card__concept">${escapeHtml(concept)}</span>
               <span class="summary-card__verdict">${meta.label}</span>
@@ -384,7 +386,7 @@ function renderSummary(progress, answers) {
 
   document.getElementById("restart-btn").addEventListener("click", () => {
     if (!confirm("진행 기록을 모두 지우고 처음부터 다시 시작할까요?")) return;
-    for (const k of [PROGRESS_KEY, ANSWERS_KEY, TIMER_KEY]) {
+    for (const k of [PROGRESS_KEY, ANSWERS_KEY, TIMER_KEY, QUEUE_KEY]) {
       try { sessionStorage.removeItem(k); } catch (_) {}
     }
     if (fade) fade.classList.remove("is-hidden");
@@ -394,7 +396,7 @@ function renderSummary(progress, answers) {
 
 function exitFlow() {
   if (!confirm("정말 테스트를 종료할까요? 진행 상황이 사라집니다.")) return;
-  for (const k of [PROGRESS_KEY, ANSWERS_KEY, TIMER_KEY]) {
+  for (const k of [PROGRESS_KEY, ANSWERS_KEY, TIMER_KEY, QUEUE_KEY]) {
     try { sessionStorage.removeItem(k); } catch (_) {}
   }
   window.location.href = "index.html";
@@ -404,5 +406,11 @@ function exitFlow() {
 
 const progress = loadProgress();
 const answers = loadAnswers();
+const queue = loadProblemQueue() ?? PROBLEMS.map((p) => p.id);
+// Sync total to queue length in case the user landed here without a fresh queue.
+if (progress.total !== queue.length) {
+  progress.total = queue.length;
+  saveProgress(progress);
+}
 
-renderPerProblem(progress, answers);
+renderPerProblem(progress, answers, queue);
