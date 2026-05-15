@@ -6,6 +6,7 @@ import {
   buildProblemQueue,
   loadProblemQueue,
   saveProblemQueue,
+  problemDifficulty,
   QUEUE_KEY,
 } from "./test-problems.js";
 import { runC, normalizeOutput, gradingSample, judgeAvailable } from "./judge.js";
@@ -210,6 +211,8 @@ function renderResultBody() {
 
 /* ---------- Input parsing & validation ---------- */
 
+const DIFFICULTY = problemDifficulty(problem);
+
 function parseAFromInput(value) {
   const trimmed = (value || "").trim();
   if (!trimmed) return null;
@@ -219,14 +222,65 @@ function parseAFromInput(value) {
   return n;
 }
 
-/** Returns "ok" | "empty" | "out-of-range" */
+/**
+ * Parse the case-input textarea into the shape `problem.expected` wants.
+ *   easy   → integer (the single A) or null
+ *   medium → { [name]: int } object matching problem.inputs, or null
+ *   killer → null (cases are immutable, expected stays from getTestCases)
+ */
+function parseInputsForProblem(value) {
+  if (DIFFICULTY === "killer") return null;
+  if (DIFFICULTY === "medium" && Array.isArray(problem.inputs)) {
+    const tokens = (value || "").trim().split(/\s+/);
+    if (tokens.length < problem.inputs.length) return null;
+    const values = {};
+    for (let i = 0; i < problem.inputs.length; i++) {
+      const inp = problem.inputs[i];
+      const n = Number(tokens[i]);
+      if (!Number.isInteger(n)) return null;
+      if (n < inp.min || n > inp.max) return null;
+      values[inp.name] = n;
+    }
+    return values;
+  }
+  // easy
+  const A = parseAFromInput(value);
+  if (A === null) return null;
+  if (A < problem.aMin || A > problem.aMax) return null;
+  return A;
+}
+
+/** Returns "ok" | "empty" | "out-of-range" | "frozen" (killer). */
 function classifyInput(value) {
+  if (DIFFICULTY === "killer") return "frozen";
   const trimmed = (value || "").trim();
   if (!trimmed) return "empty";
-  const A = parseAFromInput(value);
-  if (A === null) return "out-of-range"; // non-integer
-  if (A < problem.aMin || A > problem.aMax) return "out-of-range";
-  return "ok";
+  const parsed = parseInputsForProblem(value);
+  return parsed === null ? "out-of-range" : "ok";
+}
+
+function computeExpected(parsed) {
+  if (DIFFICULTY === "killer") return null; // expected fixed by testCases
+  if (typeof problem.expected === "function") {
+    return problem.expected(parsed);
+  }
+  return null;
+}
+
+function inputHintText() {
+  if (DIFFICULTY === "killer") {
+    return "이 문제는 미리 정해진 테스트 케이스로만 채점됩니다 (편집 불가).";
+  }
+  if (DIFFICULTY === "medium" && Array.isArray(problem.inputs)) {
+    return (
+      "허용 범위 · " +
+      problem.inputs
+        .map((inp) => `${inp.name}: ${inp.min}~${inp.max}`)
+        .join(" / ") +
+      " (각 줄에 정수 하나씩)"
+    );
+  }
+  return `허용 범위: ${problem.aMin} ~ ${problem.aMax} 사이의 정수`;
 }
 
 function refreshActiveCaseFromTextarea() {
@@ -237,20 +291,31 @@ function refreshActiveCaseFromTextarea() {
   c.pass = null;
   c.actual = "";
 
+  if (DIFFICULTY === "killer") {
+    // Killer cases are read-only: keep whatever getTestCases gave us.
+    caseInputEdit.classList.remove("is-error");
+    caseInputErr.hidden = true;
+    renderCaseTabs();
+    return;
+  }
+
   const status = classifyInput(c.input);
   if (status === "ok") {
-    const A = parseAFromInput(c.input);
-    c.A = A;
-    c.expected = problem.expected(A);
+    const parsed = parseInputsForProblem(c.input);
+    if (DIFFICULTY === "easy") c.A = parsed;
+    else c.values = parsed;
+    c.expected = computeExpected(parsed) ?? c.expected ?? "";
     caseInputEdit.classList.remove("is-error");
     caseInputErr.hidden = true;
   } else if (status === "out-of-range") {
-    c.A = null;
+    if (DIFFICULTY === "easy") c.A = null;
+    else c.values = null;
     c.expected = "";
     caseInputEdit.classList.add("is-error");
     caseInputErr.hidden = false;
   } else { // empty
-    c.A = null;
+    if (DIFFICULTY === "easy") c.A = null;
+    else c.values = null;
     c.expected = "";
     caseInputEdit.classList.remove("is-error");
     caseInputErr.hidden = true;
@@ -262,7 +327,9 @@ function renderTestsBody() {
   const c = cases[activeCaseIdx];
   if (!c) return;
   caseInputEdit.value = c.input ?? "";
-  caseInputHint.textContent = `허용 범위: ${problem.aMin} ~ ${problem.aMax} 사이의 정수`;
+  caseInputHint.textContent = inputHintText();
+  // Killer cases are not editable.
+  caseInputEdit.readOnly = DIFFICULTY === "killer";
   // Re-run validation against the synced value so the error styling stays correct.
   refreshActiveCaseFromTextarea();
 }
@@ -306,17 +373,39 @@ actResult.addEventListener("click", () => setDockMode("result"));
 
 dockAdd.addEventListener("click", () => {
   if (cases.length >= MAX_CASES) return;
+  // Killer problems ship a fixed set of cases — no manual additions.
+  if (DIFFICULTY === "killer") return;
   const nextId = (cases[cases.length - 1]?.id || 0) + 1;
-  const A = problem.aMin;
-  cases.push({
-    id: nextId,
-    input: String(A),
-    expected: problem.expected(A),
-    A,
-    ran: false,
-    pass: null,
-    actual: "",
-  });
+  if (DIFFICULTY === "medium" && Array.isArray(problem.inputs)) {
+    const values = {};
+    const lines = [];
+    for (const inp of problem.inputs) {
+      values[inp.name] = inp.min;
+      lines.push(String(inp.min));
+    }
+    cases.push({
+      id: nextId,
+      input: lines.join("\n"),
+      expected: problem.expected(values),
+      A: null,
+      values,
+      ran: false,
+      pass: null,
+      actual: "",
+    });
+  } else {
+    const A = problem.aMin;
+    cases.push({
+      id: nextId,
+      input: String(A),
+      expected: problem.expected(A),
+      A,
+      values: null,
+      ran: false,
+      pass: null,
+      actual: "",
+    });
+  }
   activeCaseIdx = cases.length - 1;
   renderCaseTabs();
   renderCaseBody();
@@ -462,7 +551,11 @@ function setRunLoading(isLoading) {
 async function runAllCases() {
   // Block the run if any case input is currently invalid — surface the error
   // by switching to tests mode on the offending case so the user can fix it.
-  const badIdx = cases.findIndex((c) => classifyInput(c.input) !== "ok");
+  // Killer's "frozen" cases are always considered valid.
+  const badIdx = cases.findIndex((c) => {
+    const s = classifyInput(c.input);
+    return s !== "ok" && s !== "frozen";
+  });
   if (badIdx >= 0) {
     activeCaseIdx = badIdx;
     setDockMode("tests");
@@ -474,9 +567,13 @@ async function runAllCases() {
 
   // Refresh expected from current input + clear any previous run state.
   cases.forEach((c) => {
-    const A = parseAFromInput(c.input);
-    c.A = A;
-    c.expected = problem.expected(A);
+    if (DIFFICULTY !== "killer") {
+      const parsed = parseInputsForProblem(c.input);
+      if (DIFFICULTY === "easy") c.A = parsed;
+      else c.values = parsed;
+      const e = computeExpected(parsed);
+      if (e !== null) c.expected = e;
+    }
     c.ran = false;
     c.pass = null;
     c.actual = "";
@@ -587,18 +684,36 @@ async function submitTest(reason = "manual") {
   overlay.setAttribute("aria-hidden", "false");
   overlayTitle.textContent = reason === "timeout" ? "시간 초과 — 자동 제출" : "채점 중…";
 
-  // Pick test inputs to grade against. With Judge0 we use a small sample
-  // (10 reps) to stay within RapidAPI's free quota; mock mode walks the
-  // full A range since it costs nothing.
-  const sampleAs = judgeAvailable
-    ? gradingSample(problem, 10)
-    : (() => {
-        const arr = [];
-        for (let A = problem.aMin; A <= problem.aMax; A++) arr.push(A);
-        return arr;
-      })();
+  // Build the grading plan up-front so the submit loop is difficulty-agnostic:
+  //   easy   → sample 10 A values across [aMin, aMax] (or sweep all in mock mode)
+  //   medium → use getTestCases() output (3 cases, or explicit testCases)
+  //   killer → use the hardcoded testCases verbatim
+  let plan;
+  if (DIFFICULTY === "easy") {
+    const As = judgeAvailable
+      ? gradingSample(problem, 10)
+      : (() => {
+          const arr = [];
+          for (let A = problem.aMin; A <= problem.aMax; A++) arr.push(A);
+          return arr;
+        })();
+    plan = As.map((A) => ({
+      input: String(A),
+      expected: problem.expected(A),
+      label: `A = ${A}`,
+      A,
+    }));
+  } else {
+    plan = getTestCases(problem).map((c) => ({
+      input: c.input,
+      expected: c.expected,
+      label: `Case${c.id}`,
+      A: c.A ?? null,
+      values: c.values ?? null,
+    }));
+  }
 
-  overlaySub.textContent = `테스트 케이스 ${sampleAs.length}개를 검증하고 있어요.`;
+  overlaySub.textContent = `테스트 케이스 ${plan.length}개를 검증하고 있어요.`;
 
   let verdict;
   if (reason === "timeout") {
@@ -606,12 +721,12 @@ async function submitTest(reason = "manual") {
   } else if (!judgeAvailable) {
     // Mock grading — sweep through samples for visual rhythm
     let idx = 0;
-    const stepEvery = Math.max(40, Math.min(200, Math.floor(1200 / sampleAs.length)));
+    const stepEvery = Math.max(40, Math.min(200, Math.floor(1200 / plan.length)));
     await new Promise((resolve) => {
       const animator = setInterval(() => {
-        if (idx >= sampleAs.length) { clearInterval(animator); resolve(); return; }
-        const A = sampleAs[idx];
-        overlaySub.textContent = `A = ${A} → 기대 출력 ${problem.expected(A)}`;
+        if (idx >= plan.length) { clearInterval(animator); resolve(); return; }
+        const tc = plan[idx];
+        overlaySub.textContent = `${tc.label} → 기대 출력 ${tc.expected}`;
         idx++;
       }, stepEvery);
     });
@@ -620,12 +735,12 @@ async function submitTest(reason = "manual") {
     // Real Judge0 grading — sequential, short-circuit on first failure
     let allPass = true;
     let stoppedReason = null;
-    for (let i = 0; i < sampleAs.length; i++) {
-      const A = sampleAs[i];
-      overlaySub.textContent = `A = ${A} 검증 중… (${i + 1}/${sampleAs.length})`;
+    for (let i = 0; i < plan.length; i++) {
+      const tc = plan[i];
+      overlaySub.textContent = `${tc.label} 검증 중… (${i + 1}/${plan.length})`;
       let result;
       try {
-        result = await runC(code, String(A) + "\n");
+        result = await runC(code, tc.input + "\n");
       } catch (err) {
         allPass = false;
         stoppedReason = `네트워크 오류: ${err?.message || err}`;
@@ -642,10 +757,10 @@ async function submitTest(reason = "manual") {
         break;
       }
       const actual = normalizeOutput(result.stdout);
-      const expected = normalizeOutput(problem.expected(A));
+      const expected = normalizeOutput(tc.expected);
       if (actual !== expected) {
         allPass = false;
-        stoppedReason = `A = ${A}에서 출력 불일치`;
+        stoppedReason = `${tc.label}에서 출력 불일치`;
         break;
       }
     }
@@ -656,7 +771,12 @@ async function submitTest(reason = "manual") {
   saveAnswer(problem.id, {
     code,
     verdict,
-    cases: sampleAs.map((A) => ({ A, expected: problem.expected(A) })),
+    cases: plan.map((tc) => ({
+      A: tc.A,
+      values: tc.values,
+      label: tc.label,
+      expected: tc.expected,
+    })),
     submittedAt: Date.now(),
     reason,
   });
