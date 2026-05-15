@@ -6,6 +6,11 @@
 
 const API_BASE = "http://localhost:3000";
 
+// Current authenticated user id, or null if not signed in / fetch failed.
+// Looked up once on page load so renderList can decide which lectures the
+// viewer is allowed to delete (only their own).
+let currentUserId = null;
+
 const els = {
   status:      document.getElementById("lectures-status"),
   empty:       document.getElementById("lectures-empty"),
@@ -111,7 +116,10 @@ function renderList(lectures) {
   setVisibility(false);
   els.list.innerHTML = lectures
     .map(
-      (lec) => `
+      (lec) => {
+        const ownsLecture =
+          currentUserId !== null && lec.uploaderId === currentUserId;
+        return `
         <article class="lecture-item" data-tilt>
           <div class="lecture-item__thumb" aria-hidden="true">
             ${lec.sourceType === "file" ? "🎞" : "▶"}
@@ -126,10 +134,16 @@ function renderList(lectures) {
               <span>·</span>
               <span>${formatDate(lec.createdAt)}</span>
             </p>
-            <button type="button" class="lecture-item__play" data-id="${lec.id}">▶ 강의 재생</button>
+            <div class="lecture-item__actions">
+              <button type="button" class="lecture-item__play" data-id="${lec.id}">▶ 강의 재생</button>
+              ${ownsLecture
+                ? `<button type="button" class="lecture-item__delete" data-id="${lec.id}">삭제</button>`
+                : ""}
+            </div>
           </div>
         </article>
-      `
+      `;
+      }
     )
     .join("");
 
@@ -140,6 +154,48 @@ function renderList(lectures) {
       if (lec) openPlayer(lec);
     });
   });
+
+  els.list.querySelectorAll(".lecture-item__delete").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = Number(btn.getAttribute("data-id"));
+      const lec = lectures.find((l) => l.id === id);
+      if (lec) deleteLecture(lec, btn);
+    });
+  });
+}
+
+async function deleteLecture(lec, btn) {
+  const ok = window.confirm("이 강의를 삭제할까요? 되돌릴 수 없어요.");
+  if (!ok) return;
+  if (btn) {
+    btn.disabled = true;
+    btn.textContent = "삭제 중…";
+  }
+  try {
+    const res = await fetch(`${API_BASE}/api/lectures/${lec.id}`, {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (res.status === 401) {
+      throw new Error("로그인 후 삭제할 수 있어요.");
+    }
+    if (res.status === 403) {
+      throw new Error("본인이 올린 강의만 삭제할 수 있어요.");
+    }
+    const data = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      throw new Error(data?.error || `삭제 실패 (HTTP ${res.status})`);
+    }
+    showStatus("삭제했어요.", "ok");
+    setTimeout(hideStatus, 2400);
+    await loadLectures();
+  } catch (err) {
+    showStatus(err.message || "삭제에 실패했어요.", "error");
+    if (btn) {
+      btn.disabled = false;
+      btn.textContent = "삭제";
+    }
+  }
 }
 
 function fullSourceUrl(lec) {
@@ -278,6 +334,20 @@ async function submitUpload(event) {
 
 // ---------------- Initial load ----------------
 
+async function loadCurrentUser() {
+  try {
+    const res = await fetch(`${API_BASE}/api/me`, { credentials: "include" });
+    if (!res.ok) {
+      currentUserId = null;
+      return;
+    }
+    const data = await res.json().catch(() => ({}));
+    currentUserId = data?.user?.id ?? null;
+  } catch {
+    currentUserId = null;
+  }
+}
+
 async function loadLectures() {
   try {
     const res = await fetch(`${API_BASE}/api/lectures`, {
@@ -312,7 +382,9 @@ function init() {
     else modal.hidden = true;
   });
 
-  loadLectures();
+  // Resolve current user before the first list render so the delete button can
+  // be drawn for the viewer's own lectures on the initial paint.
+  loadCurrentUser().finally(loadLectures);
 }
 
 if (document.readyState === "loading") {
