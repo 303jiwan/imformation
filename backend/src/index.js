@@ -11,7 +11,7 @@ import cookieParser from "cookie-parser";
 import { authRouter, loadSession } from "./auth.js";
 import { testRouter } from "./test.js";
 import { avatarRouter } from "./avatar.js";
-import { lecturesRouter, LECTURES_DIR } from "./lectures.js";
+import { lecturesRouter, LECTURES_DIR, THUMBNAILS_DIR } from "./lectures.js";
 import { surveyRouter } from "./survey.js";
 
 const app = express();
@@ -57,6 +57,16 @@ app.use("/api/survey", surveyRouter);
 app.use(
   "/uploads/lectures",
   express.static(LECTURES_DIR, {
+    setHeaders(res) {
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  })
+);
+
+// Same treatment for lecture thumbnails so <img src=...> works cross-origin.
+app.use(
+  "/uploads/thumbnails",
+  express.static(THUMBNAILS_DIR, {
     setHeaders(res) {
       res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
     },

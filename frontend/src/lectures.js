@@ -15,6 +15,7 @@ const els = {
   status:      document.getElementById("lectures-status"),
   empty:       document.getElementById("lectures-empty"),
   list:        document.getElementById("lectures-list"),
+  tabs:        document.getElementById("lectures-tabs"),
   openUpload:  document.getElementById("open-upload"),
   emptyUpload: document.getElementById("empty-upload"),
   uploadModal: document.getElementById("upload-modal"),
@@ -23,11 +24,22 @@ const els = {
   uploadSubmit:document.getElementById("upload-submit"),
   urlField:    document.getElementById("upload-url-field"),
   fileField:   document.getElementById("upload-file-field"),
+  thumbField:  document.getElementById("upload-thumb-field"),
   playerModal: document.getElementById("player-modal"),
   playerTitle: document.getElementById("player-title"),
   playerStage: document.getElementById("player-stage"),
   playerMeta:  document.getElementById("player-meta"),
 };
+
+// Korean labels for the category chip displayed on each card.
+const CATEGORY_LABELS = {
+  algorithm: "알고리즘",
+  "data-structure": "자료구조",
+  "programming-basic": "프로그래밍 기초",
+  other: "기타",
+};
+
+let currentCategory = "";  // "" means all categories
 
 function escapeHtml(s) {
   return String(s ?? "")
@@ -35,6 +47,12 @@ function escapeHtml(s) {
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;");
+}
+
+function escapeAttr(s) {
+  // Same as escapeHtml but separated for readability where we're explicitly
+  // building an attribute value (e.g. an <img src="…">).
+  return escapeHtml(s);
 }
 
 function formatDate(iso) {
@@ -108,6 +126,36 @@ function looksLikeRawVideoUrl(url) {
 
 // ---------------- Rendering ----------------
 
+function thumbnailUrl(lec) {
+  if (!lec.thumbnail) return null;
+  // Server returns either an absolute http(s) URL (YouTube) or a relative
+  // /uploads/thumbnails/... path. Relative paths need the API origin prefixed
+  // because this page is served by Vite on a different port in dev.
+  if (/^https?:\/\//i.test(lec.thumbnail)) return lec.thumbnail;
+  return `${API_BASE}${lec.thumbnail}`;
+}
+
+function categoryChip(category) {
+  const label = CATEGORY_LABELS[category] || CATEGORY_LABELS.other;
+  return `<span class="lecture-item__chip">${escapeHtml(label)}</span>`;
+}
+
+function thumbBlock(lec) {
+  const url = thumbnailUrl(lec);
+  if (url) {
+    return `
+      <div class="lecture-item__thumb lecture-item__thumb--image">
+        <img src="${escapeAttr(url)}" alt="" loading="lazy" />
+      </div>
+    `;
+  }
+  return `
+    <div class="lecture-item__thumb" aria-hidden="true">
+      ${lec.sourceType === "file" ? "🎞" : "▶"}
+    </div>
+  `;
+}
+
 function renderList(lectures) {
   if (!lectures.length) {
     setVisibility(true);
@@ -121,11 +169,12 @@ function renderList(lectures) {
           currentUserId !== null && lec.uploaderId === currentUserId;
         return `
         <article class="lecture-item" data-tilt>
-          <div class="lecture-item__thumb" aria-hidden="true">
-            ${lec.sourceType === "file" ? "🎞" : "▶"}
-          </div>
+          ${thumbBlock(lec)}
           <div class="lecture-item__body">
-            <h3 class="lecture-item__title">${escapeHtml(lec.title)}</h3>
+            <div class="lecture-item__head">
+              <h3 class="lecture-item__title">${escapeHtml(lec.title)}</h3>
+              ${categoryChip(lec.category)}
+            </div>
             ${lec.description
               ? `<p class="lecture-item__desc">${escapeHtml(lec.description)}</p>`
               : ""}
@@ -133,6 +182,8 @@ function renderList(lectures) {
               <span>${escapeHtml(lec.uploader)}</span>
               <span>·</span>
               <span>${formatDate(lec.createdAt)}</span>
+              <span>·</span>
+              <span>▶ ${Number(lec.viewCount ?? 0).toLocaleString("ko-KR")}회</span>
             </p>
             <div class="lecture-item__actions">
               <button type="button" class="lecture-item__play" data-id="${lec.id}">▶ 강의 재생</button>
@@ -208,6 +259,15 @@ function fullSourceUrl(lec) {
   return lec.source;
 }
 
+// Fire-and-forget view bump. Failure here must NOT block playback because
+// the backend may simply be offline in demo mode.
+function bumpView(id) {
+  fetch(`${API_BASE}/api/lectures/${id}/view`, {
+    method: "POST",
+    credentials: "include",
+  }).catch(() => {});
+}
+
 function openPlayer(lec) {
   els.playerTitle.textContent = lec.title;
   els.playerMeta.textContent = `업로더: ${lec.uploader} · ${formatDate(lec.createdAt)}`;
@@ -246,6 +306,7 @@ function openPlayer(lec) {
   }
   els.playerStage.innerHTML = stageHtml;
   els.playerModal.hidden = false;
+  bumpView(lec.id);
 }
 
 function closePlayer() {
@@ -271,6 +332,10 @@ function syncSourceFields() {
   const choice = els.uploadForm.elements.sourceType.value;
   els.urlField.hidden = choice !== "url";
   els.fileField.hidden = choice !== "file";
+  // Custom thumbnail upload only makes sense for file lectures — YouTube URLs
+  // get an auto-derived thumbnail server-side, and we don't want to surface a
+  // confusing input that gets ignored for non-YouTube URL submissions.
+  if (els.thumbField) els.thumbField.hidden = choice !== "file";
 }
 
 async function submitUpload(event) {
@@ -282,6 +347,7 @@ async function submitUpload(event) {
   try {
     const form = els.uploadForm;
     const sourceType = form.elements.sourceType.value;
+    const category = form.elements.category?.value || "other";
     let res;
     if (sourceType === "url") {
       const body = {
@@ -289,6 +355,7 @@ async function submitUpload(event) {
         description: form.elements.description.value.trim(),
         sourceType: "url",
         url: form.elements.url.value.trim(),
+        category,
       };
       res = await fetch(`${API_BASE}/api/lectures`, {
         method: "POST",
@@ -301,9 +368,12 @@ async function submitUpload(event) {
       fd.set("title", form.elements.title.value.trim());
       fd.set("description", form.elements.description.value.trim());
       fd.set("sourceType", "file");
+      fd.set("category", category);
       const file = form.elements.video.files?.[0];
       if (!file) throw new Error("동영상 파일을 선택해주세요.");
       fd.set("video", file);
+      const thumb = form.elements.thumbnail?.files?.[0];
+      if (thumb) fd.set("thumbnail", thumb);
       res = await fetch(`${API_BASE}/api/lectures`, {
         method: "POST",
         credentials: "include",
@@ -350,9 +420,10 @@ async function loadCurrentUser() {
 
 async function loadLectures() {
   try {
-    const res = await fetch(`${API_BASE}/api/lectures`, {
-      credentials: "include",
-    });
+    const url = currentCategory
+      ? `${API_BASE}/api/lectures?category=${encodeURIComponent(currentCategory)}`
+      : `${API_BASE}/api/lectures`;
+    const res = await fetch(url, { credentials: "include" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const data = await res.json();
     renderList(Array.isArray(data.lectures) ? data.lectures : []);
@@ -360,6 +431,15 @@ async function loadLectures() {
     setVisibility(true);
     showStatus(`강의 목록을 불러오지 못했어요 (${err.message}). 백엔드가 실행 중인지 확인해주세요.`, "error");
   }
+}
+
+function setActiveTab(category) {
+  if (!els.tabs) return;
+  els.tabs.querySelectorAll(".lectures-tab").forEach((btn) => {
+    const isActive = (btn.dataset.category || "") === category;
+    btn.classList.toggle("is-active", isActive);
+    btn.setAttribute("aria-selected", isActive ? "true" : "false");
+  });
 }
 
 function init() {
@@ -372,6 +452,17 @@ function init() {
     r.addEventListener("change", syncSourceFields)
   );
 
+  els.tabs?.addEventListener("click", (e) => {
+    const target = e.target instanceof Element ? e.target.closest(".lectures-tab") : null;
+    if (!target) return;
+    const next = target.dataset.category || "";
+    if (next === currentCategory) return;
+    currentCategory = next;
+    setActiveTab(currentCategory);
+    hideStatus();
+    loadLectures();
+  });
+
   document.addEventListener("click", (e) => {
     if (!(e.target instanceof Element)) return;
     if (!e.target.matches("[data-close]")) return;
@@ -382,6 +473,7 @@ function init() {
     else modal.hidden = true;
   });
 
+  setActiveTab(currentCategory);
   // Resolve current user before the first list render so the delete button can
   // be drawn for the viewer's own lectures on the initial paint.
   loadCurrentUser().finally(loadLectures);

@@ -86,11 +86,15 @@ db.exec(`
     description  TEXT NOT NULL DEFAULT '',
     source_type  TEXT NOT NULL CHECK (source_type IN ('url', 'file')),
     source       TEXT NOT NULL,
+    thumbnail    TEXT,
+    view_count   INTEGER NOT NULL DEFAULT 0,
+    category     TEXT NOT NULL DEFAULT 'other',
     created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
 
   CREATE INDEX IF NOT EXISTS idx_lectures_created ON lectures(created_at DESC);
+  CREATE INDEX IF NOT EXISTS idx_lectures_category ON lectures(category);
 
   CREATE TABLE IF NOT EXISTS surveys (
     user_id    INTEGER PRIMARY KEY,
@@ -101,6 +105,33 @@ db.exec(`
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
 `);
+
+// --- Lightweight column migrations -----------------------------------------
+// SQLite has no IF NOT EXISTS for ADD COLUMN, so we try each one and swallow
+// the "duplicate column name" failure. This keeps existing app.db files in
+// sync with the schema above without dropping data.
+const lectureColumnMigrations = [
+  "ALTER TABLE lectures ADD COLUMN thumbnail TEXT",
+  "ALTER TABLE lectures ADD COLUMN view_count INTEGER NOT NULL DEFAULT 0",
+  "ALTER TABLE lectures ADD COLUMN category TEXT NOT NULL DEFAULT 'other'",
+];
+for (const sql of lectureColumnMigrations) {
+  try {
+    db.exec(sql);
+  } catch (err) {
+    // Ignore "duplicate column name: …" — that means the migration already ran.
+    if (!/duplicate column name/i.test(err?.message ?? "")) {
+      throw err;
+    }
+  }
+}
+// Ensure the category index exists even on databases that pre-date the column.
+try {
+  db.exec("CREATE INDEX IF NOT EXISTS idx_lectures_category ON lectures(category)");
+} catch {
+  // index creation is best-effort; if the column truly doesn't exist we'd have
+  // bailed above.
+}
 
 // --- Prepared statements ----------------------------------------------------
 export const stmts = {
@@ -175,24 +206,42 @@ export const stmts = {
 
   // lectures
   insertLecture: db.prepare(
-    `INSERT INTO lectures (user_id, title, description, source_type, source)
-     VALUES (?, ?, ?, ?, ?)`
+    `INSERT INTO lectures
+       (user_id, title, description, source_type, source, thumbnail, category)
+     VALUES (?, ?, ?, ?, ?, ?, ?)`
   ),
   listLectures: db.prepare(
     `SELECT l.id, l.title, l.description, l.source_type, l.source,
+            l.thumbnail, l.view_count, l.category,
             l.created_at, l.user_id, u.username AS uploader
        FROM lectures l
        JOIN users u ON u.id = l.user_id
        ORDER BY l.created_at DESC`
   ),
+  listLecturesByCategory: db.prepare(
+    `SELECT l.id, l.title, l.description, l.source_type, l.source,
+            l.thumbnail, l.view_count, l.category,
+            l.created_at, l.user_id, u.username AS uploader
+       FROM lectures l
+       JOIN users u ON u.id = l.user_id
+       WHERE l.category = ?
+       ORDER BY l.created_at DESC`
+  ),
   findLecture: db.prepare(
     `SELECT l.id, l.title, l.description, l.source_type, l.source,
+            l.thumbnail, l.view_count, l.category,
             l.created_at, l.user_id, u.username AS uploader
        FROM lectures l
        JOIN users u ON u.id = l.user_id
        WHERE l.id = ?`
   ),
   deleteLecture: db.prepare("DELETE FROM lectures WHERE id = ? AND user_id = ?"),
+  incrementLectureView: db.prepare(
+    "UPDATE lectures SET view_count = view_count + 1 WHERE id = ?"
+  ),
+  getLectureViewCount: db.prepare(
+    "SELECT view_count FROM lectures WHERE id = ?"
+  ),
 
   // surveys
   getSurvey: db.prepare(

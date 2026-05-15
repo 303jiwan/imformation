@@ -114,6 +114,14 @@
         <button type="button" class="lectures-add" id="open-upload">+ 강의 추가하기</button>
       </div>
 
+      <div class="lectures-tabs" id="lectures-tabs" role="tablist" aria-label="강의 카테고리">
+        <button type="button" class="lectures-tab is-active" role="tab" aria-selected="true" data-category="">전체</button>
+        <button type="button" class="lectures-tab" role="tab" aria-selected="false" data-category="algorithm">알고리즘</button>
+        <button type="button" class="lectures-tab" role="tab" aria-selected="false" data-category="data-structure">자료구조</button>
+        <button type="button" class="lectures-tab" role="tab" aria-selected="false" data-category="programming-basic">프로그래밍 기초</button>
+        <button type="button" class="lectures-tab" role="tab" aria-selected="false" data-category="other">기타</button>
+      </div>
+
       <div class="lectures-status" id="lectures-status" hidden></div>
 
       <div class="lectures-empty" id="lectures-empty" hidden>
@@ -143,6 +151,16 @@
           <textarea name="description" maxlength="2000" rows="3" placeholder="어떤 내용을 다루는 강의인지 짧게 적어주세요."></textarea>
         </label>
 
+        <label class="upload-field">
+          <span>카테고리</span>
+          <select name="category">
+            <option value="algorithm">알고리즘</option>
+            <option value="data-structure">자료구조</option>
+            <option value="programming-basic">프로그래밍 기초</option>
+            <option value="other" selected>기타</option>
+          </select>
+        </label>
+
         <fieldset class="upload-source">
           <legend>동영상 출처</legend>
           <label class="upload-source__opt">
@@ -163,6 +181,11 @@
         <label class="upload-field" id="upload-file-field" hidden>
           <span>동영상 파일</span>
           <input name="video" type="file" accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-matroska" />
+        </label>
+
+        <label class="upload-field" id="upload-thumb-field" hidden>
+          <span>썸네일 이미지 (선택, 5MB 이하 · jpg/png/webp)</span>
+          <input name="thumbnail" type="file" accept="image/jpeg,image/png,image/webp" />
         </label>
 
         <p class="modal-error" id="upload-error" hidden></p>
