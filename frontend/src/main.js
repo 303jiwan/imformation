@@ -523,9 +523,85 @@ function goAvatar() {
   window.addEventListener('codenergy:auth', onAuth);
 }
 
-function showCodeTrail() {
-  alert(t('alert.codetrail') || '🚀 코드트레일 기능이 곧 제공됩니다!\n\n알고리즘 문제 풀이부터 실전 코딩 테스트까지,\n단계별 학습 경로를 따라 실력을 키워보세요.');
+function navigateToHref(href) {
+  if (pageFade) pageFade.classList.remove('is-hidden');
+  setTimeout(() => {
+    window.location.href = href;
+  }, PAGE_FADE_MS);
 }
+
+function showCodeTrail() {
+  navigateToHref('codetrails.html');
+}
+
+function initResultsPage() {
+  const startCard = document.querySelector('.result-card--start');
+  const diagnoseCard = document.querySelector('.result-card--diagnose');
+
+  if (startCard) {
+    startCard.addEventListener('click', () => navigateToHref('codetrails.html'));
+  }
+  if (diagnoseCard) {
+    diagnoseCard.addEventListener('click', () => navigateToHref('survey.html'));
+  }
+}
+
+function initCodeTrailsPage() {
+  const trailStartModal = document.getElementById('trail-start-modal');
+  const trailStartTitle = trailStartModal?.querySelector('.trail-start__title');
+  const trailStartDesc = trailStartModal?.querySelector('.trail-start__desc');
+  const trailStartConfirm = document.getElementById('trail-start-confirm');
+  let trailTarget = 'test-intro.html';
+
+  document.querySelectorAll('.trail-card').forEach((card) => {
+    const detailButton = card.querySelector('.trail-secondary');
+    const startButton = card.querySelector('.trail-primary');
+    const trailName = card.querySelector('.trail-name')?.textContent?.trim() || '선택한 트레일';
+    const trailSubtitle = card.querySelector('.trail-subname')?.textContent?.trim() || '';
+
+    if (detailButton) {
+      detailButton.addEventListener('click', () => {
+        alert('트레일 상세 정보는 곧 준비됩니다.');
+      });
+    }
+    if (startButton) {
+      startButton.addEventListener('click', () => {
+        if (!trailStartModal) {
+          navigateToHref(trailTarget);
+          return;
+        }
+        if (trailStartTitle) {
+          trailStartTitle.textContent = `${trailName} 시작하기`;
+        }
+        if (trailStartDesc) {
+          trailStartDesc.textContent = trailSubtitle
+            ? `${trailSubtitle} 트레일을 지금 시작하시겠습니까?`
+            : '트레일을 지금 시작하시겠습니까?';
+        }
+        trailTarget = 'test-intro.html';
+        trailStartModal.hidden = false;
+      });
+    }
+  });
+
+  if (trailStartConfirm) {
+    trailStartConfirm.addEventListener('click', () => {
+      navigateToHref(trailTarget);
+    });
+  }
+}
+
+function initHomePage() {
+  const homeCta = document.getElementById('home-cta-btn');
+  if (homeCta) {
+    homeCta.addEventListener('click', () => navigateToHref('survey.html'));
+  }
+}
+
+const currentPage = window.location.pathname.split('/').pop();
+if (currentPage === 'results.html') initResultsPage();
+if (currentPage === 'codetrails.html') initCodeTrailsPage();
+if (currentPage === 'index.html' || currentPage === '') initHomePage();
 
 function showReviews() {
   if (!reviewsModal) { window.location.href = 'index.html'; return; }
