@@ -766,7 +766,7 @@ function setMode(nextMode) {
     : nextMode === "find-password" ? "비밀번호 찾기"
     : "로그인";
   const submitKo =
-    nextMode === "signup-email" ? "인증코드 받기"
+    nextMode === "signup-email" ? "회원가입"
     : nextMode === "signup-verify" ? "회원가입"
     : nextMode === "login" ? "로그인"
     : "전송";
@@ -785,8 +785,8 @@ function setMode(nextMode) {
   const showCode = nextMode === "signup-verify";
   const showRecovery = nextMode === "login";
   const showRecoveryAlt = nextMode === "find-id" || nextMode === "find-password";
-  const showUsername = nextMode === "login" || nextMode === "signup-verify";
-  const showPassword = nextMode === "login" || nextMode === "signup-verify";
+  const showUsername = nextMode === "login" || nextMode === "signup-email" || nextMode === "signup-verify";
+  const showPassword = nextMode === "login" || nextMode === "signup-email" || nextMode === "signup-verify";
 
   usernameLabel.hidden = !showUsername;
   passwordLabel.hidden = !showPassword;
@@ -823,7 +823,7 @@ function setMode(nextMode) {
   // (which can synthesize stray click events that look like backdrop clicks).
   const pwInput = form.querySelector("input[name=password]");
   if (pwInput) {
-    pwInput.autocomplete = nextMode === "signup-verify" ? "new-password" : "current-password";
+    pwInput.autocomplete = (nextMode === "signup-verify" || nextMode === "signup-email") ? "new-password" : "current-password";
   }
 
   // Reset error region (also strips any demo-fallback button if present).
@@ -961,13 +961,21 @@ form.addEventListener("submit", async (e) => {
           return;
         }
 
-        // Success: move to signup-verify mode
-        infoEl.textContent = "인증코드를 이메일로 전송했습니다.";
-        infoEl.hidden = false;
+        // Capture the username/password the user already typed in step 1 so the
+        // form.reset() inside setMode("signup-verify") doesn't wipe them out.
+        const usernameInput = form.querySelector("input[name=username]");
+        const passwordInput = form.querySelector("input[name=password]");
+        const carryUsername = usernameInput ? usernameInput.value : "";
+        const carryPassword = passwordInput ? passwordInput.value : "";
         // Store email for next step
         sessionStorage.setItem("signup-email", data.email);
         // Switch to verify mode
         setMode("signup-verify");
+        if (usernameInput) usernameInput.value = carryUsername;
+        if (passwordInput) passwordInput.value = carryPassword;
+        // Show the info banner AFTER setMode so its reset doesn't hide it.
+        infoEl.textContent = "인증코드를 이메일로 전송했습니다.";
+        infoEl.hidden = false;
       } catch (netErr) {
         if (isNetworkError(netErr)) {
           errorEl.textContent = t("auth.serverError") || "서버에 연결할 수 없습니다.";

@@ -198,6 +198,56 @@ function renderTopbar(trail) {
   document.title = `Codenergy — ${trail.title}`;
 }
 
+function renderTrailMenu(currentTrail) {
+  const btn  = document.getElementById("trail-name-btn");
+  const menu = document.getElementById("trail-name-menu");
+  if (!btn || !menu) return;
+
+  menu.innerHTML = "";
+  TRAILS.forEach((t) => {
+    const a = document.createElement("a");
+    a.className = "trail-page__name-menu__item";
+    a.href = `trail.html?trail=${t.id}`;
+    a.setAttribute("role", "menuitem");
+    if (t.id === currentTrail.id) {
+      a.classList.add("is-active");
+      a.setAttribute("aria-current", "page");
+    }
+    a.innerHTML = `
+      <span class="trail-page__name-menu__item-eyebrow"></span>
+      <span class="trail-page__name-menu__item-title"></span>
+    `;
+    a.querySelector(".trail-page__name-menu__item-eyebrow").textContent = t.eyebrow;
+    a.querySelector(".trail-page__name-menu__item-title").textContent   = t.title;
+    menu.appendChild(a);
+  });
+
+  const close = () => {
+    menu.hidden = true;
+    btn.setAttribute("aria-expanded", "false");
+  };
+  const open = () => {
+    menu.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+  };
+
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (menu.hidden) open(); else close();
+  });
+  document.addEventListener("click", (e) => {
+    if (menu.hidden) return;
+    if (btn.contains(e.target) || menu.contains(e.target)) return;
+    close();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !menu.hidden) {
+      close();
+      btn.focus();
+    }
+  });
+}
+
 function renderChapters(trail) {
   const host = document.getElementById("trail-chapters");
   if (!host) return;
@@ -214,19 +264,24 @@ function renderChapters(trail) {
     list.className = "chapter-list";
 
     chapter.nodes.forEach((node, ni) => {
-      const isFirst = ci === 0 && ni === 0;
       const item = document.createElement("li");
-      item.className = `chapter-node${isFirst ? " is-active" : " is-locked"}`;
+      item.className = "chapter-node is-locked";
       const offset = ni % 2 === 0 ? "left" : "right";
       item.dataset.offset = offset;
       item.innerHTML = `
+        <span class="chapter-node__ring" aria-hidden="true"></span>
         <span class="hex" aria-hidden="true">
-          ${isFirst
-            ? `<span class="hex-num">${ni + 1}</span>`
-            : `<span class="hex-lock">🔒</span>`}
+          <span class="hex-num">${ni + 1}</span>
         </span>
         <span class="chapter-node__label">${node}</span>
       `;
+      item.addEventListener("click", () => {
+        const wasSelected = item.classList.contains("is-selected");
+        document.querySelectorAll(".chapter-node.is-selected").forEach((n) => {
+          n.classList.remove("is-selected");
+        });
+        if (!wasSelected) item.classList.add("is-selected");
+      });
       list.appendChild(item);
     });
 
@@ -274,6 +329,7 @@ function init() {
   const trail = pickTrail();
   setColor(trail);
   renderTopbar(trail);
+  renderTrailMenu(trail);
   renderChapters(trail);
   renderLesson(trail);
 }

@@ -3985,9 +3985,75 @@ body.is-resizing-problem * {
   letter-spacing: -0.01em;
 }
 .trail-page__name-caret {
-  font-size: 14px;
-  margin-top: 4px;
-  opacity: 0.85;
+  font-size: 28px;
+  line-height: 1;
+  margin-top: 6px;
+  opacity: 0.95;
+  transition: transform 150ms ease;
+}
+.trail-page__name[aria-expanded="true"] .trail-page__name-caret {
+  transform: rotate(180deg);
+}
+
+/* Wrapper so the dropdown can anchor to the trail-name button. */
+.trail-page__name-wrap {
+  position: relative;
+  display: flex;
+}
+.trail-page__name-wrap .trail-page__name {
+  width: 100%;
+}
+
+.trail-page__name-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.12);
+  padding: 6px;
+  display: flex;
+  flex-direction: column;
+  max-height: 60vh;
+  overflow-y: auto;
+}
+.trail-page__name-menu[hidden] { display: none; }
+.trail-page__name-menu__item {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  padding: 10px 14px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: #111;
+  text-align: left;
+  text-decoration: none;
+  font: inherit;
+  cursor: pointer;
+}
+.trail-page__name-menu__item:hover,
+.trail-page__name-menu__item:focus-visible {
+  background: #f3f4f6;
+  outline: none;
+}
+.trail-page__name-menu__item.is-active {
+  background: var(--trail-soft, #f3f4f6);
+  color: var(--trail-deep, #111);
+}
+.trail-page__name-menu__item-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  opacity: 0.7;
+}
+.trail-page__name-menu__item-title {
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 .trail-page__stats {
   display: grid;
@@ -4098,6 +4164,21 @@ body.is-resizing-problem * {
 }
 .chapter-node[data-offset="left"]  { transform: translateX(-44px); }
 .chapter-node[data-offset="right"] { transform: translateX(44px); }
+.chapter-node__ring {
+  position: absolute;
+  top: -4px;
+  left: 50%;
+  width: 72px;
+  height: 80px;
+  margin-left: -36px;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: var(--trail-hex);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+  z-index: 0;
+}
+.chapter-node.is-selected .chapter-node__ring { opacity: 1; }
 .hex {
   width: 64px;
   height: 72px;
@@ -4105,30 +4186,39 @@ body.is-resizing-problem * {
   align-items: center;
   justify-content: center;
   position: relative;
+  z-index: 1;
   clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-  background: #e5e7eb;
-  color: #fff;
-  font-weight: 800;
-  font-size: 22px;
-  box-shadow: 0 4px 0 0 rgba(0,0,0,0.08);
+  background: #d1d5db;
+  cursor: pointer;
 }
-.chapter-node.is-active .hex {
+.hex::before {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
   background: #fff;
-  color: var(--trail-deep);
-  border: none;
-  outline: 2px solid var(--trail-hex);
-  outline-offset: -4px;
+  pointer-events: none;
 }
-.chapter-node.is-locked .hex {
-  background: var(--trail-hex);
-  opacity: 0.85;
+.hex-num {
+  position: relative;
+  z-index: 2;
+  color: #9ca3af;
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
 }
-.chapter-node.is-locked .hex-lock { font-size: 22px; }
+.chapter-node.is-active .hex { background: var(--trail-hex); }
+.chapter-node.is-active .hex::before { inset: 4px; }
+.chapter-node.is-active .hex-num { color: #111; }
 .chapter-node__label {
   font-size: 12px;
-  color: #444;
+  color: #6b7280;
   text-align: center;
   max-width: 140px;
+}
+.chapter-node.is-active .chapter-node__label {
+  color: #111;
+  font-weight: 600;
 }
 
 /* ----- Lesson panel (right side) ----- */
