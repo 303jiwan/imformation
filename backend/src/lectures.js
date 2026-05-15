@@ -273,6 +273,8 @@ lecturesRouter.get("/", (req, res) => {
 });
 
 // GET /api/lectures/:id — single lecture (for the player view).
+// Suspended uploaders are hidden from non-admins (404) so direct URLs don't
+// leak content after a moderation action (Codex review P2, 2026-05-16).
 lecturesRouter.get("/:id", (req, res) => {
   const id = Number.parseInt(req.params.id, 10);
   if (!Number.isInteger(id)) {
@@ -280,15 +282,25 @@ lecturesRouter.get("/:id", (req, res) => {
   }
   const row = stmts.findLecture.get(id);
   if (!row) return res.status(404).json({ error: "not found" });
+  if (row.uploader_suspended && !req.user?.is_admin) {
+    return res.status(404).json({ error: "not found" });
+  }
   res.json({ lecture: publicLecture(row) });
 });
 
 // POST /api/lectures/:id/view — bump the view counter. Public on purpose:
 // we want anonymous viewers to count too. Returns the new total.
+// Same suspension gate as GET /:id so view counts can't be inflated on
+// hidden lectures.
 lecturesRouter.post("/:id/view", (req, res) => {
   const id = Number.parseInt(req.params.id, 10);
   if (!Number.isInteger(id)) {
     return res.status(400).json({ error: "invalid id" });
+  }
+  const lec = stmts.findLecture.get(id);
+  if (!lec) return res.status(404).json({ error: "not found" });
+  if (lec.uploader_suspended && !req.user?.is_admin) {
+    return res.status(404).json({ error: "not found" });
   }
   const result = stmts.incrementLectureView.run(id);
   if (!result.changes) {

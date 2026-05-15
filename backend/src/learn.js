@@ -25,12 +25,6 @@ import {
 
 export const learnRouter = express.Router();
 
-// Whether real grading is available. We don't ship judge0 client-side here —
-// keep mock as default and let a future wiring flip this on by env presence.
-function judgeAvailable() {
-  return Boolean(process.env.JUDGE0_KEY && process.env.JUDGE0_HOST);
-}
-
 // ---------------------------------------------------------------------------
 // GET /api/learn/progress — per-trail completion counts.
 // 401 when unauthenticated so the UI can distinguish from authenticated-zero.
@@ -131,20 +125,13 @@ learnRouter.post("/submit", requireAuth, (req, res) => {
   const lesson = getLesson(lessonId);
   const problem = lesson.problems[problemId];
 
-  // Grade. Mock grading never grants `done` — see ungraded flag below.
-  let verdict;
-  let ungraded;
-  if (judgeAvailable()) {
-    // Future: wire to a server-side judge0 fetch using process.env.JUDGE0_KEY.
-    // For now even when "judgeAvailable", fall back to mockGrade but mark
-    // ungraded=0 so the integration point is ready. (Keeping mock here means
-    // the test plan can exercise the credit-bearing branch deterministically.)
-    verdict = mockGrade(code, problem.expected);
-    ungraded = 0;
-  } else {
-    verdict = mockGrade(code, problem.expected);
-    ungraded = 1;
-  }
+  // Grade. Until a real server-side judge0 client lands, every submission is
+  // graded by `mockGrade` and stored ungraded=1 — never credit-bearing. The
+  // previous version flipped credit on when JUDGE0_KEY+HOST env vars were set
+  // even though no real call was wired, letting users complete lessons by
+  // matching string literals (Codex review P1, 2026-05-16).
+  const verdict = mockGrade(code, problem.expected);
+  const ungraded = 1;
 
   // Persist attempt + (optionally) flip lesson_progress in one transaction.
   const apply = db.transaction(() => {
