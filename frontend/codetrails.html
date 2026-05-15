@@ -1,0 +1,294 @@
+  <!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title data-i18n="codetrails.pageTitle">Codenergy — 코드트레일</title>
+    <style>
+      .page-fade {
+        position: fixed; inset: 0; background: #fff;
+        z-index: 9999; opacity: 1; pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-fade" id="page-fade"></div>
+    <header class="nav">
+      <div class="logo"><a href="index.html">Codenergy ▲</a></div>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-collapse">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-collapse" id="nav-collapse">
+        <nav class="menu" id="menu">
+          <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
+          <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
+          <a href="index.html" data-action="reviews" data-i18n="nav.reviews">후기</a>
+          <a href="index.html" data-action="invite" data-i18n="nav.invite">친구 초대</a>
+          <a href="#" data-action="avatar" data-i18n="nav.avatar">아바타</a>
+        </nav>
+        <div class="actions">
+          <div class="lang-wrap" id="lang-wrap">
+            <button class="ghost" id="lang-btn" type="button">🌐 <span id="lang-current">한국어</span> ▾</button>
+            <div class="lang-menu" id="lang-menu" hidden>
+              <button type="button" class="lang-menu__item" data-lang="ko">한국어</button>
+              <button type="button" class="lang-menu__item" data-lang="en">English</button>
+            </div>
+          </div>
+          <div class="notif-wrap" id="notif-wrap">
+            <button class="icon" id="notif-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="알림">🔔</button>
+            <div class="notif-menu" id="notif-menu" hidden>
+              <div class="notif-menu__header">알림</div>
+              <ul class="notif-menu__list" id="notif-list"></ul>
+              <p class="notif-menu__empty" id="notif-empty" hidden>새 알림이 없어요</p>
+              <p class="notif-menu__signin" id="notif-signin" hidden>로그인 후 확인할 수 있어요</p>
+            </div>
+          </div>
+          <button class="ghost" id="login-btn" data-i18n="action.login">로그인</button>
+          <button class="ghost" id="signup-btn" data-i18n="action.signup">회원가입</button>
+          <div class="my-wrap" id="my-wrap" hidden>
+            <button class="ghost" id="my-btn" data-i18n="action.my">My</button>
+            <div class="my-menu" id="my-menu" hidden>
+              <div class="my-menu__profile">
+                <div class="my-menu__avatar" aria-hidden="true">👤</div>
+                <div class="my-menu__user">
+                  <div class="my-menu__name" id="my-name" data-i18n="my.name">사용자 이름</div>
+                  <div class="my-menu__email" id="my-email">user@example.com</div>
+                </div>
+              </div>
+              <ul class="my-menu__list">
+                <li><button type="button" class="my-menu__item" data-i18n="my.mypage">마이페이지</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.invite">친구 초대</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.settings">설정</button></li>
+              </ul>
+              <div class="my-menu__divider"></div>
+              <button type="button" class="my-menu__item my-menu__logout" id="logout-btn" data-i18n="my.logout">로그아웃</button>
+            </div>
+          </div>
+          <button class="cta" data-i18n="action.cta">학습하기 →</button>
+        </div>
+      </div>
+    </header>
+
+    <div id="auth-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <form class="modal-card" id="auth-form">
+        <h3 id="modal-title" data-i18n="auth.login">로그인</h3>
+        <label class="field-username">
+          <span data-i18n="auth.username">아이디</span>
+          <input name="username" autocomplete="username" required minlength="2" />
+        </label>
+        <label class="field-password">
+          <span data-i18n="auth.password">비밀번호</span>
+          <input name="password" type="password" autocomplete="current-password" required minlength="6" />
+        </label>
+        <label class="field-email" id="email-field" hidden>
+          <span>Gmail</span>
+          <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
+        </label>
+        <p class="modal-info" id="modal-info" hidden></p>
+        <p class="modal-error" id="modal-error" hidden></p>
+        <div class="modal-recovery" id="modal-recovery">
+          <button type="button" class="link-button" id="find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-recovery-alt" id="modal-recovery-alt" hidden>
+          <button type="button" class="link-button" id="alt-find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="alt-find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close data-i18n="action.cancel">취소</button>
+          <button type="submit" class="cta" id="submit-btn" data-i18n="auth.login">로그인</button>
+        </div>
+      </form>
+    </div>
+
+    <section class="codetrails-section">
+      <div class="codetrails-header">
+        <h1 class="codetrails-brand">Codetrails.</h1>
+        <h2 class="codetrails-title">체계적이고 빈틈없는<br/>완벽한 커리큘럼</h2>
+        <p class="codetrails-subtitle">총 256개의 스킬과 1,400여개의 문제로 원하는 목표 어디든 도달할 수 있습니다.</p>
+        <button class="pill" data-tilt>
+          <span>나에게 딱 맞는 학습이 궁금하다면?</span>
+          <span class="pill-cta">시작하기 →</span>
+        </button>
+      </div>
+
+      <div class="trails-grid">
+        <article class="trail-card trail-card--diagnostic">
+          <div class="trail-badge trail-badge--purple">어디서 시작할지 막막하다면?</div>
+          <p class="trail-tagline trail-tagline--purple">지피지기면 백전백승, 갭체크</p>
+          <h3 class="trail-headline">내 코테 실력,<br/>무료로 진단하고 약점 찾기</h3>
+          <a href="survey.html" class="trail-primary trail-primary--purple">실력 진단해보기 →</a>
+          <svg class="diagnostic-scene" viewBox="0 0 520 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+            <rect x="10" y="120" width="220" height="34" rx="4" fill="#7a5a3a"/>
+            <path d="M10 120 L30 105 L50 120 L70 105 L90 120 L110 105 L130 120 L150 105 L170 120 L190 105 L210 120 L230 105 L230 120 Z" fill="#22c55e"/>
+            <rect x="290" y="120" width="220" height="34" rx="4" fill="#7a5a3a"/>
+            <path d="M290 120 L310 105 L330 120 L350 105 L370 120 L390 105 L410 120 L430 105 L450 120 L470 105 L490 120 L510 105 L510 120 Z" fill="#22c55e"/>
+            <rect x="200" y="60" width="42" height="34" rx="6" fill="#ef6f4f" stroke="#b14a2f" stroke-width="2" transform="rotate(18 221 77)"/>
+            <g transform="translate(388 70)">
+              <rect x="-44" y="-22" width="88" height="32" rx="6" fill="#22c55e"/>
+              <text x="0" y="-1" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#fff">Solved</text>
+              <path d="M0 12 L0 32" stroke="#16a34a" stroke-width="3"/>
+            </g>
+          </svg>
+        </article>
+
+        <article class="trail-card trail-card--green" data-tilt>
+          <header class="trail-card__head">
+            <span class="trail-label trail-label--green">코딩 맛보기</span>
+            <span class="trail-step">Trail 0 of 6</span>
+          </header>
+          <h4 class="trail-name trail-name--green">Codetree 101</h4>
+          <p class="trail-subname">프로그래밍 시작</p>
+          <div class="trail-progress">
+            <div class="trail-progress__bar"><span style="width: 0%; background: #22c55e;"></span></div>
+            <span class="trail-progress__text">0/103 Completed</span>
+          </div>
+          <div class="trail-tags">
+            <span class="tag">기본</span><span class="tag">입출력</span><span class="tag">조건문 1</span><span class="tag">단순 반복문 1</span>
+            <span class="tag">조건문 2</span><span class="tag">1차원 배열</span><span class="tag">문자열</span><span class="tag">단순 반복문 2</span>
+            <span class="tag">다중 반복문</span><span class="tag">2차원 배열</span>
+          </div>
+          <div class="trail-actions">
+            <button type="button" class="trail-secondary">상세 보기</button>
+            <button type="button" class="trail-primary trail-primary--green">바로 시작하기 →</button>
+          </div>
+        </article>
+
+        <article class="trail-card trail-card--yellow" data-tilt>
+          <header class="trail-card__head">
+            <span class="trail-label trail-label--yellow">코딩 첫걸음</span>
+            <span class="trail-step">Trail 1 of 6</span>
+          </header>
+          <h4 class="trail-name trail-name--yellow">Novice Low</h4>
+          <p class="trail-subname">프로그래밍 기초</p>
+          <div class="trail-progress">
+            <div class="trail-progress__bar"><span style="width: 85%; background: #eab308;"></span></div>
+            <span class="trail-progress__text">337/396 Completed</span>
+          </div>
+          <div class="trail-tags">
+            <span class="tag">출력</span><span class="tag">입출력</span><span class="tag">연산자</span><span class="tag">조건문</span><span class="tag">단순 반복문</span>
+            <span class="tag">다중 반복문</span><span class="tag">1차원 배열</span><span class="tag">2차원 배열</span><span class="tag">문자열</span>
+          </div>
+          <div class="trail-actions">
+            <button type="button" class="trail-secondary">상세 보기</button>
+            <button type="button" class="trail-primary trail-primary--yellow">바로 시작하기 →</button>
+          </div>
+        </article>
+
+        <article class="trail-card trail-card--orange" data-tilt>
+          <header class="trail-card__head">
+            <span class="trail-label trail-label--orange">생각하는 힘 키우기</span>
+            <span class="trail-step">Trail 2 of 6</span>
+          </header>
+          <h4 class="trail-name trail-name--orange">Novice Mid</h4>
+          <p class="trail-subname">프로그래밍 연습</p>
+          <div class="trail-progress">
+            <div class="trail-progress__bar"><span style="width: 0%; background: #f97316;"></span></div>
+            <span class="trail-progress__text">0/241 Completed</span>
+          </div>
+          <div class="trail-tags">
+            <span class="tag">함수</span><span class="tag">재귀함수</span><span class="tag">정렬</span><span class="tag">시뮬레이션 I</span>
+            <span class="tag">시뮬레이션 II</span><span class="tag">완전탐색 I</span><span class="tag">완전탐색 II</span>
+            <span class="tag">완전탐색 III</span><span class="tag">케이스별로 나누기</span><span class="tag">Ad-Hoc</span>
+          </div>
+          <div class="trail-actions">
+            <button type="button" class="trail-secondary">상세 보기</button>
+            <button type="button" class="trail-primary trail-primary--orange">바로 시작하기 →</button>
+          </div>
+        </article>
+
+        <article class="trail-card trail-card--red" data-tilt>
+          <header class="trail-card__head">
+            <span class="trail-label trail-label--red">기초 튼튼히 다지기</span>
+            <span class="trail-step">Trail 3 of 6</span>
+          </header>
+          <h4 class="trail-name trail-name--red">Novice High</h4>
+          <p class="trail-subname">자료구조 알고리즘</p>
+          <div class="trail-progress">
+            <div class="trail-progress__bar"><span style="width: 0%; background: #ef4444;"></span></div>
+            <span class="trail-progress__text">0/242 Completed</span>
+          </div>
+          <div class="trail-tags">
+            <span class="tag">시간, 공간복잡도</span><span class="tag">배열, 연결 리스트</span><span class="tag">정렬</span>
+            <span class="tag">이진탐색</span><span class="tag">스택, 큐, 덱</span><span class="tag">트리</span><span class="tag">해싱</span><span class="tag">DP</span>
+            <span class="tag">그래프 탐색</span><span class="tag">그래프 알고리즘</span>
+          </div>
+          <div class="trail-actions">
+            <button type="button" class="trail-secondary">상세 보기</button>
+            <button type="button" class="trail-primary trail-primary--red">바로 시작하기 →</button>
+          </div>
+        </article>
+
+        <article class="trail-card trail-card--blue" data-tilt>
+          <header class="trail-card__head">
+            <span class="trail-label trail-label--blue">현실의 문제 해결하기</span>
+            <span class="trail-step">Trail 4 of 6</span>
+          </header>
+          <h4 class="trail-name trail-name--blue">Intermediate Low</h4>
+          <p class="trail-subname">알고리즘 입문</p>
+          <div class="trail-progress">
+            <div class="trail-progress__bar"><span style="width: 0%; background: #3b82f6;"></span></div>
+            <span class="trail-progress__text">0/130 Completed</span>
+          </div>
+          <div class="trail-tags">
+            <span class="tag">Simulation</span><span class="tag">Backtracking</span><span class="tag">DFS</span><span class="tag">BFS</span>
+            <span class="tag">DP I</span><span class="tag">DP II</span>
+          </div>
+          <div class="trail-actions">
+            <button type="button" class="trail-secondary">상세 보기</button>
+            <button type="button" class="trail-primary trail-primary--blue">바로 시작하기 →</button>
+          </div>
+        </article>
+
+        <article class="trail-card trail-card--purple" data-tilt>
+          <header class="trail-card__head">
+            <span class="trail-label trail-label--purple">더 넓게 배워가기</span>
+            <span class="trail-step">Trail 5 of 6</span>
+          </header>
+          <h4 class="trail-name trail-name--purple">Intermediate Mid</h4>
+          <p class="trail-subname">알고리즘 기본</p>
+          <div class="trail-progress">
+            <div class="trail-progress__bar"><span style="width: 0%; background: #a855f7;"></span></div>
+            <span class="trail-progress__text">0/176 Completed</span>
+          </div>
+          <div class="trail-tags">
+            <span class="tag">중급 자료구조</span><span class="tag">Shorten time Technique</span>
+            <span class="tag">Parametric Search</span><span class="tag">Greedy</span><span class="tag">Shortest Path</span>
+          </div>
+          <div class="trail-actions">
+            <button type="button" class="trail-secondary">상세 보기</button>
+            <button type="button" class="trail-primary trail-primary--purple">바로 시작하기 →</button>
+          </div>
+        </article>
+
+        <article class="trail-card trail-card--dark" data-tilt>
+          <header class="trail-card__head">
+            <span class="trail-label trail-label--dark">한계를 뛰어넘기</span>
+            <span class="trail-step">Trail 6 of 6</span>
+          </header>
+          <h4 class="trail-name trail-name--dark">Intermediate High</h4>
+          <p class="trail-subname">알고리즘 실전</p>
+          <div class="trail-progress">
+            <div class="trail-progress__bar"><span style="width: 0%; background: #111;"></span></div>
+            <span class="trail-progress__text">0/149 Completed</span>
+          </div>
+          <div class="trail-tags">
+            <span class="tag">Tree</span><span class="tag">MST</span><span class="tag">위상정렬</span><span class="tag">String</span>
+            <span class="tag">Advanced DP</span>
+          </div>
+          <div class="trail-actions">
+            <button type="button" class="trail-secondary">상세 보기</button>
+            <button type="button" class="trail-primary trail-primary--dark">바로 시작하기 →</button>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

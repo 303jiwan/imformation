@@ -1,0 +1,17 @@
+node_modules/
+
+# Vite env files (Judge0 API key etc.)
+.env
+.env.local
+.env.*.local
+
+# Backend runtime data (SQLite database lives under backend/data/)
+backend/data/*.db
+backend/data/*.db-*
+backend/.env
+
+# Playwright artifacts
+test-results/
+playwright-report/
+playwright/.cache/
+

@@ -1,0 +1,217 @@
+  <!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codenergy — 학습 진단 설문</title>
+    <style>
+      .page-fade {
+        position: fixed; inset: 0; background: #fff;
+        z-index: 9999; opacity: 1; pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-fade" id="page-fade"></div>
+    <header class="nav">
+      <div class="logo"><a href="index.html">Codenergy ▲</a></div>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-collapse">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-collapse" id="nav-collapse">
+        <nav class="menu" id="menu">
+          <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
+          <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
+          <a href="index.html" data-action="reviews" data-i18n="nav.reviews">후기</a>
+          <a href="index.html" data-action="invite" data-i18n="nav.invite">친구 초대</a>
+          <a href="#" data-action="avatar" data-i18n="nav.avatar">아바타</a>
+        </nav>
+        <div class="actions">
+          <div class="lang-wrap" id="lang-wrap">
+            <button class="ghost" id="lang-btn" type="button">🌐 <span id="lang-current">한국어</span> ▾</button>
+            <div class="lang-menu" id="lang-menu" hidden>
+              <button type="button" class="lang-menu__item" data-lang="ko">한국어</button>
+              <button type="button" class="lang-menu__item" data-lang="en">English</button>
+            </div>
+          </div>
+          <div class="notif-wrap" id="notif-wrap">
+            <button class="icon" id="notif-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="알림">🔔</button>
+            <div class="notif-menu" id="notif-menu" hidden>
+              <div class="notif-menu__header">알림</div>
+              <ul class="notif-menu__list" id="notif-list"></ul>
+              <p class="notif-menu__empty" id="notif-empty" hidden>새 알림이 없어요</p>
+              <p class="notif-menu__signin" id="notif-signin" hidden>로그인 후 확인할 수 있어요</p>
+            </div>
+          </div>
+          <button class="ghost" id="login-btn" data-i18n="action.login">로그인</button>
+          <button class="ghost" id="signup-btn" data-i18n="action.signup">회원가입</button>
+          <div class="my-wrap" id="my-wrap" hidden>
+            <button class="ghost" id="my-btn" data-i18n="action.my">My</button>
+            <div class="my-menu" id="my-menu" hidden>
+              <div class="my-menu__profile">
+                <div class="my-menu__avatar" aria-hidden="true">👤</div>
+                <div class="my-menu__user">
+                  <div class="my-menu__name" id="my-name" data-i18n="my.name">사용자 이름</div>
+                  <div class="my-menu__email" id="my-email">user@example.com</div>
+                </div>
+              </div>
+              <ul class="my-menu__list">
+                <li><button type="button" class="my-menu__item" data-i18n="my.mypage">마이페이지</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.invite">친구 초대</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.settings">설정</button></li>
+              </ul>
+              <div class="my-menu__divider"></div>
+              <button type="button" class="my-menu__item my-menu__logout" id="logout-btn" data-i18n="my.logout">로그아웃</button>
+            </div>
+          </div>
+          <button class="cta" data-i18n="action.cta">학습하기 →</button>
+        </div>
+      </div>
+    </header>
+
+    <div id="auth-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <form class="modal-card" id="auth-form">
+        <h3 id="modal-title" data-i18n="auth.login">로그인</h3>
+        <label class="field-username">
+          <span data-i18n="auth.username">아이디</span>
+          <input name="username" autocomplete="username" required minlength="2" />
+        </label>
+        <label class="field-password">
+          <span data-i18n="auth.password">비밀번호</span>
+          <input name="password" type="password" autocomplete="current-password" required minlength="6" />
+        </label>
+        <label class="field-email" id="email-field" hidden>
+          <span>Gmail</span>
+          <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
+        </label>
+        <p class="modal-info" id="modal-info" hidden></p>
+        <p class="modal-error" id="modal-error" hidden></p>
+        <div class="modal-recovery" id="modal-recovery">
+          <button type="button" class="link-button" id="find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-recovery-alt" id="modal-recovery-alt" hidden>
+          <button type="button" class="link-button" id="alt-find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="alt-find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close data-i18n="action.cancel">취소</button>
+          <button type="submit" class="cta" id="submit-btn" data-i18n="auth.login">로그인</button>
+        </div>
+      </form>
+    </div>
+
+    <section class="survey-section">
+      <div class="survey-header">
+        <h1 class="survey-title">학습 진단 설문</h1>
+        <p class="survey-subtitle">3가지 질문에 답하면 딱 맞는 학습 경로를 추천해드릴게요.</p>
+      </div>
+
+      <form class="survey-form" id="survey-form">
+        <fieldset class="survey-question">
+          <legend class="survey-step">Q1</legend>
+          <h2 class="survey-prompt">코딩에 어느 정도 관심이 있으신가요?</h2>
+          <div class="survey-options">
+            <label class="survey-option">
+              <input type="radio" name="interest" value="curious" required />
+              <span class="survey-option__title">처음 접해봐요</span>
+              <span class="survey-option__desc">아직 한 번도 해본 적 없어요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="interest" value="light" />
+              <span class="survey-option__title">가볍게 관심 있어요</span>
+              <span class="survey-option__desc">기회가 되면 배워보고 싶어요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="interest" value="serious" />
+              <span class="survey-option__title">진지하게 배우고 싶어요</span>
+              <span class="survey-option__desc">취업·이직 등 목표가 분명해요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="interest" value="passionate" />
+              <span class="survey-option__title">이미 열정적으로 학습 중이에요</span>
+              <span class="survey-option__desc">매일 꾸준히 공부하고 있어요</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="survey-question">
+          <legend class="survey-step">Q2</legend>
+          <h2 class="survey-prompt">코딩에 대해 얼마나 알고 계신가요?</h2>
+          <div class="survey-options">
+            <label class="survey-option">
+              <input type="radio" name="level" value="none" required />
+              <span class="survey-option__title">전혀 몰라요</span>
+              <span class="survey-option__desc">변수, 함수 같은 개념도 처음이에요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="level" value="basic" />
+              <span class="survey-option__title">기초 문법은 알아요</span>
+              <span class="survey-option__desc">조건문·반복문 정도는 짤 수 있어요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="level" value="intermediate" />
+              <span class="survey-option__title">간단한 프로젝트는 만들 수 있어요</span>
+              <span class="survey-option__desc">함수·클래스 활용에 익숙해요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="level" value="advanced" />
+              <span class="survey-option__title">알고리즘과 자료구조에 익숙해요</span>
+              <span class="survey-option__desc">코딩테스트도 풀어본 적이 있어요</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <fieldset class="survey-question">
+          <legend class="survey-step">Q3</legend>
+          <h2 class="survey-prompt">하루에 어느 정도 시간을 투자할 수 있나요?</h2>
+          <div class="survey-options">
+            <label class="survey-option">
+              <input type="radio" name="time" value="under30" required />
+              <span class="survey-option__title">30분 미만</span>
+              <span class="survey-option__desc">짧게 짬짬이 들여다볼래요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="time" value="30to60" />
+              <span class="survey-option__title">30분 ~ 1시간</span>
+              <span class="survey-option__desc">매일 꾸준히 가능한 분량이에요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="time" value="1to2" />
+              <span class="survey-option__title">1 ~ 2시간</span>
+              <span class="survey-option__desc">집중해서 본격적으로 학습할래요</span>
+            </label>
+            <label class="survey-option">
+              <input type="radio" name="time" value="over2" />
+              <span class="survey-option__title">2시간 이상</span>
+              <span class="survey-option__desc">합격이 목표라 시간을 충분히 쓸 수 있어요</span>
+            </label>
+          </div>
+        </fieldset>
+
+        <div class="survey-actions">
+          <a class="survey-back" href="index.html">← 돌아가기</a>
+          <button type="submit" class="survey-submit">결과 보기 →</button>
+        </div>
+      </form>
+    </section>
+
+    <script type="module" src="/src/main.js"></script>
+    <script type="module">
+      const form = document.getElementById('survey-form');
+      const fade = document.getElementById('page-fade');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(form));
+        try { sessionStorage.setItem('survey', JSON.stringify(data)); } catch (_) {}
+        if (fade) fade.classList.remove('is-hidden');
+        setTimeout(() => { window.location.href = 'results.html'; }, 180);
+      });
+    </script>
+  </body>
+</html>

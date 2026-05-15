@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)"
+    ]
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "shell": "powershell",
+            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\seok\\imformation\\.claude\\scripts\\memory-cleanup-pending.ps1\""
+          }
+        ]
+      }
+    ]
+  }
+}
