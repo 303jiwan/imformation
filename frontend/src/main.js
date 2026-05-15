@@ -105,8 +105,8 @@ const TRANSLATIONS = {
     "auth.password": "Password",
     "auth.submit": "Submit",
     "auth.signupSuccess": "Sign up complete. Please log in.",
-    "auth.findIdSuccess": "ID recovery instructions sent to your Gmail.",
-    "auth.findPwSuccess": "Password reset instructions sent to your Gmail.",
+    "auth.findIdSuccess": "ID recovery instructions sent to your email.",
+    "auth.findPwSuccess": "Password reset instructions sent to your email.",
     "auth.fail": "Request failed",
     "auth.serverError": "Cannot connect to server.",
     "auth.logoutDone": "You have been logged out.",
@@ -171,7 +171,7 @@ const TRANSLATIONS = {
     "invite.b2Desc": "Earn 5,000 KRW in points",
     "invite.link": "Invite link",
     "invite.copy": "Copy",
-    "invite.gmailLabel": "Friend's Gmail address",
+    "invite.gmailLabel": "Friend's email address",
     "invite.gmailCopy": "Copy address",
     "invite.share": "Share via KakaoTalk",
     "uni.title": "🎓 Partner Universities",
@@ -226,8 +226,8 @@ const TRANSLATIONS = {
     "alert.codetrail": "🚀 Code Trail is coming soon!\n\nFollow a step-by-step learning path from algorithm practice\nto real coding tests.",
     "alert.inviteLogin": "Please log in to use the invite friends feature.",
     "alert.linkCopied": "Invite link copied!",
-    "alert.emailCopied": "Gmail address copied!",
-    "alert.emailEmpty": "Please enter a Gmail address.",
+    "alert.emailCopied": "Email address copied!",
+    "alert.emailEmpty": "Please enter an email address.",
     "lang.label": "English",
   },
 };
@@ -638,21 +638,21 @@ function copyInviteLink() {
   alert(t('alert.linkCopied') || '초대 링크가 복사되었습니다!');
 }
 
-// Copy Gmail address function
+// Copy Email address function
 function copyGmailAddress() {
   const gmailInput = document.getElementById('friend-gmail');
   const email = gmailInput.value.trim();
   if (email) {
     navigator.clipboard.writeText(email).then(() => {
-      alert(t('alert.emailCopied') || 'Gmail 주소가 복사되었습니다!');
+      alert(t('alert.emailCopied') || '이메일 주소가 복사되었습니다!');
     }).catch(() => {
       // Fallback for older browsers
       gmailInput.select();
       document.execCommand('copy');
-      alert(t('alert.emailCopied') || 'Gmail 주소가 복사되었습니다!');
+      alert(t('alert.emailCopied') || '이메일 주소가 복사되었습니다!');
     });
   } else {
-    alert(t('alert.emailEmpty') || 'Gmail 주소를 입력해주세요.');
+    alert(t('alert.emailEmpty') || '이메일 주소를 입력해주세요.');
   }
 }
 const loginBtn = document.getElementById("login-btn");
@@ -804,8 +804,8 @@ function setMode(nextMode) {
   const showCode = nextMode === "signup-verify";
   const showRecovery = nextMode === "login";
   const showRecoveryAlt = nextMode === "find-id" || nextMode === "find-password";
-  const showUsername = nextMode === "login" || nextMode === "signup-verify";
-  const showPassword = nextMode === "login" || nextMode === "signup-verify";
+  const showUsername = nextMode === "login" || nextMode === "signup-verify" || nextMode === "signup-email";
+  const showPassword = nextMode === "login" || nextMode === "signup-verify" || nextMode === "signup-email";
 
   usernameLabel.hidden = !showUsername;
   passwordLabel.hidden = !showPassword;
@@ -851,7 +851,9 @@ function setMode(nextMode) {
   errorEl.innerHTML = "";
   errorEl.classList.remove("modal-error--offline");
   infoEl.hidden = true;
-  form.reset();
+  if (!(mode === "signup-email" && nextMode === "signup-verify")) {
+    form.reset();
+  }
   if (!emailLabel.hidden) {
     form.querySelector("input[name=email]").focus();
   } else if (!codeLabel?.hidden) {
@@ -1078,13 +1080,13 @@ form.addEventListener("submit", async (e) => {
     }
 
     if (mode === "find-id") {
-      infoEl.textContent = body.message || t("auth.findIdSuccess") || "아이디 찾기 안내를 Gmail로 보냈습니다.";
+      infoEl.textContent = body.message || t("auth.findIdSuccess") || "아이디 찾기 안내를 이메일로 보냈습니다.";
       infoEl.hidden = false;
       return;
     }
 
     if (mode === "find-password") {
-      infoEl.textContent = body.message || t("auth.findPwSuccess") || "비밀번호 재설정 안내를 Gmail로 보냈습니다.";
+      infoEl.textContent = body.message || t("auth.findPwSuccess") || "비밀번호 재설정 안내를 이메일로 보냈습니다.";
       infoEl.hidden = false;      return;
     }
 

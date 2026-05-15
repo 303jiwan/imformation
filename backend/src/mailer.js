@@ -35,8 +35,11 @@ export async function sendMail({ to, subject, text, html }) {
     console.log(`  From:    ${SMTP_FROM}`);
     console.log(`  To:      ${to}`);
     console.log(`  Subject: ${subject}`);
-    console.log(`  Body:`);
-    console.log(text.split("\n").map((l) => "    " + l).join("\n"));
+    if (text) {
+      console.log(text.split("\n").map((l) => "    " + l).join("\n"));
+    } else if (html) {
+      console.log(html.split("\n").map((l) => "    " + l).join("\n"));
+    }
     console.log(`${banner}\n`);
     return { dev: true };
   }

@@ -1,5 +1,7 @@
 import { PROBLEMS, TOTAL_PROBLEMS, loadProblemQueue, QUEUE_KEY } from "./test-problems.js";
 
+const API_BASE = "http://localhost:3000";
+
 /* =====================================================================
    Test result screen — Step 6 of the coding-test flow.
 
@@ -378,16 +380,31 @@ function renderSummary(progress, answers, queue) {
 
     <div class="result-actions">
       <button type="button" class="result-back" id="restart-btn">다시 시작하기</button>
-      <button type="button" class="result-back" id="email-result-btn">결과 이메일 발송</button>
+      <button type="button" class="result-back" id="email-result-btn">결과 이메일 수동 발송</button>
       <a href="index.html" class="result-next result-next--final" id="home-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
         메인으로 돌아가기 →
       </a>
     </div>
   `;
 
+  // Define uniqueWeak
+  const weakConcepts = [];
+  for (const id of queue) {
+    if (answers[id]?.verdict !== "correct") {
+      const problem = PROBLEMS.find((p) => p.id === id);
+      if (problem?.concepts) {
+        weakConcepts.push(...problem.concepts);
+      }
+    }
+  }
+  const uniqueWeak = [...new Set(weakConcepts)];
+
+  // Auto-save and auto-email if logged in
+  saveAndEmailResults(progress, answers, queue, pct, uniqueWeak);
+
   document.getElementById("restart-btn").addEventListener("click", () => {
     if (!confirm("진행 기록을 모두 지우고 처음부터 다시 시작할까요?")) return;
-    for (const k of [PROGRESS_KEY, ANSWERS_KEY, TIMER_KEY, QUEUE_KEY]) {
+    for (const k of [PROGRESS_KEY, ANSWERS_KEY, TIMER_KEY, QUEUE_KEY, "codenergy:test:saved"]) {
       try { sessionStorage.removeItem(k); } catch (_) {}
     }
     if (fade) fade.classList.remove("is-hidden");
@@ -441,9 +458,63 @@ function renderSummary(progress, answers, queue) {
   });
 }
 
+async function saveAndEmailResults(progress, answers, queue, score, uniqueWeak) {
+  if (sessionStorage.getItem("codenergy:test:saved")) return;
+  
+  try {
+    const meRes = await fetch(`${API_BASE}/api/me`, { credentials: "include" });
+    if (!meRes.ok) return; // not logged in, skip saving
+    
+    const user = await meRes.json();
+    
+    // Save progress
+    await fetch(`${API_BASE}/api/test/progress`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ current: progress.current, total: progress.total }),
+    });
+
+    // Save answers
+    for (const id of queue) {
+      const a = answers[id];
+      if (!a) continue;
+      await fetch(`${API_BASE}/api/test/answer`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          problemId: String(id),
+          code: a.code || "",
+          verdict: a.verdict || "missing"
+        }),
+      });
+    }
+
+    // Send email automatically
+    if (user.email && !user.demo) {
+      await fetch(`${API_BASE}/api/test/result-email`, {
+        method: "POST",
+        credentials: "include",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email: user.email,
+          testType: "default",
+          score,
+          weakConcepts: uniqueWeak.slice(0, 5),
+        }),
+      });
+    }
+
+    sessionStorage.setItem("codenergy:test:saved", "true");
+  } catch (err) {
+    console.error("Auto-save failed:", err);
+  }
+}
+
 function exitFlow() {
   if (!confirm("정말 테스트를 종료할까요? 진행 상황이 사라집니다.")) return;
-  for (const k of [PROGRESS_KEY, ANSWERS_KEY, TIMER_KEY, QUEUE_KEY]) {
+  for (const k of [PROGRESS_KEY, ANSWERS_KEY, TIMER_KEY, QUEUE_KEY, "codenergy:test:saved"]) {
     try { sessionStorage.removeItem(k); } catch (_) {}
   }
   window.location.href = "index.html";

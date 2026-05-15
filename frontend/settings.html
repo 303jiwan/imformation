@@ -3,7 +3,13 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title data-i18n="pricing.pageTitle">Codenergy — 요금제</title>
+    <title>Codenergy — 설정</title>
+    <style>
+      .page-fade {
+        position: fixed; inset: 0; background: #fff;
+        z-index: 9999; opacity: 1; pointer-events: auto;
+      }
+    </style>
   </head>
   <body>
     <div class="page-fade" id="page-fade"></div>
@@ -113,86 +119,38 @@
       </form>
     </div>
 
-    <section class="pricing-section pricing-page" id="pricing-section">
-      <div class="pricing-secure">
-        <span data-i18n="pricing.secure">안전한 결제 진행</span>
-        <span class="tosspay">toss pay</span>
+    
+    <section class="survey-section">
+      <div class="survey-header">
+        <h1 class="survey-title">설정</h1>
+        <p class="survey-subtitle">알림 및 계정 환경을 설정하세요.</p>
       </div>
-      <h2 data-i18n="pricing.heading">모든 출제 원리에 액세스하세요.</h2>
-
-      <div class="pricing-cards">
-        <article class="plan-card plan-monthly">
-          <header class="plan-card__head">
-            <h3 data-i18n="pricing.monthly">월간(1개월)</h3>
-            <p class="plan-tagline" data-i18n="pricing.monthlyTagline">명확한 약점을 집중 공략하고 싶다면</p>
-          </header>
-          <div class="plan-price">
-            <span class="price-label" data-i18n="pricing.normal">정상가</span>
-            <div class="price-row">
-              <span class="price-amount">109,000<span class="price-unit" data-i18n="pricing.won">원</span></span>
-            </div>
-          </div>
-          <button type="button" class="plan-cta plan-cta--white" data-i18n="pricing.subscribe">구독 시작하기</button>
-        </article>
-
-        <article class="plan-card plan-quarterly">
-          <header class="plan-card__head">
-            <h3 data-i18n="pricing.quarterly">분기(3개월)</h3>
-            <p class="plan-tagline" data-i18n="pricing.quarterlyTagline">100일로 모든걸 새롭게 쓰고 싶다면</p>
-          </header>
-          <div class="plan-price">
-            <div class="price-original">327,000</div>
-            <div class="price-row">
-              <span class="price-amount">169,000<span class="price-unit" data-i18n="pricing.won">원</span></span>
-              <span class="price-discount price-discount--blue" data-i18n="pricing.discount48">48% 할인가</span>
-            </div>
-          </div>
-          <button type="button" class="plan-cta plan-cta--blue" data-i18n="pricing.subscribe">구독 시작하기</button>
-          <div class="plan-companies">
-            <p class="companies-label" data-i18n="pricing.companies3m">3개월 뒤 합격 기업</p>
-            <div class="company-logos">
-              <span class="logo-samsung">SAMSUNG</span>
-              <span class="logo-hyundai">HYUNDAI</span>
-              <span class="logo-naver">NAVER</span>
-            </div>
-            <div class="company-logos">
-              <span class="logo-kt">kt</span>
-              <span class="logo-toss">toss</span>
-            </div>
-            <p class="companies-note" data-i18n="pricing.realData">실제 합격자 데이터입니다.</p>
-          </div>
-        </article>
-
-        <article class="plan-card plan-yearly">
-          <header class="plan-card__head">
-            <h3 data-i18n="pricing.yearly">연간(12개월)</h3>
-            <p class="plan-tagline" data-i18n="pricing.yearlyTagline">꿈의 무대를 넓히고 싶다면</p>
-          </header>
-          <div class="plan-price">
-            <div class="price-original">1,308,000</div>
-            <div class="price-row">
-              <span class="price-amount">469,000<span class="price-unit" data-i18n="pricing.won">원</span></span>
-              <span class="price-discount price-discount--green" data-i18n="pricing.discount64">64% 할인가</span>
-            </div>
-          </div>
-          <button type="button" class="plan-cta plan-cta--green" data-i18n="pricing.subscribe">구독 시작하기</button>
-          <button type="button" class="plan-secondary" data-i18n="pricing.student">학생이신가요?</button>
-          <div class="plan-companies">
-            <p class="companies-label" data-i18n="pricing.companies1y">1년 뒤 합격 기업</p>
-            <div class="company-logos">
-              <span class="logo-google">Google</span>
-              <span class="logo-microsoft">Microsoft</span>
-            </div>
-            <div class="company-logos">
-              <span class="logo-meta">Meta</span>
-              <span class="logo-amazon">amazon</span>
-            </div>
-            <p class="companies-note" data-i18n="pricing.realData">실제 합격자 데이터입니다.</p>
-          </div>
-        </article>
+      <div style="padding: 20px; background: #fff; border-radius: 8px; border: 1px solid #ddd; color: #333;">
+        <h2>환경 설정</h2>
+        <div style="margin-top: 15px;">
+          <label style="display: block; margin-bottom: 10px;">
+            <input type="checkbox" checked> 이메일 알림 받기
+          </label>
+          <label style="display: block; margin-bottom: 10px;">
+            <input type="checkbox" checked> 마케팅 정보 수신 동의
+          </label>
+          <button type="button" style="margin-top: 15px; padding: 10px 20px; background: #111; color: #fff; border: none; border-radius: 4px; cursor: pointer;">설정 저장</button>
+        </div>
       </div>
     </section>
 
+
     <script type="module" src="/src/main.js"></script>
+    <script type="module">
+      const form = document.getElementById('survey-form');
+      const fade = document.getElementById('page-fade');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const data = Object.fromEntries(new FormData(form));
+        try { sessionStorage.setItem('survey', JSON.stringify(data)); } catch (_) {}
+        if (fade) fade.classList.remove('is-hidden');
+        setTimeout(() => { window.location.href = 'results.html'; }, 180);
+      });
+    </script>
   </body>
 </html>
