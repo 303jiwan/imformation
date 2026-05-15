@@ -254,7 +254,7 @@ authRouter.post("/signup/send-code", async (req, res) => {
   stmts.insertEmailAuthCode.run(cleanEmail, code, expiresAt);
 
   try {
-    await sendMail({
+    const mailResult = await sendMail({
       to: cleanEmail,
       subject: "[Codenergy] 이메일 인증 코드",
       html: `
@@ -269,7 +269,12 @@ authRouter.post("/signup/send-code", async (req, res) => {
         </p>
       `,
     });
-    res.json({ ok: true, message: "인증코드를 이메일로 전송했습니다." });
+    
+    if (mailResult.dev) {
+      res.json({ ok: true, message: "개발 모드: 인증코드가 서버 콘솔에 출력되었습니다.", devCode: code });
+    } else {
+      res.json({ ok: true, message: "인증코드를 이메일로 전송했습니다." });
+    }
   } catch (err) {
     console.error("Failed to send auth code:", err);
     res.status(500).json({ error: "이메일 전송에 실패했습니다." });

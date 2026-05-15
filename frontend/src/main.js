@@ -1153,6 +1153,11 @@ form.addEventListener("submit", async (e) => {
         // Success: move to signup-verify mode
         infoEl.textContent = "인증코드를 이메일로 전송했습니다. 3분 이내에 입력해주세요.";
         infoEl.hidden = false;
+        
+        if (body.devCode) {
+          alert(`[개발 모드 안내]\n현재 SMTP 서버가 설정되지 않아 실제 이메일이 발송되지 않습니다.\n\n인증코드: ${body.devCode}`);
+        }
+
         // Store email for next step
         sessionStorage.setItem("signup-email", data.email);
         // Switch to verify mode
