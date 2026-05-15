@@ -22,11 +22,42 @@ import { runC, normalizeOutput, gradingSample, judgeAvailable } from "./judge.js
      swap test-problems.js's `expected` for backend output when ready.
    ===================================================================== */
 
+const API_BASE = "http://localhost:3000";
 const PROGRESS_KEY = "codenergy:test:progress";
 const ANSWERS_KEY  = "codenergy:test:answers";
 const TIMER_KEY    = "codenergy:test:timer";
 const CONCEPTS_KEY = "codenergy:test:concepts";
 const NEXT_PAGE    = "test-result.html";
+
+async function tryPostTestProgress(progress) {
+  try {
+    await fetch(`${API_BASE}/api/test/progress`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(progress),
+    });
+  } catch (err) {
+    console.warn("Failed to save progress to server:", err);
+  }
+}
+
+async function tryPostTestAnswer(problemId, payload) {
+  try {
+    await fetch(`${API_BASE}/api/test/answer`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        problemId,
+        code: payload.code || "",
+        verdict: payload.verdict || "wrong",
+      }),
+    });
+  } catch (err) {
+    console.warn("Failed to save answer to server:", err);
+  }
+}
 
 /* ---------- Storage ---------- */
 
@@ -653,13 +684,16 @@ async function submitTest(reason = "manual") {
     if (stoppedReason) overlaySub.textContent = `${stoppedReason} — 채점 종료`;
   }
 
-  saveAnswer(problem.id, {
+  const answerPayload = {
     code,
     verdict,
     cases: sampleAs.map((A) => ({ A, expected: problem.expected(A) })),
     submittedAt: Date.now(),
     reason,
-  });
+  };
+  saveAnswer(problem.id, answerPayload);
+  await tryPostTestAnswer(problem.id, answerPayload);
+  await tryPostTestProgress(progress);
 
   try { sessionStorage.removeItem(TIMER_KEY); } catch (_) {}
   setTimeout(() => {
@@ -672,15 +706,18 @@ actSubmit.addEventListener("click", () => submitTest("manual"));
 
 /* ---------- Skip / Exit ---------- */
 
-skipBtn.addEventListener("click", () => {
+skipBtn.addEventListener("click", async () => {
   if (!confirm("이 문제를 건너뛰고 다음 문제로 넘어갈까요? 미제출 처리됩니다.")) return;
-  saveAnswer(problem.id, {
+  const skippedPayload = {
     code: editorImpl.getValue(),
     verdict: "wrong",
     cases: [],
     submittedAt: Date.now(),
     reason: "skipped",
-  });
+  };
+  saveAnswer(problem.id, skippedPayload);
+  await tryPostTestAnswer(problem.id, skippedPayload);
+  await tryPostTestProgress(progress);
   clearInterval(timerInterval);
   try { sessionStorage.removeItem(TIMER_KEY); } catch (_) {}
   if (fade) fade.classList.remove("is-hidden");

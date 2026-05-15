@@ -89,6 +89,10 @@
           <span>Gmail</span>
           <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
         </label>
+        <label class="field-code" id="code-field" hidden>
+          <span>인증코드</span>
+          <input name="code" type="text" placeholder="인증코드 5자리" autocomplete="off" />
+        </label>
         <p class="modal-info" id="modal-info" hidden></p>
         <p class="modal-error" id="modal-error" hidden></p>
         <div class="modal-recovery" id="modal-recovery">
@@ -127,6 +131,7 @@
       </div>
       <div style="padding: 20px; background: #fff; border-radius: 8px; border: 1px solid #ddd; color: #333;">
         <h2>내 정보</h2>
+        <p id="mypage-status">로그인을 하면 내 정보를 확인할 수 있습니다.</p>
         <p><strong>이름:</strong> <span id="mypage-name">로딩 중...</span></p>
         <p><strong>이메일:</strong> <span id="mypage-email">로딩 중...</span></p>
         <hr style="margin: 20px 0;">
@@ -138,16 +143,5 @@
 
 
     <script type="module" src="/src/main.js"></script>
-    <script type="module">
-      const form = document.getElementById('survey-form');
-      const fade = document.getElementById('page-fade');
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const data = Object.fromEntries(new FormData(form));
-        try { sessionStorage.setItem('survey', JSON.stringify(data)); } catch (_) {}
-        if (fade) fade.classList.remove('is-hidden');
-        setTimeout(() => { window.location.href = 'results.html'; }, 180);
-      });
-    </script>
   </body>
 </html>

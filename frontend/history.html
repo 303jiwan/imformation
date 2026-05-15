@@ -89,6 +89,10 @@
           <span>Gmail</span>
           <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
         </label>
+        <label class="field-code" id="code-field" hidden>
+          <span>인증코드</span>
+          <input name="code" type="text" placeholder="인증코드 5자리" autocomplete="off" />
+        </label>
         <p class="modal-info" id="modal-info" hidden></p>
         <p class="modal-error" id="modal-error" hidden></p>
         <div class="modal-recovery" id="modal-recovery">
@@ -127,32 +131,15 @@
       </div>
       <div style="padding: 20px; background: #fff; border-radius: 8px; border: 1px solid #ddd; color: #333;">
         <h2>최근 학습 내역</h2>
-        <ul style="list-style: none; padding: 0;">
-          <li style="padding: 10px; border-bottom: 1px solid #eee;">
-            <strong>코드테스트 결과</strong> - 정답률 80% <span style="color: #888; font-size: 0.9em;">(오늘)</span>
-          </li>
-          <li style="padding: 10px; border-bottom: 1px solid #eee;">
-            <strong>실력 진단</strong> - 70점 <span style="color: #888; font-size: 0.9em;">(어제)</span>
-          </li>
-          <li style="padding: 10px;">
-            <span style="color: #888;">더 많은 기록은 곧 제공됩니다.</span>
-          </li>
+        <p id="history-status">로그인을 하면 학습 기록을 확인할 수 있습니다.</p>
+        <div id="history-progress" style="margin: 16px 0;"></div>
+        <ul id="history-list" style="list-style: none; padding: 0;">
+          <li style="padding: 10px;">기록을 불러오는 중입니다...</li>
         </ul>
       </div>
     </section>
 
 
     <script type="module" src="/src/main.js"></script>
-    <script type="module">
-      const form = document.getElementById('survey-form');
-      const fade = document.getElementById('page-fade');
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const data = Object.fromEntries(new FormData(form));
-        try { sessionStorage.setItem('survey', JSON.stringify(data)); } catch (_) {}
-        if (fade) fade.classList.remove('is-hidden');
-        setTimeout(() => { window.location.href = 'results.html'; }, 180);
-      });
-    </script>
   </body>
 </html>

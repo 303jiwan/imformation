@@ -245,10 +245,12 @@ authRouter.post("/signup/send-code", async (req, res) => {
     });
   }
 
-  // Generate 6-digit code
-  const code = Math.floor(100000 + Math.random() * 900000).toString();
-  const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
+  // Generate 5-digit code and keep code valid for 3 minutes only
+  const code = Math.floor(10000 + Math.random() * 90000).toString();
+  const expiresAt = new Date(Date.now() + 3 * 60 * 1000).toISOString(); // 3 minutes
 
+  stmts.deleteExpiredEmailAuthCodes.run();
+  stmts.deleteEmailAuthCodesByEmail.run(cleanEmail);
   stmts.insertEmailAuthCode.run(cleanEmail, code, expiresAt);
 
   try {
@@ -262,7 +264,7 @@ authRouter.post("/signup/send-code", async (req, res) => {
           ${code}
         </h1>
         <p style="color: #666; font-size: 12px;">
-          이 코드는 10분간 유효합니다.<br />
+          이 코드는 3분간 유효합니다.<br />
           본인이 요청하지 않은 경우 무시해주세요.
         </p>
       `,
@@ -286,10 +288,13 @@ authRouter.post("/signup/verify-code", async (req, res) => {
   if (typeof code !== "string" || code.trim().length === 0) {
     return res.status(400).json({ error: "인증코드가 필요합니다." });
   }
+  const cleanCode = code.trim();
+  if (!/^[0-9]{5}$/.test(cleanCode)) {
+    return res.status(400).json({ error: "인증코드는 5자리 숫자여야 합니다." });
+  }
 
   // Check code validity
   const cleanEmail = email.trim().toLowerCase();
-  const cleanCode = code.trim();
   const authRow = stmts.findEmailAuthCode.get(cleanEmail, cleanCode);
 
   if (!authRow) {

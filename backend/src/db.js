@@ -171,6 +171,12 @@ export const stmts = {
   deleteEmailAuthCode: db.prepare(
     "DELETE FROM email_auth_codes WHERE email = ? AND code = ?"
   ),
+  deleteEmailAuthCodesByEmail: db.prepare(
+    "DELETE FROM email_auth_codes WHERE email = ?"
+  ),
+  deleteExpiredEmailAuthCodes: db.prepare(
+    "DELETE FROM email_auth_codes WHERE expires_at <= CURRENT_TIMESTAMP"
+  ),
 };
 
 // Light periodic cleanup: nuke expired sessions on startup.

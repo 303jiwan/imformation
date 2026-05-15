@@ -7,11 +7,25 @@
      sessionStorage["codenergy:test:progress"] = { current, total }.
    ===================================================================== */
 
+const API_BASE = "http://localhost:3000";
 const PROGRESS_KEY = "codenergy:test:progress";
 const NEXT_PAGE = "test-problem.html";
 const TOTAL_PROBLEMS = 5;
 const FILL_DURATION_MS = 3500; // total animation time
 const CIRCUMFERENCE = 263.89;  // 2π × 42 (matches the SVG circle r=42)
+
+async function trySaveProgressToServer(progress) {
+  try {
+    await fetch(`${API_BASE}/api/test/progress`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(progress),
+    });
+  } catch (_) {
+    // Ignore network/auth failures; local session still works.
+  }
+}
 
 const STAGE_LABELS = [
   "주제 분석 중…",
@@ -125,9 +139,10 @@ function startAnimation() {
 
 /* ---------- Wiring ---------- */
 
-startBtn.addEventListener("click", () => {
+startBtn.addEventListener("click", async () => {
   if (startBtn.disabled) return;
   saveProgress(progress);
+  await trySaveProgressToServer(progress);
   if (fade) fade.classList.remove("is-hidden");
   setTimeout(() => {
     window.location.href = NEXT_PAGE;

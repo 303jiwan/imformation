@@ -1,4 +1,5 @@
 import { PROBLEMS, TOTAL_PROBLEMS, loadProblemQueue, QUEUE_KEY } from "./test-problems.js";
+const API_BASE = "http://localhost:3000";
 
 /* =====================================================================
    Test result screen — Step 6 of the coding-test flow.
@@ -419,10 +420,11 @@ function renderSummary(progress, answers, queue) {
     try {
       const res = await fetch(`${API_BASE}/api/test/result-email`, {
         method: "POST",
+        credentials: "include",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           email,
-          testType: "default",
+          testType: "codetest",
           score,
           weakConcepts: uniqueWeak.slice(0, 5),
         }),
@@ -430,6 +432,10 @@ function renderSummary(progress, answers, queue) {
 
       if (!res.ok) {
         const error = await res.json().catch(() => ({}));
+        if (res.status === 401) {
+          alert("로그인 후 이용해주세요.");
+          return;
+        }
         alert(error.error || "이메일 발송 실패");
         return;
       }

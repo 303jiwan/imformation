@@ -530,6 +530,63 @@ function navigateToHref(href) {
   }, PAGE_FADE_MS);
 }
 
+const MY_MENU_ROUTES = {
+  'my.mypage': 'mypage.html',
+  'my.history': 'history.html',
+  'my.subscription': 'pricing.html',
+  'my.invite': 'index.html',
+  'my.settings': 'settings.html',
+};
+
+function initMyMenuNavigation() {
+  if (!myMenu) return;
+  myMenu.querySelectorAll('.my-menu__item').forEach((btn) => {
+    const route = MY_MENU_ROUTES[btn.dataset.i18n];
+    if (!route) return;
+    btn.addEventListener('click', () => {
+      myMenu.hidden = true;
+      navigateToHref(route);
+    });
+  });
+}
+
+async function getAuthenticatedUser() {
+  try {
+    const res = await fetch(`${API_BASE}/api/me`, {
+      credentials: 'include',
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (_) {
+    return null;
+  }
+}
+
+async function getTestState() {
+  try {
+    const res = await fetch(`${API_BASE}/api/test/state`, {
+      credentials: 'include',
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch (_) {
+    return null;
+  }
+}
+
+function showLoginPrompt(container, message) {
+  if (!container) return;
+  container.innerHTML = `
+    <div style="padding: 20px; background: #fff; border-radius: 8px; border: 1px solid #ddd;">
+      <p>${message}</p>
+      <button class="cta" type="button" id="login-prompt-btn">로그인</button>
+    </div>
+  `;
+  container.querySelector('#login-prompt-btn')?.addEventListener('click', () => {
+    openModal('login');
+  });
+}
+
 function showCodeTrail() {
   navigateToHref('codetrails.html');
 }
@@ -591,6 +648,96 @@ function initCodeTrailsPage() {
   }
 }
 
+function initMypagePage() {
+  const nameEl = document.getElementById('mypage-name');
+  const emailEl = document.getElementById('mypage-email');
+  const statusEl = document.getElementById('mypage-status');
+
+  getAuthenticatedUser().then((user) => {
+    if (!user) {
+      if (statusEl) statusEl.textContent = '로그인하면 내 정보를 확인할 수 있습니다.';
+      if (nameEl) nameEl.textContent = '로그인 필요';
+      if (emailEl) emailEl.textContent = '-';
+      return;
+    }
+    if (statusEl) statusEl.textContent = `${user.username}님 환영합니다.`;
+    if (nameEl) nameEl.textContent = user.username;
+    if (emailEl) emailEl.textContent = user.email;
+  });
+}
+
+function initHistoryPage() {
+  const progressEl = document.getElementById('history-progress');
+  const listEl = document.getElementById('history-list');
+  const statusEl = document.getElementById('history-status');
+
+  getTestState().then((state) => {
+    if (!state) {
+      if (statusEl) statusEl.textContent = '로그인 후 학습 기록을 확인할 수 있습니다.';
+      if (listEl) listEl.innerHTML = '<li style="padding: 10px;">기록을 불러올 수 없습니다.</li>';
+      return;
+    }
+
+    if (statusEl) statusEl.textContent = '최근 학습 기록입니다.';
+    if (progressEl) {
+      const p = state.progress || { current: 0, total: 0 };
+      progressEl.innerHTML = `
+        <p><strong>진행도:</strong> ${p.current} / ${p.total}</p>
+      `;
+    }
+
+    if (!listEl) return;
+    const answers = Array.isArray(state.answers) ? state.answers : [];
+    if (!answers.length) {
+      listEl.innerHTML = '<li style="padding: 10px;">등록된 기록이 없습니다.</li>';
+      return;
+    }
+
+    listEl.innerHTML = answers
+      .map((item) => {
+        const when = item.submitted_at ? new Date(item.submitted_at).toLocaleString() : '알 수 없음';
+        const verdict = item.verdict || '미제출';
+        return `
+          <li style="padding: 10px; border-bottom: 1px solid #eee;">
+            <strong>${item.problem_id}</strong> - ${verdict}
+            <div style="color: #888; font-size: 0.9em; margin-top: 4px;">${when}</div>
+          </li>
+        `;
+      })
+      .join('');
+  });
+}
+
+function initSettingsPage() {
+  const statusEl = document.getElementById('settings-status');
+  const emailCheckbox = document.getElementById('settings-email-notifications');
+  const marketingCheckbox = document.getElementById('settings-marketing');
+  const saveButton = document.getElementById('settings-save-btn');
+
+  const saved = JSON.parse(localStorage.getItem('codenergy:settings') || '{}');
+  if (emailCheckbox) emailCheckbox.checked = saved.emailNotifications !== false;
+  if (marketingCheckbox) marketingCheckbox.checked = saved.marketingOptIn !== false;
+
+  if (saveButton) {
+    saveButton.addEventListener('click', () => {
+      const payload = {
+        emailNotifications: emailCheckbox?.checked ?? false,
+        marketingOptIn: marketingCheckbox?.checked ?? false,
+      };
+      localStorage.setItem('codenergy:settings', JSON.stringify(payload));
+      alert('설정이 저장되었습니다.');
+    });
+  }
+
+  getAuthenticatedUser().then((user) => {
+    if (!user) {
+      if (statusEl) statusEl.textContent = '로그인하면 개인 설정을 더 쉽게 관리할 수 있습니다.';
+      return;
+    }
+    if (statusEl) statusEl.textContent = `${user.username}님이 로그인 중입니다.`;
+  });
+}
+
 function initHomePage() {
   const homeCta = document.getElementById('home-cta-btn');
   if (homeCta) {
@@ -601,6 +748,9 @@ function initHomePage() {
 const currentPage = window.location.pathname.split('/').pop();
 if (currentPage === 'results.html') initResultsPage();
 if (currentPage === 'codetrails.html') initCodeTrailsPage();
+if (currentPage === 'mypage.html') initMypagePage();
+if (currentPage === 'history.html') initHistoryPage();
+if (currentPage === 'settings.html') initSettingsPage();
 if (currentPage === 'index.html' || currentPage === '') initHomePage();
 
 function showReviews() {
@@ -765,6 +915,8 @@ logoutBtn.addEventListener("click", async () => {
   alert(t("auth.logoutDone") || "로그아웃되었습니다");
 });
 
+initMyMenuNavigation();
+
 function setMode(nextMode) {
   mode = nextMode;
   const titleKey =
@@ -851,9 +1003,25 @@ function setMode(nextMode) {
   errorEl.innerHTML = "";
   errorEl.classList.remove("modal-error--offline");
   infoEl.hidden = true;
+
+  const preserveSignupFields = mode === "login" && nextMode === "signup-email";
+  const preservedUsername = preserveSignupFields
+    ? form.querySelector("input[name=username]")?.value || ""
+    : "";
+  const preservedPassword = preserveSignupFields
+    ? form.querySelector("input[name=password]")?.value || ""
+    : "";
+
   if (!(mode === "signup-email" && nextMode === "signup-verify")) {
     form.reset();
   }
+  if (preserveSignupFields) {
+    const usernameInput = form.querySelector("input[name=username]");
+    const passwordInput = form.querySelector("input[name=password]");
+    if (usernameInput) usernameInput.value = preservedUsername;
+    if (passwordInput) passwordInput.value = preservedPassword;
+  }
+
   if (!emailLabel.hidden) {
     form.querySelector("input[name=email]").focus();
   } else if (!codeLabel?.hidden) {
@@ -983,7 +1151,7 @@ form.addEventListener("submit", async (e) => {
         }
 
         // Success: move to signup-verify mode
-        infoEl.textContent = "인증코드를 이메일로 전송했습니다.";
+        infoEl.textContent = "인증코드를 이메일로 전송했습니다. 3분 이내에 입력해주세요.";
         infoEl.hidden = false;
         // Store email for next step
         sessionStorage.setItem("signup-email", data.email);

@@ -73,6 +73,10 @@
         <label class="field-username"><span>아이디</span><input name="username" required minlength="2" /></label>
         <label class="field-password"><span>비밀번호</span><input name="password" type="password" required minlength="6" /></label>
         <label class="field-email" id="email-field" hidden><span>Gmail</span><input name="email" type="email" /></label>
+        <label class="field-code" id="code-field" hidden>
+          <span>인증코드</span>
+          <input name="code" type="text" placeholder="인증코드 5자리" autocomplete="off" />
+        </label>
         <p class="modal-info" id="modal-info" hidden></p>
         <p class="modal-error" id="modal-error" hidden></p>
         <div class="modal-recovery" id="modal-recovery">

@@ -89,6 +89,10 @@
           <span>Gmail</span>
           <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
         </label>
+        <label class="field-code" id="code-field" hidden>
+          <span>인증코드</span>
+          <input name="code" type="text" placeholder="인증코드 5자리" autocomplete="off" />
+        </label>
         <p class="modal-info" id="modal-info" hidden></p>
         <p class="modal-error" id="modal-error" hidden></p>
         <div class="modal-recovery" id="modal-recovery">
@@ -128,29 +132,19 @@
       <div style="padding: 20px; background: #fff; border-radius: 8px; border: 1px solid #ddd; color: #333;">
         <h2>환경 설정</h2>
         <div style="margin-top: 15px;">
+          <p id="settings-status">로그인하면 개인 설정을 더 쉽게 관리할 수 있습니다.</p>
           <label style="display: block; margin-bottom: 10px;">
-            <input type="checkbox" checked> 이메일 알림 받기
+            <input type="checkbox" id="settings-email-notifications" name="emailNotifications" checked> 이메일 알림 받기
           </label>
           <label style="display: block; margin-bottom: 10px;">
-            <input type="checkbox" checked> 마케팅 정보 수신 동의
+            <input type="checkbox" id="settings-marketing" name="marketingOptIn" checked> 마케팅 정보 수신 동의
           </label>
-          <button type="button" style="margin-top: 15px; padding: 10px 20px; background: #111; color: #fff; border: none; border-radius: 4px; cursor: pointer;">설정 저장</button>
+          <button type="button" id="settings-save-btn" style="margin-top: 15px; padding: 10px 20px; background: #111; color: #fff; border: none; border-radius: 4px; cursor: pointer;">설정 저장</button>
         </div>
       </div>
     </section>
 
 
     <script type="module" src="/src/main.js"></script>
-    <script type="module">
-      const form = document.getElementById('survey-form');
-      const fade = document.getElementById('page-fade');
-      form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        const data = Object.fromEntries(new FormData(form));
-        try { sessionStorage.setItem('survey', JSON.stringify(data)); } catch (_) {}
-        if (fade) fade.classList.remove('is-hidden');
-        setTimeout(() => { window.location.href = 'results.html'; }, 180);
-      });
-    </script>
   </body>
 </html>

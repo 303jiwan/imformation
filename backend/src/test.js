@@ -72,12 +72,14 @@ testRouter.post("/result-email", requireAuth, async (req, res) => {
   }
   
   const emailLower = email.trim().toLowerCase();
-  const username = req.user.username || "학습자";
+  const username = req.user?.username || "학습자";
   const testTypeLabel = testType === "survey" ? "실력 진단" : "코드테스트";
   const weakList = Array.isArray(weakConcepts) ? weakConcepts.join(", ") : "미분류";
   
   // Generate learning recommendation
-  const scorePercent = Math.round(score * 10);
+  const scorePercent = Number.isFinite(score)
+    ? score <= 1 ? Math.round(score * 100) : Math.round(score)
+    : 0;
   let recommendedTrail = "Codetree 101";
   if (scorePercent >= 70) recommendedTrail = "Novice Low";
   if (scorePercent >= 80) recommendedTrail = "Novice Mid";

@@ -44,12 +44,24 @@ export async function sendMail({ to, subject, text, html }) {
     return { dev: true };
   }
 
-  const info = await transporter.sendMail({
+  const mailOptions = {
     from: SMTP_FROM,
     to,
     subject,
-    text,
-    html,
-  });
+  };
+  if (text) {
+    mailOptions.text = text;
+  }
+  if (html) {
+    mailOptions.html = html;
+    if (!text) {
+      mailOptions.text = html
+        .replace(/<[^>]+>/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    }
+  }
+
+  const info = await transporter.sendMail(mailOptions);
   return { dev: false, messageId: info.messageId };
 }
