@@ -50,10 +50,10 @@ const TOPS = [
       const stroke = shade(color, 0.18);
       return `
       <g class="outfit-top top-tshirt-white">
-        <path d="M96 220 Q116 218 140 224 Q160 240 180 224 Q204 218 224 220
-                 L240 252 L222 264 L218 256 L218 346 L102 346 L102 256 L98 264 L80 252 Z"
+        <path d="M74 215 C88 196 132 190 160 190 C188 190 232 196 246 215
+                 L246 245 C240 255 232 275 232 280 L232 350 L100 350 L100 280 C90 255 84 245 74 245 Z"
               fill="${color}" stroke="${stroke}" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M140 224 Q160 240 180 224" fill="none" stroke="${stroke}" stroke-width="2"/>
+        <path d="M100 219 Q160 245 220 219" fill="none" stroke="${stroke}" stroke-width="2"/>
       </g>`;
     },
   },
@@ -69,18 +69,20 @@ const TOPS = [
         <line x1="32" y1="30" x2="32" y2="48" stroke="#7c3aed" stroke-width="2"/>
       </svg>`,
     svgFragment: (color = '#a855f7') => {
-      const dark = shade(color, 0.25);
-      const darker = shade(color, 0.4);
+      const stroke = shade(color, 0.25);
       return `
       <g class="outfit-top top-hoodie-purple">
-        <path d="M96 218 Q112 200 140 198 Q160 192 180 198 Q208 200 224 218
-                 L240 252 L222 264 L218 256 L218 348 L102 348 L102 256 L98 264 L80 252 Z"
-              fill="${color}" stroke="${dark}" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M112 222 Q160 250 208 222 Q198 244 160 252 Q122 244 112 222 Z"
-              fill="${dark}"/>
-        <line x1="150" y1="244" x2="150" y2="280" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round"/>
-        <line x1="170" y1="244" x2="170" y2="280" stroke="#f1f5f9" stroke-width="3" stroke-linecap="round"/>
-        <path d="M126 296 L194 296 L186 332 L134 332 Z" fill="${darker}" stroke="${dark}" stroke-width="2"/>
+        <path d="M84 215 C98 196 132 190 160 190 C188 190 222 196 236 215
+                 L244 245 C240 255 232 275 232 280 L232 352 L100 352 L100 280 C90 255 86 245 84 245 Z"
+              fill="${color}" stroke="${stroke}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M84 216 C78 236 82 275 100 280 L100 352 L84 352 Z"
+              fill="${color}" stroke="${stroke}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M236 216 C242 236 238 275 220 280 L220 352 L236 352 Z"
+              fill="${color}" stroke="${stroke}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M100 219 Q160 245 220 219" fill="none" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>
+        <path d="M116 290 L204 290 L198 326 L122 326 Z" fill="none" stroke="${stroke}" stroke-width="3"/>
+        <line x1="130" y1="244" x2="130" y2="280" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>
+        <line x1="190" y1="244" x2="190" y2="280" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>
       </g>`;
     },
   },
@@ -102,16 +104,16 @@ const TOPS = [
       const collar = shade(color, 0.1);
       return `
       <g class="outfit-top top-shirt-formal">
-        <path d="M96 220 Q116 218 140 224 Q160 240 180 224 Q204 218 224 220
-                 L240 252 L222 264 L218 256 L218 346 L102 346 L102 256 L98 264 L80 252 Z"
+        <path d="M74 215 C88 196 132 190 160 190 C188 190 232 196 246 215
+                 L246 245 C240 255 232 275 232 280 L232 350 L100 350 L100 280 C90 255 84 245 74 245 Z"
               fill="${color}" stroke="${stroke}" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M138 224 L160 256 L182 224 L172 218 L160 232 L148 218 Z" fill="${collar}" stroke="${stroke}" stroke-width="2"/>
-        <path d="M155 244 L165 244 L168 252 L162 264 L158 264 L152 252 Z" fill="#22c55e"/>
-        <path d="M158 264 L162 264 L168 332 L152 332 Z" fill="#16a34a"/>
-        <line x1="160" y1="266" x2="160" y2="344" stroke="${stroke}" stroke-width="1.5"/>
-        <circle cx="160" cy="288" r="2" fill="${stroke}"/>
-        <circle cx="160" cy="310" r="2" fill="${stroke}"/>
-        <circle cx="160" cy="332" r="2" fill="${stroke}"/>
+        <path d="M138 219 L160 251 L182 219 L172 213 L160 227 L148 213 Z" fill="${collar}" stroke="${stroke}" stroke-width="2"/>
+        <path d="M155 239 L165 239 L168 247 L162 259 L158 259 L152 247 Z" fill="#22c55e"/>
+        <path d="M158 259 L162 259 L168 327 L152 327 Z" fill="#16a34a"/>
+        <line x1="160" y1="261" x2="160" y2="339" stroke="${stroke}" stroke-width="1.5"/>
+        <circle cx="160" cy="283" r="2" fill="${stroke}"/>
+        <circle cx="160" cy="305" r="2" fill="${stroke}"/>
+        <circle cx="160" cy="327" r="2" fill="${stroke}"/>
       </g>`;
     },
   },
@@ -127,18 +129,20 @@ const TOPS = [
         <line x1="32" y1="30" x2="32" y2="48" stroke="#0f172a" stroke-width="2"/>
       </svg>`,
     svgFragment: (color = '#1f2937') => {
-      const dark = shade(color, 0.3);
-      const darker = shade(color, 0.45);
+      const stroke = shade(color, 0.25);
       return `
       <g class="outfit-top top-hoodie-black">
-        <path d="M96 218 Q112 200 140 198 Q160 192 180 198 Q208 200 224 218
-                 L240 252 L222 264 L218 256 L218 348 L102 348 L102 256 L98 264 L80 252 Z"
-              fill="${color}" stroke="${dark}" stroke-width="3" stroke-linejoin="round"/>
-        <path d="M112 222 Q160 250 208 222 Q198 244 160 252 Q122 244 112 222 Z"
-              fill="${dark}"/>
-        <line x1="150" y1="244" x2="150" y2="280" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
-        <line x1="170" y1="244" x2="170" y2="280" stroke="#cbd5e1" stroke-width="3" stroke-linecap="round"/>
-        <path d="M126 296 L194 296 L186 332 L134 332 Z" fill="${darker}" stroke="${dark}" stroke-width="2"/>
+        <path d="M84 215 C98 196 132 190 160 190 C188 190 222 196 236 215
+                 L244 245 C240 255 232 275 232 280 L232 352 L100 352 L100 280 C90 255 86 245 84 245 Z"
+              fill="${color}" stroke="${stroke}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M84 216 C78 236 82 275 100 280 L100 352 L84 352 Z"
+              fill="${color}" stroke="${stroke}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M236 216 C242 236 238 275 220 280 L220 352 L236 352 Z"
+              fill="${color}" stroke="${stroke}" stroke-width="3" stroke-linejoin="round"/>
+        <path d="M100 219 Q160 245 220 219" fill="none" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>
+        <path d="M116 290 L204 290 L198 326 L122 326 Z" fill="none" stroke="${stroke}" stroke-width="3"/>
+        <line x1="130" y1="244" x2="130" y2="280" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>
+        <line x1="190" y1="244" x2="190" y2="280" stroke="${stroke}" stroke-width="3" stroke-linecap="round"/>
       </g>`;
     },
   },
@@ -163,12 +167,12 @@ const BOTTOMS = [
       const dark = shade(color, 0.3);
       return `
       <g class="outfit-bottom bottom-jeans-blue">
-        <path d="M100 340 L220 340 L222 372 L204 448 L184 448 L172 380 L160 376 L148 380 L136 448 L116 448 L98 372 Z"
+        <path d="M100 340 L220 340 L222 372 L185 460 L175 460 L160 380 L160 376 L150 380 L145 460 L135 460 L98 372 Z"
               fill="${color}" stroke="${dark}" stroke-width="3" stroke-linejoin="round"/>
         <rect x="100" y="340" width="120" height="10" fill="${dark}"/>
         <line x1="160" y1="350" x2="160" y2="378" stroke="${dark}" stroke-width="2"/>
-        <line x1="148" y1="386" x2="138" y2="444" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3 3"/>
-        <line x1="172" y1="386" x2="182" y2="444" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <line x1="150" y1="386" x2="145" y2="456" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3 3"/>
+        <line x1="170" y1="386" x2="175" y2="456" stroke="#fbbf24" stroke-width="1.5" stroke-dasharray="3 3"/>
       </g>`;
     },
   },
@@ -186,7 +190,7 @@ const BOTTOMS = [
       const dark = shade(color, 0.3);
       return `
       <g class="outfit-bottom bottom-shorts">
-        <path d="M100 340 L220 340 L220 360 L208 408 L182 408 L172 380 L160 376 L148 380 L138 408 L112 408 L100 360 Z"
+        <path d="M100 340 L220 340 L220 360 L185 420 L175 420 L160 380 L160 376 L150 380 L145 420 L135 420 L100 360 Z"
               fill="${color}" stroke="${dark}" stroke-width="3" stroke-linejoin="round"/>
         <rect x="100" y="340" width="120" height="8" fill="${dark}"/>
         <line x1="160" y1="348" x2="160" y2="378" stroke="${dark}" stroke-width="2"/>
@@ -208,11 +212,11 @@ const BOTTOMS = [
       const crease = shade(color, 0.15);
       return `
       <g class="outfit-bottom bottom-slacks">
-        <path d="M100 340 L220 340 L222 372 L204 448 L184 448 L172 380 L160 376 L148 380 L136 448 L116 448 L98 372 Z"
+        <path d="M100 340 L220 340 L222 372 L185 460 L175 460 L160 380 L160 376 L150 380 L145 460 L135 460 L98 372 Z"
               fill="${color}" stroke="${dark}" stroke-width="3" stroke-linejoin="round"/>
         <rect x="100" y="340" width="120" height="8" fill="${dark}"/>
-        <line x1="142" y1="386" x2="130" y2="444" stroke="${crease}" stroke-width="1.5"/>
-        <line x1="178" y1="386" x2="190" y2="444" stroke="${crease}" stroke-width="1.5"/>
+        <line x1="145" y1="386" x2="140" y2="456" stroke="${crease}" stroke-width="1.5"/>
+        <line x1="175" y1="386" x2="180" y2="456" stroke="${crease}" stroke-width="1.5"/>
       </g>`;
     },
   },
@@ -396,11 +400,11 @@ const HAIR = [
       const accent = shade(color, 0.3);
       return `
       <g class="outfit-hair hair-short">
-        <path d="M88 122 Q92 60 160 54 Q228 60 232 122
-                 Q220 96 196 92 Q176 100 160 96 Q142 96 130 102
-                 Q108 100 100 110 Z"
+        <path d="M82 120 Q86 45 160 39 Q234 45 238 120
+                 Q226 96 208 92 Q188 100 160 96 Q132 96 120 102
+                 Q98 100 90 110 Z"
               fill="${color}"/>
-        <path d="M120 96 Q140 70 178 76 Q166 88 150 92 Q132 92 120 96 Z" fill="${accent}"/>
+        <path d="M110 96 Q130 55 188 61 Q176 88 160 92 Q142 92 110 96 Z" fill="${accent}"/>
       </g>`;
     },
   },
@@ -417,11 +421,11 @@ const HAIR = [
       const accent = shade(color, 0.25);
       return `
       <g class="outfit-hair hair-long">
-        <path d="M86 130 Q82 56 160 50 Q238 56 234 130
-                 L240 240 L222 246 L218 220 L218 132
-                 Q200 100 160 96 Q120 100 102 132 L102 220 L98 246 L80 240 Z"
+        <path d="M76 130 Q72 41 160 35 Q248 41 244 130
+                 L250 260 L232 266 L228 220 L228 132
+                 Q210 100 160 96 Q110 100 92 132 L92 220 L88 266 L70 260 Z"
               fill="${color}"/>
-        <path d="M120 96 Q140 70 178 76 Q166 88 150 92 Q132 92 120 96 Z" fill="${accent}"/>
+        <path d="M110 96 Q130 55 188 61 Q176 88 160 92 Q142 92 110 96 Z" fill="${accent}"/>
       </g>`;
     },
   },
@@ -440,13 +444,15 @@ const HAIR = [
       </svg>`,
     svgFragment: (color = '#8b5e34') => `
       <g class="outfit-hair hair-curly">
-        <circle cx="100" cy="100" r="22" fill="${color}"/>
-        <circle cx="130" cy="76"  r="26" fill="${color}"/>
-        <circle cx="160" cy="62"  r="28" fill="${color}"/>
-        <circle cx="190" cy="76"  r="26" fill="${color}"/>
-        <circle cx="220" cy="100" r="22" fill="${color}"/>
-        <circle cx="92"  cy="128" r="18" fill="${color}"/>
-        <circle cx="228" cy="128" r="18" fill="${color}"/>
+        <circle cx="85" cy="85" r="26" fill="${color}"/>
+        <circle cx="115" cy="61"  r="30" fill="${color}"/>
+        <circle cx="160" cy="47"  r="32" fill="${color}"/>
+        <circle cx="205" cy="61"  r="30" fill="${color}"/>
+        <circle cx="235" cy="85" r="26" fill="${color}"/>
+        <circle cx="77"  cy="128" r="22" fill="${color}"/>
+        <circle cx="243" cy="128" r="22" fill="${color}"/>
+        <circle cx="75"  cy="150" r="18" fill="${color}"/>
+        <circle cx="245" cy="150" r="18" fill="${color}"/>
       </g>`,
   },
   {
@@ -463,12 +469,12 @@ const HAIR = [
       const accent = shade(color, 0.2);
       return `
       <g class="outfit-hair hair-ponytail">
-        <path d="M88 122 Q92 56 160 52 Q228 56 232 122
-                 Q220 96 196 92 Q176 100 160 96 Q142 96 130 102
-                 Q108 100 100 110 Z"
+        <path d="M86 122 Q90 41 160 37 Q240 41 238 122
+                 Q228 98 208 92 Q188 100 160 96 Q132 96 120 102
+                 Q98 100 90 110 Z"
               fill="${color}"/>
-        <ellipse cx="248" cy="170" rx="16" ry="34" fill="${color}" stroke="${accent}" stroke-width="2"/>
-        <path d="M232 142 Q252 138 254 156" stroke="${accent}" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <ellipse cx="242" cy="164" rx="18" ry="42" fill="${color}" stroke="${accent}" stroke-width="2"/>
+        <path d="M236 138 Q244 154 242 164" stroke="${accent}" stroke-width="3" fill="none" stroke-linecap="round"/>
       </g>`;
     },
   },
