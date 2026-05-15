@@ -393,6 +393,52 @@ function renderSummary(progress, answers, queue) {
     if (fade) fade.classList.remove("is-hidden");
     setTimeout(() => { window.location.href = "test-concepts.html"; }, 180);
   });
+
+  document.getElementById("email-result-btn").addEventListener("click", async () => {
+    const email = prompt("결과를 받을 이메일을 입력해주세요:");
+    if (!email) return;
+
+    // Calculate score and weak concepts
+    const correct = queue.filter((id) => answers[id]?.verdict === "correct").length;
+    const total = queue.length;
+    const score = Math.round((correct / total) * 100);
+    
+    // Identify weak concepts
+    const weakConcepts = [];
+    for (const id of queue) {
+      if (answers[id]?.verdict !== "correct") {
+        const problem = PROBLEMS.find((p) => p.id === id);
+        if (problem?.concepts) {
+          weakConcepts.push(...problem.concepts);
+        }
+      }
+    }
+    // Keep unique weak concepts
+    const uniqueWeak = [...new Set(weakConcepts)];
+
+    try {
+      const res = await fetch(`${API_BASE}/api/test/result-email`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          testType: "default",
+          score,
+          weakConcepts: uniqueWeak.slice(0, 5),
+        }),
+      });
+
+      if (!res.ok) {
+        const error = await res.json().catch(() => ({}));
+        alert(error.error || "이메일 발송 실패");
+        return;
+      }
+
+      alert("결과가 이메일로 발송되었습니다!");
+    } catch (err) {
+      alert("서버 연결 실패: " + err.message);
+    }
+  });
 }
 
 function exitFlow() {
