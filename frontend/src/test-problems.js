@@ -9278,6 +9278,1445 @@ int main(void) {
 }
 `,
   },
+  /* --- structs medium (10) --- */
+  {
+    id: 192,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "두 Point 사이 거리의 제곱",
+    description:
+      "두 점 <code>p1 = (x1, y1)</code>, <code>p2 = (x2, y2)</code>가 주어집니다. <code>Point</code> 구조체를 정의해 " +
+      "두 점 사이 거리의 제곱 <code>(x1 - x2)² + (y1 - y2)²</code>을 출력하세요.",
+    inputDesc:
+      "네 줄에 걸쳐 <code>x1</code>, <code>y1</code>, <code>x2</code>, <code>y2</code>가 주어집니다.",
+    outputDesc: "거리의 제곱을 출력합니다.",
+    constraints: ["-100 ≤ x1, y1, x2, y2 ≤ 100"],
+    examples: [
+      { input: "0\n0\n3\n4", output: "25" },
+      { input: "1\n1\n4\n5", output: "25" },
+    ],
+    inputs: [
+      { name: "x1", min: -100, max: 100, desc: "p1.x" },
+      { name: "y1", min: -100, max: 100, desc: "p1.y" },
+      { name: "x2", min: -100, max: 100, desc: "p2.x" },
+      { name: "y2", min: -100, max: 100, desc: "p2.y" },
+    ],
+    testCases: [
+      { input: "0\n0\n3\n4", expected: "25" },
+      { input: "1\n1\n4\n5", expected: "25" },
+      { input: "-1\n-1\n2\n3", expected: "25" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+int main(void) {
+    Point p1, p2;
+    scanf("%d", &p1.x);
+    scanf("%d", &p1.y);
+    scanf("%d", &p2.x);
+    scanf("%d", &p2.y);
+
+    // TODO: 두 점 사이 거리의 제곱 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+int main(void) {
+    Point p1, p2;
+    scanf("%d", &p1.x);
+    scanf("%d", &p1.y);
+    scanf("%d", &p2.x);
+    scanf("%d", &p2.y);
+    int dx = p1.x - p2.x;
+    int dy = p1.y - p2.y;
+    printf("%d\\n", dx * dx + dy * dy);
+    return 0;
+}
+`,
+    expected: ({ x1, y1, x2, y2 }) => {
+      const dx = x1 - x2, dy = y1 - y2;
+      return String(dx * dx + dy * dy);
+    },
+  },
+  {
+    id: 193,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "Rect 둘레",
+    description:
+      "직사각형의 너비 <code>W</code>와 높이 <code>H</code>가 주어집니다. <code>Rect</code> 구조체를 정의해 " +
+      "둘레 <code>2 × (W + H)</code>를 출력하세요.",
+    inputDesc: "첫 줄에 <code>W</code>, 그다음 줄에 <code>H</code>가 주어집니다.",
+    outputDesc: "직사각형 둘레를 출력합니다.",
+    constraints: ["1 ≤ W, H ≤ 1000"],
+    examples: [
+      { input: "3\n4", output: "14" },
+      { input: "5\n5", output: "20" },
+    ],
+    inputs: [
+      { name: "W", min: 1, max: 1000, desc: "너비" },
+      { name: "H", min: 1, max: 1000, desc: "높이" },
+    ],
+    testCases: [
+      { input: "3\n4", expected: "14" },
+      { input: "5\n5", expected: "20" },
+      { input: "10\n1", expected: "22" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int width;
+    int height;
+} Rect;
+
+int main(void) {
+    Rect r;
+    scanf("%d", &r.width);
+    scanf("%d", &r.height);
+
+    // TODO: 둘레 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int width;
+    int height;
+} Rect;
+
+int main(void) {
+    Rect r;
+    scanf("%d", &r.width);
+    scanf("%d", &r.height);
+    printf("%d\\n", 2 * (r.width + r.height));
+    return 0;
+}
+`,
+    expected: ({ W, H }) => String(2 * (W + H)),
+  },
+  {
+    id: 194,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "두 직사각형 면적 비교",
+    description:
+      "직사각형 두 개의 크기 <code>(W1, H1)</code>, <code>(W2, H2)</code>가 주어집니다. 두 구조체의 면적을 비교해 " +
+      "더 큰 면적을 출력하세요. 면적이 같으면 그 값을 출력합니다.",
+    inputDesc:
+      "네 줄에 걸쳐 <code>W1</code>, <code>H1</code>, <code>W2</code>, <code>H2</code>가 주어집니다.",
+    outputDesc: "더 큰 면적(또는 같은 경우 그 값)을 출력합니다.",
+    constraints: ["1 ≤ W1, H1, W2, H2 ≤ 1000"],
+    examples: [
+      { input: "3\n4\n5\n2", output: "12" },
+      { input: "2\n2\n2\n2", output: "4" },
+    ],
+    inputs: [
+      { name: "W1", min: 1, max: 1000, desc: "1번 너비" },
+      { name: "H1", min: 1, max: 1000, desc: "1번 높이" },
+      { name: "W2", min: 1, max: 1000, desc: "2번 너비" },
+      { name: "H2", min: 1, max: 1000, desc: "2번 높이" },
+    ],
+    testCases: [
+      { input: "3\n4\n5\n2", expected: "12" },
+      { input: "2\n2\n2\n2", expected: "4" },
+      { input: "10\n10\n1\n1", expected: "100" },
+    ],
+    concepts: ["structs", "cond", "operators"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int width;
+    int height;
+} Rect;
+
+int main(void) {
+    Rect r1, r2;
+    scanf("%d", &r1.width);
+    scanf("%d", &r1.height);
+    scanf("%d", &r2.width);
+    scanf("%d", &r2.height);
+
+    // TODO: 두 면적 비교 후 더 큰 값(같으면 그 값) 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int width;
+    int height;
+} Rect;
+
+int main(void) {
+    Rect r1, r2;
+    scanf("%d", &r1.width);
+    scanf("%d", &r1.height);
+    scanf("%d", &r2.width);
+    scanf("%d", &r2.height);
+    int a1 = r1.width * r1.height;
+    int a2 = r2.width * r2.height;
+    printf("%d\\n", a1 >= a2 ? a1 : a2);
+    return 0;
+}
+`,
+    expected: ({ W1, H1, W2, H2 }) =>
+      String(Math.max(W1 * H1, W2 * H2)),
+  },
+  {
+    id: 195,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "Time 더하기 (분 단위)",
+    description:
+      "두 시각 <code>(h1, m1)</code>, <code>(h2, m2)</code>가 주어집니다. <code>Time</code> 구조체를 정의해 " +
+      "두 시각의 합을 24시간 시계 기준 분 단위로 더한 결과를 <code>시 분</code> 형식으로 출력하세요. (24시간 모듈로)",
+    inputDesc:
+      "네 줄에 걸쳐 <code>h1</code>, <code>m1</code>, <code>h2</code>, <code>m2</code>가 주어집니다.",
+    outputDesc: "<code>시 분</code> 형식으로 출력합니다.",
+    constraints: ["0 ≤ h1, h2 ≤ 23", "0 ≤ m1, m2 ≤ 59"],
+    examples: [
+      { input: "1\n30\n2\n45", output: "4 15" },
+      { input: "23\n50\n0\n20", output: "0 10" },
+    ],
+    inputs: [
+      { name: "h1", min: 0, max: 23, desc: "시각1 시" },
+      { name: "m1", min: 0, max: 59, desc: "시각1 분" },
+      { name: "h2", min: 0, max: 23, desc: "시각2 시" },
+      { name: "m2", min: 0, max: 59, desc: "시각2 분" },
+    ],
+    testCases: [
+      { input: "1\n30\n2\n45", expected: "4 15" },
+      { input: "23\n50\n0\n20", expected: "0 10" },
+      { input: "0\n0\n0\n0", expected: "0 0" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int h;
+    int m;
+} Time;
+
+int main(void) {
+    Time t1, t2;
+    scanf("%d", &t1.h);
+    scanf("%d", &t1.m);
+    scanf("%d", &t2.h);
+    scanf("%d", &t2.m);
+
+    // TODO: 두 시각을 분 단위로 더하고 24시간 시계로 환산해 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int h;
+    int m;
+} Time;
+
+int main(void) {
+    Time t1, t2;
+    scanf("%d", &t1.h);
+    scanf("%d", &t1.m);
+    scanf("%d", &t2.h);
+    scanf("%d", &t2.m);
+    int total = (t1.h * 60 + t1.m + t2.h * 60 + t2.m) % (24 * 60);
+    printf("%d %d\\n", total / 60, total % 60);
+    return 0;
+}
+`,
+    expected: ({ h1, m1, h2, m2 }) => {
+      const total = (h1 * 60 + m1 + h2 * 60 + m2) % (24 * 60);
+      return `${Math.floor(total / 60)} ${total % 60}`;
+    },
+  },
+  {
+    id: 196,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "Student 점수 합과 평균",
+    description:
+      "한 학생의 세 과목 점수 <code>S1</code>, <code>S2</code>, <code>S3</code>가 주어집니다. " +
+      "<code>Student</code> 구조체에 담은 뒤 합과 평균(소수점 둘째 자리)을 두 줄에 출력하세요.",
+    inputDesc: "세 줄에 걸쳐 <code>S1</code>, <code>S2</code>, <code>S3</code>가 주어집니다.",
+    outputDesc: "첫 줄에 합, 둘째 줄에 평균(소수점 둘째 자리).",
+    constraints: ["0 ≤ S1, S2, S3 ≤ 100"],
+    examples: [
+      { input: "80\n90\n70", output: "240\n80.00" },
+      { input: "100\n100\n100", output: "300\n100.00" },
+    ],
+    inputs: [
+      { name: "S1", min: 0, max: 100, desc: "1번 과목" },
+      { name: "S2", min: 0, max: 100, desc: "2번 과목" },
+      { name: "S3", min: 0, max: 100, desc: "3번 과목" },
+    ],
+    testCases: [
+      { input: "80\n90\n70", expected: "240\n80.00" },
+      { input: "100\n100\n100", expected: "300\n100.00" },
+      { input: "50\n60\n70", expected: "180\n60.00" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int scores[3];
+} Student;
+
+int main(void) {
+    Student s;
+    for (int i = 0; i < 3; i++) scanf("%d", &s.scores[i]);
+
+    // TODO: 합과 평균을 두 줄에 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int scores[3];
+} Student;
+
+int main(void) {
+    Student s;
+    for (int i = 0; i < 3; i++) scanf("%d", &s.scores[i]);
+    int sum = s.scores[0] + s.scores[1] + s.scores[2];
+    printf("%d\\n", sum);
+    printf("%.2f\\n", sum / 3.0);
+    return 0;
+}
+`,
+    expected: ({ S1, S2, S3 }) => {
+      const sum = S1 + S2 + S3;
+      return `${sum}\n${(sum / 3).toFixed(2)}`;
+    },
+  },
+  {
+    id: 197,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "Vector 합의 크기 제곱",
+    description:
+      "두 2D 벡터 <code>a = (ax, ay)</code>, <code>b = (bx, by)</code>가 주어집니다. <code>Vec</code> 구조체로 " +
+      "두 벡터를 합한 결과의 크기 제곱 <code>(ax + bx)² + (ay + by)²</code>을 출력하세요.",
+    inputDesc:
+      "네 줄에 걸쳐 <code>ax</code>, <code>ay</code>, <code>bx</code>, <code>by</code>가 주어집니다.",
+    outputDesc: "합 벡터의 크기 제곱을 출력합니다.",
+    constraints: ["-100 ≤ ax, ay, bx, by ≤ 100"],
+    examples: [
+      { input: "1\n2\n3\n4", output: "52" },
+      { input: "0\n0\n0\n0", output: "0" },
+    ],
+    inputs: [
+      { name: "ax", min: -100, max: 100, desc: "벡터 a의 x" },
+      { name: "ay", min: -100, max: 100, desc: "벡터 a의 y" },
+      { name: "bx", min: -100, max: 100, desc: "벡터 b의 x" },
+      { name: "by", min: -100, max: 100, desc: "벡터 b의 y" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n4", expected: "52" },
+      { input: "0\n0\n0\n0", expected: "0" },
+      { input: "1\n0\n-1\n0", expected: "0" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Vec;
+
+int main(void) {
+    Vec a, b;
+    scanf("%d", &a.x);
+    scanf("%d", &a.y);
+    scanf("%d", &b.x);
+    scanf("%d", &b.y);
+
+    // TODO: 합 벡터의 크기 제곱 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Vec;
+
+int main(void) {
+    Vec a, b;
+    scanf("%d", &a.x);
+    scanf("%d", &a.y);
+    scanf("%d", &b.x);
+    scanf("%d", &b.y);
+    int sx = a.x + b.x;
+    int sy = a.y + b.y;
+    printf("%d\\n", sx * sx + sy * sy);
+    return 0;
+}
+`,
+    expected: ({ ax, ay, bx, by }) => {
+      const sx = ax + bx, sy = ay + by;
+      return String(sx * sx + sy * sy);
+    },
+  },
+  {
+    id: 198,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "Circle 면적 큰 쪽",
+    description:
+      "두 원의 반지름 <code>R1</code>, <code>R2</code>가 주어집니다. <code>Circle</code> 구조체로 두 원의 면적(원주율 사용 안 함, " +
+      "<code>r²</code> 비교)을 비교해 더 큰 면적의 반지름을 출력하세요. 같으면 <code>R1</code>의 반지름을 출력합니다.",
+    inputDesc: "첫 줄에 <code>R1</code>, 그다음 줄에 <code>R2</code>가 주어집니다.",
+    outputDesc: "면적이 더 큰 원의 반지름을 출력합니다.",
+    constraints: ["1 ≤ R1, R2 ≤ 1000"],
+    examples: [
+      { input: "3\n5", output: "5" },
+      { input: "7\n7", output: "7" },
+    ],
+    inputs: [
+      { name: "R1", min: 1, max: 1000, desc: "원 1 반지름" },
+      { name: "R2", min: 1, max: 1000, desc: "원 2 반지름" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "5" },
+      { input: "7\n7", expected: "7" },
+      { input: "10\n2", expected: "10" },
+    ],
+    concepts: ["structs", "cond", "operators"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int r;
+} Circle;
+
+int main(void) {
+    Circle c1, c2;
+    scanf("%d", &c1.r);
+    scanf("%d", &c2.r);
+
+    // TODO: r²이 더 큰 원의 반지름 출력 (같으면 R1)
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int r;
+} Circle;
+
+int main(void) {
+    Circle c1, c2;
+    scanf("%d", &c1.r);
+    scanf("%d", &c2.r);
+    if (c1.r * c1.r >= c2.r * c2.r) printf("%d\\n", c1.r);
+    else                            printf("%d\\n", c2.r);
+    return 0;
+}
+`,
+    expected: ({ R1, R2 }) => (R1 * R1 >= R2 * R2 ? String(R1) : String(R2)),
+  },
+  {
+    id: 199,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "Date 비교",
+    description:
+      "두 날짜 <code>(y1, m1, d1)</code>, <code>(y2, m2, d2)</code>가 주어집니다. <code>Date</code> 구조체를 정의하고 " +
+      "비교 결과를 출력하세요: <code>date1 &lt; date2</code>이면 <code>-1</code>, 같으면 <code>0</code>, " +
+      "<code>date1 &gt; date2</code>이면 <code>1</code>.",
+    inputDesc:
+      "여섯 줄에 걸쳐 <code>y1</code>, <code>m1</code>, <code>d1</code>, <code>y2</code>, <code>m2</code>, <code>d2</code>가 주어집니다.",
+    outputDesc: "<code>-1</code>, <code>0</code>, <code>1</code> 중 하나를 출력합니다.",
+    constraints: ["1900 ≤ y1, y2 ≤ 2100", "1 ≤ m1, m2 ≤ 12", "1 ≤ d1, d2 ≤ 31"],
+    examples: [
+      { input: "2024\n5\n15\n2025\n1\n1", output: "-1" },
+      { input: "2024\n5\n15\n2024\n5\n15", output: "0" },
+      { input: "2024\n5\n15\n2024\n4\n20", output: "1" },
+    ],
+    inputs: [
+      { name: "y1", min: 1900, max: 2100, desc: "1번 연" },
+      { name: "m1", min: 1, max: 12, desc: "1번 월" },
+      { name: "d1", min: 1, max: 31, desc: "1번 일" },
+      { name: "y2", min: 1900, max: 2100, desc: "2번 연" },
+      { name: "m2", min: 1, max: 12, desc: "2번 월" },
+      { name: "d2", min: 1, max: 31, desc: "2번 일" },
+    ],
+    testCases: [
+      { input: "2024\n5\n15\n2025\n1\n1", expected: "-1" },
+      { input: "2024\n5\n15\n2024\n5\n15", expected: "0" },
+      { input: "2024\n5\n15\n2024\n4\n20", expected: "1" },
+    ],
+    concepts: ["structs", "cond", "operators"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int y;
+    int m;
+    int d;
+} Date;
+
+int main(void) {
+    Date a, b;
+    scanf("%d", &a.y);
+    scanf("%d", &a.m);
+    scanf("%d", &a.d);
+    scanf("%d", &b.y);
+    scanf("%d", &b.m);
+    scanf("%d", &b.d);
+
+    // TODO: -1, 0, 1 중 하나 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int y;
+    int m;
+    int d;
+} Date;
+
+int compareDates(Date a, Date b) {
+    if (a.y != b.y) return a.y < b.y ? -1 : 1;
+    if (a.m != b.m) return a.m < b.m ? -1 : 1;
+    if (a.d != b.d) return a.d < b.d ? -1 : 1;
+    return 0;
+}
+
+int main(void) {
+    Date a, b;
+    scanf("%d", &a.y);
+    scanf("%d", &a.m);
+    scanf("%d", &a.d);
+    scanf("%d", &b.y);
+    scanf("%d", &b.m);
+    scanf("%d", &b.d);
+    printf("%d\\n", compareDates(a, b));
+    return 0;
+}
+`,
+    expected: ({ y1, m1, d1, y2, m2, d2 }) => {
+      if (y1 !== y2) return y1 < y2 ? "-1" : "1";
+      if (m1 !== m2) return m1 < m2 ? "-1" : "1";
+      if (d1 !== d2) return d1 < d2 ? "-1" : "1";
+      return "0";
+    },
+  },
+  {
+    id: 200,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "RGB 회색조 변환",
+    description:
+      "세 색 성분 <code>R</code>, <code>G</code>, <code>B</code>(0~255)가 주어집니다. <code>Color</code> 구조체를 정의하고 " +
+      "회색조 값 <code>gray = (R + G + B) / 3</code>(정수 나눗셈)을 출력하세요.",
+    inputDesc: "세 줄에 걸쳐 <code>R</code>, <code>G</code>, <code>B</code>가 주어집니다.",
+    outputDesc: "회색조 값을 출력합니다.",
+    constraints: ["0 ≤ R, G, B ≤ 255"],
+    examples: [
+      { input: "100\n200\n50", output: "116" },
+      { input: "0\n0\n0", output: "0" },
+      { input: "255\n255\n255", output: "255" },
+    ],
+    inputs: [
+      { name: "R", min: 0, max: 255, desc: "Red" },
+      { name: "G", min: 0, max: 255, desc: "Green" },
+      { name: "B", min: 0, max: 255, desc: "Blue" },
+    ],
+    testCases: [
+      { input: "100\n200\n50", expected: "116" },
+      { input: "0\n0\n0", expected: "0" },
+      { input: "255\n255\n255", expected: "255" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int r;
+    int g;
+    int b;
+} Color;
+
+int main(void) {
+    Color c;
+    scanf("%d", &c.r);
+    scanf("%d", &c.g);
+    scanf("%d", &c.b);
+
+    // TODO: (r + g + b) / 3 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int r;
+    int g;
+    int b;
+} Color;
+
+int main(void) {
+    Color c;
+    scanf("%d", &c.r);
+    scanf("%d", &c.g);
+    scanf("%d", &c.b);
+    printf("%d\\n", (c.r + c.g + c.b) / 3);
+    return 0;
+}
+`,
+    expected: ({ R, G, B }) => String(Math.floor((R + G + B) / 3)),
+  },
+  {
+    id: 201,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "두 Point 합",
+    description:
+      "두 점 <code>(x1, y1)</code>, <code>(x2, y2)</code>가 주어집니다. <code>Point</code> 구조체로 표현해 " +
+      "두 점을 더한 점의 좌표를 <code>x y</code> 형식으로 출력하세요.",
+    inputDesc:
+      "네 줄에 걸쳐 <code>x1</code>, <code>y1</code>, <code>x2</code>, <code>y2</code>가 주어집니다.",
+    outputDesc: "합 좌표를 공백 구분으로 출력합니다.",
+    constraints: ["-1000 ≤ x1, y1, x2, y2 ≤ 1000"],
+    examples: [
+      { input: "1\n2\n3\n4", output: "4 6" },
+      { input: "-1\n-1\n1\n1", output: "0 0" },
+    ],
+    inputs: [
+      { name: "x1", min: -1000, max: 1000, desc: "p1.x" },
+      { name: "y1", min: -1000, max: 1000, desc: "p1.y" },
+      { name: "x2", min: -1000, max: 1000, desc: "p2.x" },
+      { name: "y2", min: -1000, max: 1000, desc: "p2.y" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n4", expected: "4 6" },
+      { input: "-1\n-1\n1\n1", expected: "0 0" },
+      { input: "100\n200\n300\n400", expected: "400 600" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+Point addPoint(Point a, Point b) {
+    Point r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    return r;
+}
+
+int main(void) {
+    Point p1, p2;
+    scanf("%d", &p1.x);
+    scanf("%d", &p1.y);
+    scanf("%d", &p2.x);
+    scanf("%d", &p2.y);
+    Point s = addPoint(p1, p2);
+    printf("%d %d\\n", s.x, s.y);
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+Point addPoint(Point a, Point b) {
+    Point r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    return r;
+}
+
+int main(void) {
+    Point p1, p2;
+    scanf("%d", &p1.x);
+    scanf("%d", &p1.y);
+    scanf("%d", &p2.x);
+    scanf("%d", &p2.y);
+    Point s = addPoint(p1, p2);
+    printf("%d %d\\n", s.x, s.y);
+    return 0;
+}
+`,
+    expected: ({ x1, y1, x2, y2 }) => `${x1 + x2} ${y1 + y2}`,
+  },
+  /* --- memory medium (10) --- */
+  {
+    id: 202,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "malloc 배열에 시작값부터 채우기",
+    description:
+      "길이 <code>N</code>과 시작값 <code>V</code>가 주어집니다. <code>malloc</code>으로 길이 <code>N</code>인 " +
+      "배열을 할당해 <code>V, V+1, V+2, ..., V+N-1</code>로 채운 뒤 합을 출력하고 <code>free</code>하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>V</code>가 주어집니다.",
+    outputDesc: "<code>N × V + N × (N - 1) / 2</code>의 값을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 100", "-100 ≤ V ≤ 100"],
+    examples: [
+      { input: "5\n1", output: "15" },
+      { input: "3\n10", output: "33" },
+      { input: "1\n7", output: "7" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 100, desc: "배열 길이" },
+      { name: "V", min: -100, max: 100, desc: "시작값" },
+    ],
+    testCases: [
+      { input: "5\n1", expected: "15" },
+      { input: "3\n10", expected: "33" },
+      { input: "1\n7", expected: "7" },
+    ],
+    concepts: ["memory", "arrays", "loops"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, V;
+    scanf("%d", &N);
+    scanf("%d", &V);
+
+    // TODO: malloc + 채우고 합 출력 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, V;
+    scanf("%d", &N);
+    scanf("%d", &V);
+    int *arr = (int *)malloc(sizeof(int) * N);
+    for (int i = 0; i < N; i++) arr[i] = V + i;
+    int sum = 0;
+    for (int i = 0; i < N; i++) sum += arr[i];
+    printf("%d\\n", sum);
+    free(arr);
+    return 0;
+}
+`,
+    expected: ({ N, V }) =>
+      String(N * V + Math.floor((N * (N - 1)) / 2)),
+  },
+  {
+    id: 203,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "두 동적 배열 합치기",
+    description:
+      "두 양의 정수 <code>N</code>, <code>M</code>이 주어집니다. <code>malloc</code>으로 두 배열을 만들어 " +
+      "첫 번째는 <code>1, 2, ..., N</code>, 두 번째는 <code>1, 2, ..., M</code>으로 채운 뒤, 두 배열의 합 전체를 " +
+      "출력하고 두 배열 모두 <code>free</code>하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>M</code>이 주어집니다.",
+    outputDesc: "<code>N(N+1)/2 + M(M+1)/2</code>를 출력합니다.",
+    constraints: ["1 ≤ N, M ≤ 100"],
+    examples: [
+      { input: "3\n2", output: "9" },
+      { input: "10\n5", output: "70" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 100, desc: "첫 배열 길이" },
+      { name: "M", min: 1, max: 100, desc: "두 번째 배열 길이" },
+    ],
+    testCases: [
+      { input: "3\n2", expected: "9" },
+      { input: "10\n5", expected: "70" },
+      { input: "1\n1", expected: "2" },
+    ],
+    concepts: ["memory", "arrays", "loops"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+
+    // TODO: malloc 두 개, 채우고 합 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+    int *a = (int *)malloc(sizeof(int) * N);
+    int *b = (int *)malloc(sizeof(int) * M);
+    for (int i = 0; i < N; i++) a[i] = i + 1;
+    for (int i = 0; i < M; i++) b[i] = i + 1;
+    long long sum = 0;
+    for (int i = 0; i < N; i++) sum += a[i];
+    for (int i = 0; i < M; i++) sum += b[i];
+    printf("%lld\\n", sum);
+    free(a);
+    free(b);
+    return 0;
+}
+`,
+    expected: ({ N, M }) =>
+      String((N * (N + 1)) / 2 + (M * (M + 1)) / 2),
+  },
+  {
+    id: 204,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "realloc로 크기 변경",
+    description:
+      "두 양의 정수 <code>N1</code>, <code>N2</code>가 주어집니다(<code>N2 ≥ N1</code>). 길이 <code>N1</code>인 배열을 " +
+      "<code>malloc</code>해 <code>1, 2, ..., N1</code>로 채우고, <code>realloc</code>으로 길이를 <code>N2</code>로 늘려 " +
+      "새로 추가된 칸을 <code>0</code>으로 채운 뒤 전체 합을 출력하고 <code>free</code>하세요.",
+    inputDesc:
+      "첫 줄에 <code>N1</code>, 그다음 줄에 <code>N2</code>가 주어집니다.",
+    outputDesc: "<code>1 + 2 + ... + N1</code>의 값을 출력합니다.",
+    constraints: ["1 ≤ N1 ≤ N2 ≤ 100"],
+    examples: [
+      { input: "3\n5", output: "6" },
+      { input: "5\n5", output: "15" },
+    ],
+    inputs: [
+      { name: "N1", min: 1, max: 100, desc: "초기 길이" },
+      { name: "N2", min: 1, max: 100, desc: "확장 후 길이" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "6" },
+      { input: "5\n5", expected: "15" },
+      { input: "1\n10", expected: "1" },
+    ],
+    concepts: ["memory", "arrays", "loops"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N1, N2;
+    scanf("%d", &N1);
+    scanf("%d", &N2);
+
+    // TODO: malloc -> realloc -> 합 출력 -> free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N1, N2;
+    scanf("%d", &N1);
+    scanf("%d", &N2);
+    int *arr = (int *)malloc(sizeof(int) * N1);
+    for (int i = 0; i < N1; i++) arr[i] = i + 1;
+    arr = (int *)realloc(arr, sizeof(int) * N2);
+    for (int i = N1; i < N2; i++) arr[i] = 0;
+    long long sum = 0;
+    for (int i = 0; i < N2; i++) sum += arr[i];
+    printf("%lld\\n", sum);
+    free(arr);
+    return 0;
+}
+`,
+    expected: ({ N1 }) => String((N1 * (N1 + 1)) / 2),
+  },
+  {
+    id: 205,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "calloc 0 카운트",
+    description:
+      "양의 정수 <code>N</code>과 <code>K</code>가 주어집니다. <code>calloc</code>으로 길이 <code>N</code>인 " +
+      "배열을 0으로 초기화하고, 인덱스 <code>0, K, 2K, 3K, ...</code>의 칸에 1을 대입한 뒤 0인 칸의 개수를 " +
+      "출력하고 <code>free</code>하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "0인 칸의 개수를 출력합니다.",
+    constraints: ["1 ≤ N ≤ 1000", "1 ≤ K ≤ 100"],
+    examples: [
+      { input: "10\n3", output: "6" },
+      { input: "10\n1", output: "0" },
+      { input: "10\n100", output: "9" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 1000, desc: "배열 길이" },
+      { name: "K", min: 1, max: 100, desc: "스텝" },
+    ],
+    testCases: [
+      { input: "10\n3", expected: "6" },
+      { input: "10\n1", expected: "0" },
+      { input: "10\n100", expected: "9" },
+    ],
+    concepts: ["memory", "arrays", "loops"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+
+    // TODO: calloc + 인덱스 0, K, 2K ...에 1 대입 후 0 카운트 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    int *arr = (int *)calloc(N, sizeof(int));
+    for (int i = 0; i < N; i += K) arr[i] = 1;
+    int zeros = 0;
+    for (int i = 0; i < N; i++) if (arr[i] == 0) zeros++;
+    printf("%d\\n", zeros);
+    free(arr);
+    return 0;
+}
+`,
+    expected: ({ N, K }) => {
+      let marked = 0;
+      for (let i = 0; i < N; i += K) marked++;
+      return String(N - marked);
+    },
+  },
+  {
+    id: 206,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "동적 문자열 반복",
+    description:
+      "양의 정수 <code>N</code>과 알파벳 순서 <code>K</code>(1~26, 소문자)가 주어집니다. <code>malloc</code>으로 길이 " +
+      "<code>N + 1</code>인 <code>char</code> 배열을 할당해 <code>'a' + (K - 1)</code> 글자를 <code>N</code>번 채우고 " +
+      "<code>'\\0'</code>으로 종료한 뒤 문자열을 출력하고 <code>free</code>하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "만든 문자열을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 50", "1 ≤ K ≤ 26"],
+    examples: [
+      { input: "3\n1", output: "aaa" },
+      { input: "5\n26", output: "zzzzz" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 50, desc: "반복 횟수" },
+      { name: "K", min: 1, max: 26, desc: "알파벳 순서" },
+    ],
+    testCases: [
+      { input: "3\n1", expected: "aaa" },
+      { input: "5\n26", expected: "zzzzz" },
+      { input: "1\n5", expected: "e" },
+    ],
+    concepts: ["memory", "strings", "loops"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+
+    // TODO: malloc char + 채움 + 출력 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    char *s = (char *)malloc(sizeof(char) * (N + 1));
+    char c = 'a' + (K - 1);
+    for (int i = 0; i < N; i++) s[i] = c;
+    s[N] = '\\0';
+    printf("%s\\n", s);
+    free(s);
+    return 0;
+}
+`,
+    expected: ({ N, K }) =>
+      String.fromCharCode("a".charCodeAt(0) + (K - 1)).repeat(N),
+  },
+  {
+    id: 207,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "free 후 재할당",
+    description:
+      "두 양의 정수 <code>K</code>, <code>M</code>이 주어집니다. <code>malloc</code>으로 길이 <code>K</code>인 배열을 " +
+      "할당해 <code>1~K</code>로 채워 합을 구하고 <code>free</code>한 뒤, 다시 <code>malloc</code>으로 길이 <code>M</code>인 " +
+      "배열을 할당해 <code>1~M</code>으로 채워 합을 구한 결과 두 줄을 출력하세요.",
+    inputDesc: "첫 줄에 <code>K</code>, 그다음 줄에 <code>M</code>이 주어집니다.",
+    outputDesc: "두 줄에 걸쳐 두 합을 출력합니다.",
+    constraints: ["1 ≤ K, M ≤ 100"],
+    examples: [
+      { input: "3\n5", output: "6\n15" },
+      { input: "10\n10", output: "55\n55" },
+    ],
+    inputs: [
+      { name: "K", min: 1, max: 100, desc: "첫 배열 길이" },
+      { name: "M", min: 1, max: 100, desc: "두 번째 배열 길이" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "6\n15" },
+      { input: "10\n10", expected: "55\n55" },
+      { input: "1\n100", expected: "1\n5050" },
+    ],
+    concepts: ["memory", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int K, M;
+    scanf("%d", &K);
+    scanf("%d", &M);
+
+    // TODO: malloc K -> 합 -> free, malloc M -> 합 -> free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int K, M;
+    scanf("%d", &K);
+    scanf("%d", &M);
+    int *a = (int *)malloc(sizeof(int) * K);
+    long long sa = 0;
+    for (int i = 0; i < K; i++) { a[i] = i + 1; sa += a[i]; }
+    free(a);
+    int *b = (int *)malloc(sizeof(int) * M);
+    long long sb = 0;
+    for (int i = 0; i < M; i++) { b[i] = i + 1; sb += b[i]; }
+    free(b);
+    printf("%lld\\n", sa);
+    printf("%lld\\n", sb);
+    return 0;
+}
+`,
+    expected: ({ K, M }) =>
+      `${(K * (K + 1)) / 2}\n${(M * (M + 1)) / 2}`,
+  },
+  {
+    id: 208,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "동적 배열 max - min",
+    description:
+      "두 양의 정수 <code>N</code>, <code>V</code>가 주어집니다. <code>malloc</code>으로 길이 <code>N</code>인 배열을 " +
+      "<code>V, V+1, V+2, ..., V+N-1</code>로 채운 뒤 최댓값과 최솟값의 차이(<code>N - 1</code>)를 출력하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>V</code>가 주어집니다.",
+    outputDesc: "<code>N - 1</code>의 값을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 1000", "-1000 ≤ V ≤ 1000"],
+    examples: [
+      { input: "5\n10", output: "4" },
+      { input: "1\n0", output: "0" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 1000, desc: "배열 길이" },
+      { name: "V", min: -1000, max: 1000, desc: "시작값" },
+    ],
+    testCases: [
+      { input: "5\n10", expected: "4" },
+      { input: "1\n0", expected: "0" },
+      { input: "100\n-50", expected: "99" },
+    ],
+    concepts: ["memory", "arrays", "operators"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, V;
+    scanf("%d", &N);
+    scanf("%d", &V);
+
+    // TODO: malloc + V..V+N-1로 채워 max-min 출력 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, V;
+    scanf("%d", &N);
+    scanf("%d", &V);
+    int *arr = (int *)malloc(sizeof(int) * N);
+    for (int i = 0; i < N; i++) arr[i] = V + i;
+    int mx = arr[0], mn = arr[0];
+    for (int i = 1; i < N; i++) {
+        if (arr[i] > mx) mx = arr[i];
+        if (arr[i] < mn) mn = arr[i];
+    }
+    printf("%d\\n", mx - mn);
+    free(arr);
+    return 0;
+}
+`,
+    expected: ({ N }) => String(N - 1),
+  },
+  {
+    id: 209,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "i² 채워서 합",
+    description:
+      "양의 정수 <code>N</code>이 주어집니다. <code>malloc</code>으로 길이 <code>N</code> 배열을 할당하고 " +
+      "<code>arr[i] = (i + 1)²</code>로 채운 뒤 전체 합을 출력하고 <code>free</code>하세요.",
+    inputDesc: "첫 줄에 정수 <code>N</code>이 주어집니다.",
+    outputDesc: "<code>1² + 2² + ... + N²</code>의 값을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 100"],
+    examples: [
+      { input: "3", output: "14" },
+      { input: "10", output: "385" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 100, desc: "배열 길이" },
+    ],
+    testCases: [
+      { input: "3", expected: "14" },
+      { input: "10", expected: "385" },
+      { input: "1", expected: "1" },
+    ],
+    concepts: ["memory", "arrays", "operators"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+
+    // TODO: malloc + i²로 채워 합 출력 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    int *arr = (int *)malloc(sizeof(int) * N);
+    for (int i = 0; i < N; i++) arr[i] = (i + 1) * (i + 1);
+    long long sum = 0;
+    for (int i = 0; i < N; i++) sum += arr[i];
+    printf("%lld\\n", sum);
+    free(arr);
+    return 0;
+}
+`,
+    expected: ({ N }) => {
+      let s = 0;
+      for (let i = 1; i <= N; i++) s += i * i;
+      return String(s);
+    },
+  },
+  {
+    id: 210,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "동적 2D 행 합",
+    description:
+      "두 양의 정수 <code>N</code>, <code>M</code>이 주어집니다. <code>malloc</code>으로 <code>N × M</code> 2차원 배열을 " +
+      "할당해 <code>mat[i][j] = i + j</code>로 채운 뒤, 각 행의 합을 한 줄씩 출력하고 메모리를 해제하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>M</code>이 주어집니다.",
+    outputDesc: "<code>N</code>개의 줄에 걸쳐 각 행의 합을 출력합니다.",
+    constraints: ["1 ≤ N, M ≤ 20"],
+    examples: [
+      { input: "3\n3", output: "3\n6\n9" },
+      { input: "2\n4", output: "6\n10" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 20, desc: "행 수" },
+      { name: "M", min: 1, max: 20, desc: "열 수" },
+    ],
+    testCases: [
+      { input: "3\n3", expected: "3\n6\n9" },
+      { input: "2\n4", expected: "6\n10" },
+      { input: "1\n1", expected: "0" },
+    ],
+    concepts: ["memory", "arrays", "loops"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+
+    // TODO: 동적 2D 배열에 i+j 채우고 행 합 출력 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+    int **mat = (int **)malloc(sizeof(int *) * N);
+    for (int i = 0; i < N; i++) {
+        mat[i] = (int *)malloc(sizeof(int) * M);
+        for (int j = 0; j < M; j++) mat[i][j] = i + j;
+    }
+    for (int i = 0; i < N; i++) {
+        long long s = 0;
+        for (int j = 0; j < M; j++) s += mat[i][j];
+        printf("%lld\\n", s);
+    }
+    for (int i = 0; i < N; i++) free(mat[i]);
+    free(mat);
+    return 0;
+}
+`,
+    expected: ({ N, M }) => {
+      const out = [];
+      for (let i = 0; i < N; i++) {
+        let s = 0;
+        for (let j = 0; j < M; j++) s += i + j;
+        out.push(s);
+      }
+      return out.join("\n");
+    },
+  },
+  /* --- structs killer --- */
+  {
+    id: 211,
+    difficulty: "killer",
+    tag: "킬러 · 시뮬레이션",
+    title: "학생 점수 내림차순 정렬",
+    description:
+      "<code>N</code>명의 학생 데이터(<code>id</code>, <code>score</code>)가 주어집니다. 점수 내림차순으로, 점수가 같으면 " +
+      "id 오름차순으로 정렬한 결과의 <code>id</code> 목록을 공백 구분으로 한 줄에 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>N</code>, 이후 <code>N</code>개의 줄에 각각 <code>id score</code>가 주어집니다.",
+    outputDesc: "정렬된 id 목록을 공백 구분으로 출력합니다.",
+    constraints: ["1 ≤ N ≤ 1000", "id, score는 0~10000 사이 정수"],
+    examples: [
+      { input: "3\n1 80\n2 90\n3 80", output: "2 1 3" },
+      { input: "1\n5 100", output: "5" },
+    ],
+    testCases: [
+      { input: "3\n1 80\n2 90\n3 80", expected: "2 1 3" },
+      { input: "1\n5 100", expected: "5" },
+      {
+        input: "5\n10 70\n20 80\n30 80\n40 90\n50 70",
+        expected: "40 20 30 10 50",
+      },
+    ],
+    concepts: ["structs", "arrays", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int id;
+    int score;
+} Student;
+
+int cmpStudent(const void *a, const void *b) {
+    const Student *sa = a;
+    const Student *sb = b;
+    if (sa->score != sb->score) return sb->score - sa->score;
+    return sa->id - sb->id;
+}
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    Student s[1000];
+    for (int i = 0; i < N; i++) scanf("%d %d", &s[i].id, &s[i].score);
+
+    // TODO: qsort로 정렬 후 id 공백 구분 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int id;
+    int score;
+} Student;
+
+int cmpStudent(const void *a, const void *b) {
+    const Student *sa = a;
+    const Student *sb = b;
+    if (sa->score != sb->score) return sb->score - sa->score;
+    return sa->id - sb->id;
+}
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    Student s[1000];
+    for (int i = 0; i < N; i++) scanf("%d %d", &s[i].id, &s[i].score);
+    qsort(s, N, sizeof(Student), cmpStudent);
+    for (int i = 0; i < N; i++) {
+        if (i > 0) printf(" ");
+        printf("%d", s[i].id);
+    }
+    printf("\\n");
+    return 0;
+}
+`,
+  },
+  /* --- memory killer --- */
+  {
+    id: 212,
+    difficulty: "killer",
+    tag: "킬러 · 시뮬레이션",
+    title: "큐 시뮬레이션",
+    description:
+      "<code>M</code>개의 명령이 주어집니다. 각 명령은 <code>1 x</code>(큐에 <code>x</code>를 push)이거나 " +
+      "<code>2</code>(큐 front를 pop, 큐가 비었으면 무시)입니다. 모든 명령을 처리한 뒤 큐에 남아있는 " +
+      "값들을 front부터 공백 구분으로 한 줄에 출력하세요. 큐가 비었으면 <code>empty</code>를 출력합니다.",
+    inputDesc:
+      "첫 줄에 <code>M</code>이 주어집니다. 이후 <code>M</code>개의 줄에 각 명령이 주어집니다.",
+    outputDesc: "최종 큐 상태를 공백 구분으로 출력하거나 <code>empty</code>를 출력합니다.",
+    constraints: ["0 ≤ M ≤ 100000", "1 ≤ push 값 ≤ 1000000000"],
+    examples: [
+      { input: "5\n1 3\n1 5\n2\n1 7\n1 2", output: "5 7 2" },
+      { input: "3\n1 10\n2\n2", output: "empty" },
+      { input: "0", output: "empty" },
+    ],
+    testCases: [
+      { input: "5\n1 3\n1 5\n2\n1 7\n1 2", expected: "5 7 2" },
+      { input: "3\n1 10\n2\n2", expected: "empty" },
+      { input: "4\n1 1\n1 2\n1 3\n1 4", expected: "1 2 3 4" },
+    ],
+    concepts: ["memory", "arrays", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int M;
+    scanf("%d", &M);
+    long long *q = (long long *)malloc(sizeof(long long) * (M + 1));
+    int head = 0, tail = 0;
+
+    // TODO: M개의 명령을 처리해 큐 상태를 출력
+
+    free(q);
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int M;
+    scanf("%d", &M);
+    long long *q = (long long *)malloc(sizeof(long long) * (M + 1));
+    int head = 0, tail = 0;
+    for (int i = 0; i < M; i++) {
+        int op;
+        scanf("%d", &op);
+        if (op == 1) {
+            long long x;
+            scanf("%lld", &x);
+            q[tail++] = x;
+        } else {
+            if (head < tail) head++;
+        }
+    }
+    if (head == tail) {
+        printf("empty\\n");
+    } else {
+        for (int i = head; i < tail; i++) {
+            if (i > head) printf(" ");
+            printf("%lld", q[i]);
+        }
+        printf("\\n");
+    }
+    free(q);
+    return 0;
+}
+`,
+  },
 ];
 
 /* =====================================================================
