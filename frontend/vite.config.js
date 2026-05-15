@@ -19,6 +19,8 @@ export default defineConfig({
         codetrails: resolve(__dirname, 'codetrails.html'),
         trail: resolve(__dirname, 'trail.html'),
         lectures: resolve(__dirname, 'lectures.html'),
+        lessons: resolve(__dirname, 'lessons.html'),
+        admin: resolve(__dirname, 'admin.html'),
       },
     },
   },

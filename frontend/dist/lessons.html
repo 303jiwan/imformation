@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Codenergy — 트레일</title>
+    <title>Codenergy — 레슨</title>
     <style>
       .page-fade {
         position: fixed; inset: 0; background: #fff;
         z-index: 9999; opacity: 1; pointer-events: auto;
       }
     </style>
-    <script type="module" crossorigin src="/assets/trail-Dn9r7Nge.js"></script>
+    <script type="module" crossorigin src="/assets/lessons-D32Q-Ma7.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
     <link rel="modulepreload" crossorigin href="/assets/main-D-71enms.js">
     <link rel="modulepreload" crossorigin href="/assets/lesson-data-CUelCfFl.js">
@@ -21,9 +21,7 @@
     <header class="nav">
       <div class="logo"><a href="index.html">Codenergy ▲</a></div>
       <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-collapse">
-        <span></span>
-        <span></span>
-        <span></span>
+        <span></span><span></span><span></span>
       </button>
       <div class="nav-collapse" id="nav-collapse">
         <nav class="menu" id="menu">
@@ -111,86 +109,60 @@
       </form>
     </div>
 
-    <main class="trail-page" id="trail-page" data-color="green">
-      <header class="trail-page__topbar">
-        <div class="trail-page__name-wrap">
-          <button type="button" class="trail-page__name" id="trail-name-btn" aria-haspopup="true" aria-expanded="false" aria-controls="trail-name-menu">
-            <span class="trail-page__name-eyebrow" id="trail-eyebrow">Trail 0. Codetree 101</span>
-            <span class="trail-page__name-title" id="trail-title">프로그래밍 시작</span>
-            <span class="trail-page__name-caret" aria-hidden="true">▾</span>
-          </button>
-          <div class="trail-page__name-menu" id="trail-name-menu" role="menu" hidden></div>
-        </div>
-        <div class="trail-page__stats">
-          <div class="trail-stat trail-stat--streak">
-            <span class="trail-stat__icon" aria-hidden="true">▬</span>
-            <div>
-              <div class="trail-stat__value">0</div>
-              <div class="trail-stat__label">Day Streak</div>
-            </div>
-          </div>
-          <div class="trail-stat trail-stat--xp">
-            <div class="trail-stat__row">
-              <span class="trail-stat__label">경험치 목표</span>
-              <span class="trail-stat__chip">열심히</span>
-            </div>
-            <div class="trail-stat__bar"><span style="width: 0%"></span></div>
-            <div class="trail-stat__small">0 / 90 XP</div>
-          </div>
-          <div class="trail-stat trail-stat--points">
-            <div class="trail-stat__row"><span class="trail-stat__dot"></span><strong>4</strong>&nbsp;points</div>
-            <div class="trail-stat__row"><span aria-hidden="true">🎁</span>&nbsp;나의 추천</div>
-          </div>
-        </div>
-      </header>
+    <main class="lessons-page" id="lessons-page">
+      <section class="lesson-empty" id="lesson-empty" hidden>
+        <h1 class="lesson-empty__title">레슨을 찾을 수 없어요</h1>
+        <p class="lesson-empty__sub" id="lesson-empty-sub">잘못된 주소이거나, 아직 준비 중인 레슨입니다.</p>
+        <a class="lesson-empty__back" href="codetrails.html">← 코드트레일로 돌아가기</a>
+      </section>
 
-      <div class="trail-page__body">
-        <aside class="trail-page__chapters" id="trail-chapters" aria-label="챕터 목록"></aside>
+      <section class="lesson-locked" id="lesson-locked" hidden>
+        <h1 class="lesson-locked__title">아직 잠긴 레슨이에요</h1>
+        <p class="lesson-locked__sub">이전 레슨을 먼저 완료해야 들어올 수 있어요.</p>
+        <a class="lesson-locked__back" href="codetrails.html">← 코드트레일로 돌아가기</a>
+      </section>
 
-        <section class="trail-page__lesson">
-          <div class="trail-gapcheck">
-            <div class="trail-gapcheck__text">
-              <p>정밀 진단을 통해 나에게 딱 맞는<br/>학습 시작점을 찾고 싶나요?</p>
-              <a class="trail-gapcheck__btn" href="survey.html">갭체크 시작하기</a>
-            </div>
-            <div class="trail-gapcheck__art" aria-hidden="true">
-              <span class="g-shape g-shape--orange"></span>
-              <span class="g-shape g-shape--yellow"></span>
-              <span class="g-shape g-shape--green"></span>
-              <span class="g-shape g-shape--blue"></span>
-            </div>
+      <section class="lesson-shell" id="lesson-shell" hidden>
+        <header class="lesson-shell__head">
+          <a class="lesson-shell__back" href="codetrails.html">← 코드트레일</a>
+          <div class="lesson-shell__title">
+            <span class="lesson-shell__crumb" id="lesson-crumb"></span>
+            <h1 class="lesson-shell__name" id="lesson-name"></h1>
           </div>
+          <span class="lesson-shell__badge" id="lesson-badge" hidden></span>
+        </header>
 
-          <div class="trail-lesson">
-            <div class="trail-lesson__head">
-              <div>
-                <div class="trail-lesson__eyebrow">Lesson 1.</div>
-                <h2 class="trail-lesson__title" id="lesson-title">출력 입문</h2>
-                <span class="trail-lesson__tag">Foundation</span>
-              </div>
-              <div class="trail-lesson__progress">
-                <div class="trail-lesson__bar"><span style="width: 0%"></span></div>
-                <span class="trail-lesson__percent">0%</span>
-              </div>
+        <nav class="lesson-tabs" id="lesson-tabs" role="tablist">
+          <button type="button" class="lesson-tab is-active" data-tab="concept" role="tab" aria-selected="true">개념</button>
+          <button type="button" class="lesson-tab" data-tab="problem" role="tab" aria-selected="false">문제</button>
+        </nav>
+
+        <article class="lesson-pane lesson-pane--concept" id="pane-concept" data-tab="concept"></article>
+
+        <article class="lesson-pane lesson-pane--problem" id="pane-problem" data-tab="problem" hidden>
+          <aside class="lesson-problem-list" id="problem-list" aria-label="문제 목록"></aside>
+          <section class="lesson-problem-detail" id="problem-detail">
+            <header class="lesson-problem-detail__head">
+              <h2 id="problem-title">문제</h2>
+              <span class="diff" id="problem-diff"></span>
+            </header>
+            <div class="lesson-problem-detail__desc" id="problem-desc"></div>
+            <div class="lesson-problem-detail__example" id="problem-example"></div>
+            <label class="lesson-editor-label" for="lesson-editor">코드 (C)</label>
+            <textarea id="lesson-editor" class="lesson-editor" spellcheck="false" autocomplete="off"
+              placeholder="#include <stdio.h>&#10;int main() {&#10;  // 여기에 코드를 작성하세요&#10;  return 0;&#10;}"></textarea>
+            <div class="lesson-actions">
+              <button type="button" class="ghost" id="lesson-reset">코드 초기화</button>
+              <button type="button" class="cta" id="lesson-submit">제출</button>
             </div>
+            <div class="lesson-result" id="lesson-result" hidden></div>
+          </section>
+        </article>
 
-            <table class="trail-lesson__table">
-              <thead>
-                <tr>
-                  <th class="col-step">단계</th>
-                  <th class="col-prob">문제</th>
-                  <th class="col-time">시간</th>
-                  <th class="col-xp">XP</th>
-                  <th class="col-diff">난이도</th>
-                </tr>
-              </thead>
-              <tbody id="lesson-rows"></tbody>
-            </table>
-          </div>
-
-          <button type="button" class="trail-cta" id="lesson-cta">레슨 시작하기 →</button>
-        </section>
-      </div>
+        <footer class="lesson-shell__foot" id="lesson-foot" hidden>
+          <button type="button" class="cta" id="lesson-next">다음 레슨 →</button>
+        </footer>
+      </section>
     </main>
 
   </body>

@@ -4647,3 +4647,172 @@ body.is-resizing-problem * {
 .player-modal__meta { font-size: 12px; color: #666; }
 
 
+
+/* ===== Lesson page ===================================================== */
+.lessons-page {
+  --lesson-hex: #22c55e;
+  max-width: 1100px;
+  margin: 24px auto 80px;
+  padding: 0 18px;
+}
+.lesson-empty, .lesson-locked {
+  text-align: center;
+  padding: 80px 20px;
+}
+.lesson-empty__title, .lesson-locked__title {
+  font-size: 22px; font-weight: 800; color: #111; margin-bottom: 8px;
+}
+.lesson-empty__sub, .lesson-locked__sub { color: #555; margin-bottom: 18px; }
+.lesson-empty__back, .lesson-locked__back {
+  color: var(--lesson-hex); font-weight: 700; text-decoration: none;
+}
+.lesson-shell { display: flex; flex-direction: column; gap: 18px; }
+.lesson-shell__head {
+  display: flex; align-items: center; gap: 16px;
+  border-bottom: 1px solid #e5e7eb; padding-bottom: 14px;
+}
+.lesson-shell__back {
+  color: #555; text-decoration: none; font-size: 13px;
+}
+.lesson-shell__back:hover { color: var(--lesson-hex); }
+.lesson-shell__title { display: flex; flex-direction: column; gap: 2px; flex: 1; }
+.lesson-shell__crumb { font-size: 12px; color: #777; font-weight: 600; }
+.lesson-shell__name { font-size: 22px; font-weight: 800; color: #111; }
+.lesson-shell__badge {
+  background: var(--lesson-hex); color: #fff;
+  padding: 4px 12px; border-radius: 999px;
+  font-size: 12px; font-weight: 700;
+}
+.lesson-tabs {
+  display: inline-flex; gap: 4px; background: #f3f4f6;
+  padding: 4px; border-radius: 10px; align-self: flex-start;
+}
+.lesson-tab {
+  padding: 8px 16px; border-radius: 8px; border: none;
+  background: transparent; cursor: pointer;
+  font-size: 14px; font-weight: 600; color: #555;
+}
+.lesson-tab.is-active { background: #fff; color: #111; box-shadow: 0 1px 2px rgba(0,0,0,0.06); }
+.lesson-pane { background: #fff; border: 1px solid #e5e7eb; border-radius: 14px; padding: 24px; }
+.lesson-pane--problem {
+  display: grid; grid-template-columns: 220px 1fr; gap: 18px;
+}
+@media (max-width: 720px) {
+  .lesson-pane--problem { grid-template-columns: 1fr; }
+}
+.lesson-section__h { font-size: 18px; font-weight: 800; margin: 18px 0 8px; color: #111; }
+.lesson-section__h3 { font-size: 15px; font-weight: 700; margin: 14px 0 6px; color: #111; }
+.lesson-section__p { font-size: 14px; line-height: 1.7; color: #333; margin: 6px 0; }
+.lesson-section__list { font-size: 14px; line-height: 1.7; color: #333; padding-left: 22px; }
+.lesson-section__code {
+  background: #0f172a; color: #e2e8f0; border-radius: 10px;
+  padding: 14px; font-size: 13px; overflow-x: auto;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  line-height: 1.6;
+  margin: 8px 0;
+}
+.lesson-section__table {
+  width: 100%; border-collapse: collapse; font-size: 13px; margin: 8px 0;
+}
+.lesson-section__table td {
+  border: 1px solid #e5e7eb; padding: 6px 10px;
+}
+.lesson-section__table tr:first-child td { background: #f9fafb; font-weight: 700; }
+.lesson-section__callout {
+  background: #fef9c3; border-left: 3px solid #eab308;
+  padding: 10px 14px; border-radius: 6px; font-size: 13px; color: #713f12;
+  margin: 12px 0;
+}
+.lesson-problem-list {
+  display: flex; flex-direction: column; gap: 6px;
+  border-right: 1px solid #f1f5f9; padding-right: 12px;
+}
+@media (max-width: 720px) {
+  .lesson-problem-list { border-right: none; border-bottom: 1px solid #f1f5f9; padding: 0 0 12px; }
+}
+.lesson-problem-item {
+  display: grid; grid-template-columns: 24px 36px 1fr; gap: 6px;
+  align-items: center; text-align: left;
+  padding: 8px 10px; border-radius: 8px; border: 1px solid transparent;
+  background: transparent; cursor: pointer; font-size: 13px; color: #333;
+}
+.lesson-problem-item:hover { background: #f9fafb; }
+.lesson-problem-item.is-selected { background: #f3f4f6; border-color: var(--lesson-hex); }
+.lesson-problem-item__kind {
+  font-size: 11px; padding: 2px 6px; border-radius: 4px;
+  background: #f3f4f6; color: #555; font-weight: 700; text-align: center;
+}
+.lesson-problem-item__title { font-weight: 600; color: #111; }
+.lesson-problem-detail { display: flex; flex-direction: column; gap: 12px; }
+.lesson-problem-detail__head {
+  display: flex; align-items: center; gap: 10px;
+}
+.lesson-problem-detail__head h2 { font-size: 17px; font-weight: 800; color: #111; }
+.lesson-problem-detail__desc { font-size: 14px; line-height: 1.7; color: #333; }
+.lesson-problem-detail__example {
+  display: flex; flex-direction: column; gap: 8px;
+}
+.lesson-example {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+}
+.lesson-example pre {
+  background: #f9fafb; border: 1px solid #e5e7eb; padding: 8px;
+  border-radius: 8px; font-family: ui-monospace, monospace; font-size: 12px;
+  white-space: pre-wrap;
+  margin: 4px 0 0;
+}
+.lesson-editor-label { font-size: 12px; font-weight: 700; color: #555; }
+.lesson-editor {
+  width: 100%; min-height: 220px;
+  padding: 12px; border: 1px solid #d1d5db; border-radius: 10px;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 13px; line-height: 1.6;
+  resize: vertical;
+}
+.lesson-editor:focus { outline: 2px solid var(--lesson-hex); outline-offset: 2px; }
+.lesson-actions { display: flex; gap: 10px; justify-content: flex-end; }
+.lesson-result {
+  padding: 12px 16px; border-radius: 10px; font-size: 14px; font-weight: 600;
+}
+.lesson-result.is-ok { background: #dcfce7; color: #166534; border: 1px solid #86efac; }
+.lesson-result.is-warn { background: #fef9c3; color: #713f12; border: 1px solid #fde047; }
+.lesson-result.is-error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+.lesson-shell__foot {
+  display: flex; justify-content: flex-end; padding-top: 14px;
+  border-top: 1px solid #e5e7eb;
+}
+
+/* ===== Trail card progress (codetrails gauge 4-state) ================== */
+.trail-card__gauge {
+  position: relative;
+  margin-top: 10px;
+  height: 10px; background: #f3f4f6; border-radius: 999px; overflow: hidden;
+}
+.trail-card__gauge-fill {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, currentColor, currentColor);
+  width: 0%;
+  transition: width 0.25s ease;
+}
+.trail-card__gauge-meta {
+  display: flex; align-items: center; gap: 6px;
+  margin-top: 6px;
+  font-size: 11px; color: #6b7280; font-weight: 600;
+}
+.trail-card__gauge-meta--auth { color: #9ca3af; }
+.trail-card__gauge-meta--err { color: #b91c1c; }
+.trail-card__gauge-meta button {
+  background: transparent; border: none; color: inherit;
+  font-weight: 700; font-size: 11px; cursor: pointer;
+  text-decoration: underline;
+}
+.trail-card__gauge-skeleton {
+  position: absolute; inset: 0;
+  background: linear-gradient(90deg, #f3f4f6 0%, #e5e7eb 50%, #f3f4f6 100%);
+  background-size: 200% 100%;
+  animation: trail-card__gauge-pulse 1.2s ease infinite;
+}
+@keyframes trail-card__gauge-pulse {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}

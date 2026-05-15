@@ -3,6 +3,8 @@
 // 각 트레일의 챕터/노드 이름은 codetrails.html 카드에 노출된 태그 + 첨부 시안에
 // 보이는 챕터 라벨을 합쳐 만든 정적 데이터. 실제 학습 콘텐츠는 후속 작업.
 
+import { getLesson as getLessonDisplay } from "./lesson-data.js";
+
 const COLORS = {
   green:  { hex: "#22c55e", deep: "#16a34a", soft: "#ecfdf5", chip: "#dcfce7" },
   yellow: { hex: "#eab308", deep: "#ca8a04", soft: "#fefce8", chip: "#fef9c3" },
@@ -268,6 +270,8 @@ function renderChapters(trail) {
       item.className = "chapter-node is-locked";
       const offset = ni % 2 === 0 ? "left" : "right";
       item.dataset.offset = offset;
+      const lessonId = `t${trail.id}-ch${ci + 1}-${ni + 1}`;
+      item.dataset.lessonId = lessonId;
       item.innerHTML = `
         <span class="chapter-node__ring" aria-hidden="true"></span>
         <span class="hex" aria-hidden="true">
@@ -280,13 +284,63 @@ function renderChapters(trail) {
         document.querySelectorAll(".chapter-node.is-selected").forEach((n) => {
           n.classList.remove("is-selected");
         });
-        if (!wasSelected) item.classList.add("is-selected");
+        if (!wasSelected) {
+          item.classList.add("is-selected");
+          renderLessonForNode(trail, lessonId, node);
+        }
       });
       list.appendChild(item);
     });
 
     host.appendChild(list);
   });
+}
+
+/**
+ * Update the right-side lesson panel to reflect the clicked hex node.
+ * Falls back to whatever the trail's static lesson rows define when the
+ * lesson isn't yet wired in lesson-data.js.
+ */
+function renderLessonForNode(trail, lessonId, nodeTitle) {
+  const display = getLessonDisplay(lessonId);
+  const titleEl = document.getElementById("lesson-title");
+  if (titleEl) titleEl.textContent = display?.title || nodeTitle || trail.lesson.title;
+
+  const tbody = document.getElementById("lesson-rows");
+  if (tbody) {
+    tbody.innerHTML = "";
+    if (display?.problems) {
+      const all = [
+        ...(display.problems.basic    || []).map((p) => ({ ...p, step: "기본 문제" })),
+        ...(display.problems.practice || []).map((p) => ({ ...p, step: "연습 문제" })),
+      ];
+      let prevStep = "";
+      all.forEach((row) => {
+        const tr = document.createElement("tr");
+        const stepCell = row.step === prevStep ? "" : row.step;
+        prevStep = row.step;
+        tr.innerHTML = `
+          <td class="col-step">${stepCell}</td>
+          <td class="col-prob"><span class="bean" aria-hidden="true">●</span> ${row.title || row.id}</td>
+          <td class="col-time">${row.time || "—"}</td>
+          <td class="col-xp">${row.xp ?? 10}</td>
+          <td class="col-diff"><span class="${diffClass(row.diff || "Easy")}">${row.diff || "Easy"}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } else {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="5" style="text-align:center;color:#888;padding:18px">아직 준비 중인 레슨이에요.</td>`;
+      tbody.appendChild(tr);
+    }
+  }
+
+  const cta = document.getElementById("lesson-cta");
+  if (cta) {
+    cta.textContent = display ? "레슨 시작하기 →" : "준비 중";
+    cta.disabled = !display;
+    cta.onclick = display ? () => { location.href = `lessons.html?lesson=${encodeURIComponent(lessonId)}`; } : null;
+  }
 }
 
 function renderLesson(trail) {
@@ -322,7 +376,13 @@ function renderLesson(trail) {
   });
 
   const cta = document.getElementById("lesson-cta");
-  if (cta) cta.textContent = trail.ctaText || "레슨 시작하기 →";
+  if (cta) {
+    cta.textContent = trail.ctaText || "레슨 시작하기 →";
+    const firstLessonId = `t${trail.id}-ch1-1`;
+    const display = getLessonDisplay(firstLessonId);
+    cta.disabled = !display;
+    cta.onclick = display ? () => { location.href = `lessons.html?lesson=${encodeURIComponent(firstLessonId)}`; } : null;
+  }
 }
 
 function init() {
