@@ -94,7 +94,10 @@ db.exec(`
   );
 
   CREATE INDEX IF NOT EXISTS idx_lectures_created ON lectures(created_at DESC);
-  CREATE INDEX IF NOT EXISTS idx_lectures_category ON lectures(category);
+  -- idx_lectures_category is created AFTER the column-migration block below.
+  -- Creating it here would crash on legacy databases whose lectures table
+  -- pre-dates the category column (CREATE TABLE IF NOT EXISTS is a no-op
+  -- on existing tables, so the column would not exist yet at this point).
 
   CREATE TABLE IF NOT EXISTS surveys (
     user_id    INTEGER PRIMARY KEY,
@@ -125,13 +128,22 @@ for (const sql of lectureColumnMigrations) {
     }
   }
 }
-// Ensure the category index exists even on databases that pre-date the column.
-try {
-  db.exec("CREATE INDEX IF NOT EXISTS idx_lectures_category ON lectures(category)");
-} catch {
-  // index creation is best-effort; if the column truly doesn't exist we'd have
-  // bailed above.
+// Fail loudly if a migration silently no-op'd — otherwise the issue surfaces
+// later as an opaque "no such column" during a prepared-statement compile.
+const lectureCols = new Set(
+  db.prepare("PRAGMA table_info(lectures)").all().map((c) => c.name)
+);
+const expectedLectureCols = ["thumbnail", "view_count", "category"];
+const missing = expectedLectureCols.filter((c) => !lectureCols.has(c));
+if (missing.length) {
+  throw new Error(
+    `lectures table is missing expected columns: ${missing.join(", ")}. ` +
+      `Migrations may have failed silently — inspect backend/data/app.db.`
+  );
 }
+
+// Now that we know `category` exists, create its index.
+db.exec("CREATE INDEX IF NOT EXISTS idx_lectures_category ON lectures(category)");
 
 // --- Prepared statements ----------------------------------------------------
 export const stmts = {
@@ -201,6 +213,20 @@ export const stmts = {
      VALUES (?, ?, CURRENT_TIMESTAMP)
      ON CONFLICT(user_id) DO UPDATE SET
        config = excluded.config,
+       updated_at = CURRENT_TIMESTAMP`
+  ),
+
+  // surveys (one row per user; latest write wins via upsert)
+  getSurvey: db.prepare(
+    "SELECT interest, level, time, updated_at FROM surveys WHERE user_id = ?"
+  ),
+  upsertSurvey: db.prepare(
+    `INSERT INTO surveys (user_id, interest, level, time, updated_at)
+     VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+     ON CONFLICT(user_id) DO UPDATE SET
+       interest = excluded.interest,
+       level = excluded.level,
+       time = excluded.time,
        updated_at = CURRENT_TIMESTAMP`
   ),
 

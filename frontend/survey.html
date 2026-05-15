@@ -207,42 +207,51 @@
       const form = document.getElementById('survey-form');
       const fade = document.getElementById('page-fade');
 
-      // Guard: if the visitor has already completed the survey, skip straight
-      // to the results page. Logged-in users are checked against the backend
-      // (persists across devices); anonymous users fall back to sessionStorage
-      // (works within one tab session).
-      async function alreadyCompleted() {
+      // Three-step gate on load:
+      //   1. Require login. If /api/me says 401, send them to index.html
+      //      (which hosts the login modal). Network errors fall through so the
+      //      page still works in demo/offline mode.
+      //   2. If the logged-in user already has a saved survey, mirror it into
+      //      sessionStorage (test-problems.js reads it for difficulty) and skip
+      //      to results.html.
+      //   3. Otherwise, reveal the form.
+      async function gateOnLoad() {
+        let loggedIn = null; // null = unknown (backend unreachable)
         try {
-          const res = await fetch(`${API_BASE}/api/survey`, { credentials: 'include' });
-          if (res.ok) {
-            const data = await res.json();
-            if (data?.survey) {
-              // Mirror the backend record into sessionStorage so existing
-              // readers (test-problems.js readSurveyLevel) keep working.
-              try {
-                sessionStorage.setItem('survey', JSON.stringify({
-                  interest: data.survey.interest,
-                  level: data.survey.level,
-                  time: data.survey.time,
-                }));
-              } catch (_) {}
-              return true;
+          const me = await fetch(`${API_BASE}/api/me`, { credentials: 'include' });
+          loggedIn = me.ok;
+        } catch (_) { /* offline — leave loggedIn null */ }
+
+        if (loggedIn === false) {
+          alert('로그인 후 이용해주세요.');
+          window.location.replace('index.html');
+          return;
+        }
+
+        if (loggedIn === true) {
+          try {
+            const res = await fetch(`${API_BASE}/api/survey`, { credentials: 'include' });
+            if (res.ok) {
+              const data = await res.json();
+              if (data?.survey) {
+                try {
+                  sessionStorage.setItem('survey', JSON.stringify({
+                    interest: data.survey.interest,
+                    level: data.survey.level,
+                    time: data.survey.time,
+                  }));
+                } catch (_) {}
+                window.location.replace('results.html');
+                return;
+              }
             }
-          }
-        } catch (_) { /* offline — fall through to sessionStorage */ }
-        try {
-          const raw = sessionStorage.getItem('survey');
-          if (raw && JSON.parse(raw)?.level) return true;
-        } catch (_) {}
-        return false;
+          } catch (_) { /* fall through to showing the form */ }
+        }
+
+        if (fade) fade.classList.add('is-hidden');
       }
 
-      (async () => {
-        if (await alreadyCompleted()) {
-          if (fade) fade.classList.remove('is-hidden');
-          window.location.replace('results.html');
-        }
-      })();
+      gateOnLoad();
 
       form.addEventListener('submit', async (e) => {
         e.preventDefault();
