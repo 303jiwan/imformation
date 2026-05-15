@@ -1,5 +1,0 @@
-<<<<<<<< HEAD:frontend/dist/assets/results-CrXVDQcu.js
-import"./main-BLTUPEoH.js";const e=document.getElementById("page-fade"),t=document.querySelector(".result-card--diagnose");t&&t.addEventListener("click",()=>{e&&e.classList.remove("is-hidden"),setTimeout(()=>{window.location.href="test-concepts.html"},180)});const i=document.querySelector(".result-card--start");i&&i.addEventListener("click",()=>{e&&e.classList.remove("is-hidden"),setTimeout(()=>{window.location.href="trail.html?trail=0"},180)});
-========
-import"./main-CTj2Xg_3.js";const e=document.getElementById("page-fade"),t=document.querySelector(".result-card--diagnose");t&&t.addEventListener("click",()=>{e&&e.classList.remove("is-hidden"),setTimeout(()=>{window.location.href="test-concepts.html"},180)});const i=document.querySelector(".result-card--start");i&&i.addEventListener("click",()=>{e&&e.classList.remove("is-hidden"),setTimeout(()=>{window.location.href="trail.html?trail=0"},180)});
->>>>>>>> 8109c71 (강의 썸네일/조회수/카테고리 추가):frontend/dist/assets/results-DkX4Oax1.js
