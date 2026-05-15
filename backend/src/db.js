@@ -78,6 +78,28 @@ db.exec(`
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
+
+  CREATE TABLE IF NOT EXISTS lectures (
+    id           INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id      INTEGER NOT NULL,
+    title        TEXT NOT NULL,
+    description  TEXT NOT NULL DEFAULT '',
+    source_type  TEXT NOT NULL CHECK (source_type IN ('url', 'file')),
+    source       TEXT NOT NULL,
+    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_lectures_created ON lectures(created_at DESC);
+
+  CREATE TABLE IF NOT EXISTS surveys (
+    user_id    INTEGER PRIMARY KEY,
+    interest   TEXT NOT NULL,
+    level      TEXT NOT NULL,
+    time       TEXT NOT NULL,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+  );
 `);
 
 // --- Prepared statements ----------------------------------------------------
@@ -148,6 +170,41 @@ export const stmts = {
      VALUES (?, ?, CURRENT_TIMESTAMP)
      ON CONFLICT(user_id) DO UPDATE SET
        config = excluded.config,
+       updated_at = CURRENT_TIMESTAMP`
+  ),
+
+  // lectures
+  insertLecture: db.prepare(
+    `INSERT INTO lectures (user_id, title, description, source_type, source)
+     VALUES (?, ?, ?, ?, ?)`
+  ),
+  listLectures: db.prepare(
+    `SELECT l.id, l.title, l.description, l.source_type, l.source,
+            l.created_at, l.user_id, u.username AS uploader
+       FROM lectures l
+       JOIN users u ON u.id = l.user_id
+       ORDER BY l.created_at DESC`
+  ),
+  findLecture: db.prepare(
+    `SELECT l.id, l.title, l.description, l.source_type, l.source,
+            l.created_at, l.user_id, u.username AS uploader
+       FROM lectures l
+       JOIN users u ON u.id = l.user_id
+       WHERE l.id = ?`
+  ),
+  deleteLecture: db.prepare("DELETE FROM lectures WHERE id = ? AND user_id = ?"),
+
+  // surveys
+  getSurvey: db.prepare(
+    "SELECT interest, level, time, updated_at FROM surveys WHERE user_id = ?"
+  ),
+  upsertSurvey: db.prepare(
+    `INSERT INTO surveys (user_id, interest, level, time, updated_at)
+     VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
+     ON CONFLICT(user_id) DO UPDATE SET
+       interest = excluded.interest,
+       level = excluded.level,
+       time = excluded.time,
        updated_at = CURRENT_TIMESTAMP`
   ),
 };

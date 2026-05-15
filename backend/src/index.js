@@ -11,6 +11,8 @@ import cookieParser from "cookie-parser";
 import { authRouter, loadSession } from "./auth.js";
 import { testRouter } from "./test.js";
 import { avatarRouter } from "./avatar.js";
+import { lecturesRouter, LECTURES_DIR } from "./lectures.js";
+import { surveyRouter } from "./survey.js";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -47,6 +49,19 @@ app.get("/", (_req, res) => {
 app.use("/api", authRouter);
 app.use("/api/test", testRouter);
 app.use("/api/avatar", avatarRouter);
+app.use("/api/lectures", lecturesRouter);
+app.use("/api/survey", surveyRouter);
+
+// Serve uploaded lecture files. Marked Cross-Origin-Resource-Policy so the
+// frontend on a different origin (Vite dev server) can <video src=...> them.
+app.use(
+  "/uploads/lectures",
+  express.static(LECTURES_DIR, {
+    setHeaders(res) {
+      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
+    },
+  })
+);
 
 // 404 (JSON)
 app.use((req, res) => {

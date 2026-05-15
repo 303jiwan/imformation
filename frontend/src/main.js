@@ -79,8 +79,8 @@ const TRANSLATIONS = {
   en: {
     "title": "Codenergy — From Knowledge to Skill",
     "nav.codetrail": "Code Trail",
+    "nav.lectures": "Lectures",
     "nav.pricing": "Pricing",
-    "nav.reviews": "Reviews",
     "nav.invite": "Invite",
     "nav.universities": "Universities",
     "nav.avatar": "Avatar",
@@ -152,16 +152,6 @@ const TRANSLATIONS = {
     "pricing.proF4": "Career consulting",
     "pricing.proF5": "Priority application alerts",
     "pricing.proBtn": "Start Pro",
-    "reviews.title": "⭐ User Reviews",
-    "reviews.r1Text": "\"It was crucial in passing my coding tests. The realistic problems gave me confidence.\"",
-    "reviews.r1Name": "Kim Dev",
-    "reviews.r1Co": "Hired at Samsung",
-    "reviews.r2Text": "\"The step-by-step learning system was excellent. I could learn systematically from basics to advanced.\"",
-    "reviews.r2Name": "Park Coding",
-    "reviews.r2Co": "Hired at Naver",
-    "reviews.r3Text": "\"I started after a friend recommended it — no regrets. I even landed a job!\"",
-    "reviews.r3Name": "Lee Programmer",
-    "reviews.r3Co": "Hired at Kakao",
     "invite.title": "🎁 Invite Friends",
     "invite.hero": "Grow together with friends!",
     "invite.heroSub": "Invite friends and you both get rewards",
@@ -418,7 +408,6 @@ applyLang(currentLang);
 
 // ---------------- Navigation Menu ----------------
 const menuLinks = document.querySelectorAll('.menu a');
-const reviewsModal = document.getElementById('reviews-modal');
 const inviteModal = document.getElementById('invite-modal');
 const universitiesModal = document.getElementById('universities-modal');
 
@@ -431,9 +420,6 @@ menuLinks.forEach(link => {
     switch(action) {
       case 'codetrail':
         showCodeTrail();
-        break;
-      case 'reviews':
-        showReviews();
         break;
       case 'invite':
         showInvite();
@@ -602,11 +588,6 @@ const currentPage = window.location.pathname.split('/').pop();
 if (currentPage === 'results.html') initResultsPage();
 if (currentPage === 'codetrails.html') initCodeTrailsPage();
 if (currentPage === 'index.html' || currentPage === '') initHomePage();
-
-function showReviews() {
-  if (!reviewsModal) { window.location.href = 'index.html'; return; }
-  reviewsModal.hidden = false;
-}
 
 function showInvite() {
   if (!inviteModal) { window.location.href = 'index.html'; return; }

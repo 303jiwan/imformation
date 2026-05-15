@@ -759,7 +759,6 @@ body:has(.page-fade.is-hidden) .mascot {
 
 /* ---------- Feature Modals ---------- */
 .challenge-modal,
-.reviews-modal,
 .invite-modal,
 .universities-modal {
   max-width: 600px;
@@ -938,7 +937,6 @@ body:has(.page-fade.is-hidden) .mascot {
 }
 
 .challenge-content,
-.reviews-grid,
 .invite-content,
 .universities-content {
   margin: 20px 0;
@@ -1000,50 +998,6 @@ body:has(.page-fade.is-hidden) .mascot {
   height: 100%;
   border-radius: 4px;
   transition: width 0.3s ease;
-}
-
-.reviews-grid {
-  display: grid;
-  gap: 16px;
-}
-
-.review-card {
-  border: 1px solid #e5e5e5;
-  border-radius: 8px;
-  padding: 16px;
-}
-
-.review-stars {
-  color: #fbbf24;
-  margin-bottom: 8px;
-}
-
-.review-author {
-  display: flex;
-  align-items: center;
-  margin-top: 12px;
-  gap: 12px;
-}
-
-.author-avatar {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  background: var(--purple);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-}
-
-.author-name {
-  font-weight: 600;
-}
-
-.author-company {
-  font-size: 12px;
-  color: #666;
 }
 
 .invite-benefits {
@@ -4305,4 +4259,224 @@ body.is-resizing-problem * {
 .trail-page[data-color="dark"] .trail-stat__chip,
 .trail-page[data-color="dark"] .trail-lesson__tag { color: #fff; background: #374151; }
 .trail-page[data-color="dark"] .chapter-head { color: #111; }
+
+/* ---------- Lectures Page (lectures.html) ---------- */
+.lectures-section {
+  background: #fff;
+  color: #111;
+  padding: 80px 24px 120px;
+  text-align: center;
+}
+.lectures-header {
+  max-width: 900px;
+  margin: 0 auto 40px;
+}
+.lectures-brand {
+  font-size: clamp(28px, 3.6vw, 44px);
+  font-weight: 800;
+  color: var(--purple-deep);
+  letter-spacing: -0.01em;
+  margin-bottom: 12px;
+}
+.lectures-title {
+  font-size: clamp(24px, 3vw, 36px);
+  font-weight: 800;
+  line-height: 1.25;
+  color: #111;
+  margin-bottom: 16px;
+}
+.lectures-subtitle {
+  color: #666;
+  font-size: 14px;
+  margin-bottom: 24px;
+}
+.lectures-add {
+  background: var(--purple-deep);
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 10px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: filter 160ms ease;
+}
+.lectures-add:hover { filter: brightness(1.07); }
+
+.lectures-status {
+  max-width: 720px;
+  margin: 0 auto 24px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-size: 13px;
+  text-align: left;
+}
+.lectures-status--info  { background: #f1f5f9; color: #334155; }
+.lectures-status--ok    { background: #dcfce7; color: #166534; }
+.lectures-status--error { background: #fee2e2; color: #b91c1c; }
+
+.lectures-empty {
+  max-width: 520px;
+  margin: 24px auto 0;
+  padding: 60px 24px;
+  border: 1px dashed #e5e7eb;
+  border-radius: 16px;
+  background: #fafafa;
+}
+.lectures-empty__icon { font-size: 44px; margin-bottom: 12px; }
+.lectures-empty__title { font-size: 18px; font-weight: 800; color: #111; margin-bottom: 6px; }
+.lectures-empty__sub   { font-size: 13px; color: #666; margin-bottom: 18px; }
+
+.lectures-list {
+  max-width: 1100px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+  text-align: left;
+}
+@media (max-width: 700px) {
+  .lectures-list { grid-template-columns: 1fr; max-width: 480px; }
+}
+
+.lecture-item {
+  display: flex;
+  gap: 14px;
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 14px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.03);
+  transition: transform 200ms ease, box-shadow 200ms ease;
+}
+.lecture-item:hover {
+  box-shadow: 0 12px 24px rgba(0,0,0,0.08);
+}
+.lecture-item__thumb {
+  flex: 0 0 96px;
+  height: 72px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #ede9fe, #f5f3ff);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: var(--purple-deep);
+}
+.lecture-item__body { display: flex; flex-direction: column; gap: 6px; flex: 1; min-width: 0; }
+.lecture-item__title {
+  font-size: 16px; font-weight: 800; color: #111;
+  overflow: hidden; text-overflow: ellipsis;
+}
+.lecture-item__desc {
+  font-size: 13px; color: #555; line-height: 1.45;
+  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+}
+.lecture-item__meta {
+  font-size: 11px; color: #888;
+  display: flex; gap: 6px;
+}
+.lecture-item__play {
+  align-self: flex-start;
+  margin-top: 4px;
+  padding: 6px 12px;
+  border-radius: 999px;
+  border: none;
+  background: #111; color: #fff;
+  font-size: 12px; font-weight: 700;
+  cursor: pointer;
+}
+.lecture-item__play:hover { background: #333; }
+
+/* Upload modal */
+.upload-modal {
+  width: min(540px, 92vw);
+  max-height: 90vh;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.upload-modal h3 {
+  font-size: 18px; font-weight: 800; color: #111;
+}
+.upload-modal__sub { font-size: 13px; color: #666; }
+.upload-field { display: flex; flex-direction: column; gap: 6px; font-size: 13px; }
+.upload-field span { font-weight: 700; color: #333; }
+.upload-field input[type="text"],
+.upload-field input[type="url"],
+.upload-field textarea,
+.upload-field input[type="file"] {
+  border: 1px solid #d4d4d8;
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  width: 100%;
+}
+.upload-field textarea { resize: vertical; }
+.upload-source {
+  border: none;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.upload-source legend { font-size: 13px; font-weight: 700; color: #333; padding: 0; margin-bottom: 4px; }
+.upload-source__opt { display: flex; align-items: center; gap: 8px; font-size: 13px; color: #444; }
+
+/* Player modal */
+.player-modal {
+  width: min(880px, 94vw);
+  max-height: 92vh;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+}
+.player-modal__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.player-modal__head h3 {
+  font-size: 16px; font-weight: 800; color: #111;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.player-modal__close {
+  background: transparent;
+  border: none;
+  font-size: 18px;
+  cursor: pointer;
+  color: #555;
+  padding: 4px 8px;
+  border-radius: 6px;
+}
+.player-modal__close:hover { background: #f3f4f6; color: #111; }
+.player-modal__stage {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  border-radius: 10px;
+  overflow: hidden;
+}
+.player-modal__video,
+.player-modal__iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  display: block;
+}
+.player-modal__fallback {
+  padding: 30px;
+  color: #fff;
+  background: #111;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+}
+.player-modal__fallback a { color: #93c5fd; word-break: break-all; }
+.player-modal__meta { font-size: 12px; color: #666; }
+
 

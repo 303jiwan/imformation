@@ -18,6 +18,7 @@ export default defineConfig({
         avatar: resolve(__dirname, 'avatar.html'),
         codetrails: resolve(__dirname, 'codetrails.html'),
         trail: resolve(__dirname, 'trail.html'),
+        lectures: resolve(__dirname, 'lectures.html'),
       },
     },
   },

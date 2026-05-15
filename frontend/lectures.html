@@ -1,9 +1,9 @@
-  <!doctype html>
+<!doctype html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Codenergy — 로그인</title>
+    <title data-i18n="lectures.pageTitle">Codenergy — 강의</title>
     <style>
       .page-fade {
         position: fixed; inset: 0; background: #fff;
@@ -106,77 +106,88 @@
       </form>
     </div>
 
-    <section class="login-section">
-      <div class="login-shell">
-        <div class="login-header">
-          <span class="login-eyebrow">맞춤 진단 · 로그인</span>
-          <h1 class="login-title">결과를 받아볼 방법을<br/>선택해주세요.</h1>
-          <p class="login-subtitle">
-            이메일로 결과만 받아보거나, 로그인하면 풀이 기록과
-            진행 상황까지 저장돼요.
-          </p>
-        </div>
-
-        <div class="login-status" id="login-status" hidden>
-          <span class="login-status__text">
-            <span class="login-status__check" aria-hidden="true">✓</span>
-            <strong id="login-status-name">사용자</strong> 님으로 로그인되어 있어요. 바로 진행할 수 있습니다.
-          </span>
-          <button type="button" class="login-status__btn" id="continue-btn">
-            이어서 진행하기 →
-          </button>
-        </div>
-
-        <div class="login-grid">
-          <article class="login-card login-card--featured">
-            <span class="login-card__icon" aria-hidden="true">📬</span>
-            <h2 class="login-card__title">이메일로 결과만 받기</h2>
-            <p class="login-card__desc">
-              회원가입 없이 Gmail만 입력하면 진단 결과를 보내드려요.
-              가장 빠른 시작 방법입니다.
-            </p>
-            <form class="login-card__form" id="email-form" novalidate>
-              <input
-                type="email"
-                class="login-input"
-                id="email-input"
-                name="email"
-                placeholder="example@gmail.com"
-                autocomplete="email"
-                required
-              />
-              <p class="login-error" id="email-error" hidden></p>
-              <p class="login-success" id="email-success" hidden></p>
-              <button type="submit" class="login-cta" id="email-submit">
-                이메일로 시작하기 →
-              </button>
-            </form>
-          </article>
-
-          <article class="login-card">
-            <span class="login-card__icon" aria-hidden="true">🔐</span>
-            <h2 class="login-card__title">로그인하고 시작</h2>
-            <p class="login-card__desc">
-              기존 계정으로 로그인하면 풀이 기록·진행 상황·결과를
-              모두 저장할 수 있어요.
-            </p>
-            <div class="login-card__form">
-              <button type="button" class="login-cta" id="open-login">
-                로그인
-              </button>
-              <div class="login-divider">또는</div>
-              <button type="button" class="login-cta login-cta--ghost" id="open-signup">
-                회원가입
-              </button>
-            </div>
-          </article>
-        </div>
-
-        <a href="test-intro.html" class="login-back">← 안내로 돌아가기</a>
+    <section class="lectures-section">
+      <div class="lectures-header">
+        <h1 class="lectures-brand">Lectures.</h1>
+        <h2 class="lectures-title">사용자가 만든 강의를<br/>함께 배워요</h2>
+        <p class="lectures-subtitle">동영상 링크를 공유하거나 직접 업로드해서 다른 사용자와 학습 내용을 나눠보세요.</p>
+        <button type="button" class="lectures-add" id="open-upload">+ 강의 추가하기</button>
       </div>
+
+      <div class="lectures-status" id="lectures-status" hidden></div>
+
+      <div class="lectures-empty" id="lectures-empty" hidden>
+        <div class="lectures-empty__icon" aria-hidden="true">🎬</div>
+        <h3 class="lectures-empty__title">아직 올라온 강의가 없어요</h3>
+        <p class="lectures-empty__sub">첫 강의를 올려서 다른 사용자와 지식을 나눠보세요.</p>
+        <button type="button" class="lectures-add" id="empty-upload">+ 첫 강의 올리기</button>
+      </div>
+
+      <div class="lectures-list" id="lectures-list" hidden></div>
     </section>
 
+    <!-- Upload modal -->
+    <div id="upload-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <form class="modal-card upload-modal" id="upload-form" enctype="multipart/form-data">
+        <h3>강의 추가하기</h3>
+        <p class="upload-modal__sub">동영상 링크 또는 파일을 올려주세요. 로그인 후 가능합니다.</p>
+
+        <label class="upload-field">
+          <span>제목</span>
+          <input name="title" type="text" maxlength="120" required placeholder="예: 시뮬레이션 입문" />
+        </label>
+
+        <label class="upload-field">
+          <span>설명 (선택)</span>
+          <textarea name="description" maxlength="2000" rows="3" placeholder="어떤 내용을 다루는 강의인지 짧게 적어주세요."></textarea>
+        </label>
+
+        <fieldset class="upload-source">
+          <legend>동영상 출처</legend>
+          <label class="upload-source__opt">
+            <input type="radio" name="sourceType" value="url" checked />
+            <span>외부 링크 (YouTube, Vimeo 등)</span>
+          </label>
+          <label class="upload-source__opt">
+            <input type="radio" name="sourceType" value="file" />
+            <span>파일 업로드 (mp4 등, 최대 200MB)</span>
+          </label>
+        </fieldset>
+
+        <label class="upload-field" id="upload-url-field">
+          <span>동영상 URL</span>
+          <input name="url" type="url" placeholder="https://www.youtube.com/watch?v=..." />
+        </label>
+
+        <label class="upload-field" id="upload-file-field" hidden>
+          <span>동영상 파일</span>
+          <input name="video" type="file" accept="video/mp4,video/webm,video/ogg,video/quicktime,video/x-matroska" />
+        </label>
+
+        <p class="modal-error" id="upload-error" hidden></p>
+
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close>취소</button>
+          <button type="submit" class="cta" id="upload-submit">올리기</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Player modal -->
+    <div id="player-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card player-modal">
+        <header class="player-modal__head">
+          <h3 id="player-title">강의</h3>
+          <button type="button" class="player-modal__close" data-close aria-label="닫기">✕</button>
+        </header>
+        <div class="player-modal__stage" id="player-stage"></div>
+        <p class="player-modal__meta" id="player-meta"></p>
+      </div>
+    </div>
+
     <script type="module" src="/src/main.js"></script>
-    <script type="module" src="/src/test-login.js"></script>
+    <script type="module" src="/src/lectures.js"></script>
   </body>
 </html>
