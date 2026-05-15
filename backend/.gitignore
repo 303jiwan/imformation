@@ -1,5 +1,13 @@
 node_modules/
-data/*.db
-data/*.db-*
+
+# 시크릿 / 환경설정
 .env
+
+# 업로드된 사용자 파일 (강의 동영상 등)
+uploads/
+
+# SQLite DB + WAL/SHM 등 런타임 데이터
+data/
+!data/.gitkeep
+
 *.log
