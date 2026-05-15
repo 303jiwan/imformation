@@ -227,3 +227,115 @@ authRouter.post("/forgot-password", async (req, res) => {
     message: `비밀번호 재설정 안내를 ${cleanEmail}로 보냈습니다.`,
   });
 });
+
+// POST /api/signup/send-code  { email }
+// Send verification code to email for signup
+authRouter.post("/signup/send-code", async (req, res) => {
+  const { email } = req.body || {};
+  const errEmail = validateEmail(email);
+  if (errEmail) return res.status(400).json({ error: errEmail });
+
+  const cleanEmail = email.trim().toLowerCase();
+
+  // Check if email already exists
+  const existing = stmts.findUserByEmail.get(cleanEmail);
+  if (existing) {
+    return res.status(400).json({
+      error: "이미 가입된 이메일주소입니다.",
+    });
+  }
+
+  // Generate 6-digit code
+  const code = Math.floor(100000 + Math.random() * 900000).toString();
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString(); // 10 minutes
+
+  stmts.insertEmailAuthCode.run(cleanEmail, code, expiresAt);
+
+  try {
+    await sendMail({
+      to: cleanEmail,
+      subject: "[Codenergy] 이메일 인증 코드",
+      html: `
+        <h2>안녕하세요, Codenergy입니다.</h2>
+        <p>이메일 인증 코드는 다음과 같습니다:</p>
+        <h1 style="letter-spacing: 8px; font-family: monospace; background: #f5f5f5; padding: 20px; text-align: center;">
+          ${code}
+        </h1>
+        <p style="color: #666; font-size: 12px;">
+          이 코드는 10분간 유효합니다.<br />
+          본인이 요청하지 않은 경우 무시해주세요.
+        </p>
+      `,
+    });
+    res.json({ ok: true, message: "인증코드를 이메일로 전송했습니다." });
+  } catch (err) {
+    console.error("Failed to send auth code:", err);
+    res.status(500).json({ error: "이메일 전송에 실패했습니다." });
+  }
+});
+
+// POST /api/signup/verify-code  { email, code, username, password }
+// Verify code and create account
+authRouter.post("/signup/verify-code", async (req, res) => {
+  const { email, code, username, password } = req.body || {};
+
+  // Validate email and code first
+  const errEmail = validateEmail(email);
+  if (errEmail) return res.status(400).json({ error: errEmail });
+
+  if (typeof code !== "string" || code.trim().length === 0) {
+    return res.status(400).json({ error: "인증코드가 필요합니다." });
+  }
+
+  // Check code validity
+  const cleanEmail = email.trim().toLowerCase();
+  const cleanCode = code.trim();
+  const authRow = stmts.findEmailAuthCode.get(cleanEmail, cleanCode);
+
+  if (!authRow) {
+    return res.status(400).json({
+      error: "유효하지 않거나 만료된 인증코드입니다.",
+    });
+  }
+
+  // Validate username and password
+  const errUser = validateUsername(username);
+  if (errUser) return res.status(400).json({ error: errUser });
+
+  const errPass = validatePassword(password);
+  if (errPass) return res.status(400).json({ error: errPass });
+
+  const cleanUsername = username.trim();
+
+  // Check if username already exists
+  const existing = stmts.findUserByUsername.get(cleanUsername);
+  if (existing) {
+    return res.status(400).json({ error: "이미 사용 중인 아이디입니다." });
+  }
+
+  // Hash password and create user
+  try {
+    const hash = await bcrypt.hash(password, BCRYPT_ROUNDS);
+    const info = stmts.insertUser.run(cleanUsername, cleanEmail, hash);
+    const userId = Number(info.lastInsertRowid);
+
+    // Delete used code
+    stmts.deleteEmailAuthCode.run(cleanEmail, cleanCode);
+
+    // Create session
+    createSession(res, userId);
+    const user = stmts.findUserById.get(userId);
+
+    res.json({
+      ok: true,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      },
+    });
+  } catch (err) {
+    console.error("signup error:", err);
+    res.status(500).json({ error: "회원가입에 실패했습니다." });
+  }
+});
