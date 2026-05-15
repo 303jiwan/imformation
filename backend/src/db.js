@@ -107,6 +107,16 @@ db.exec(`
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
+
+  CREATE TABLE IF NOT EXISTS email_auth_codes (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    email      TEXT NOT NULL,
+    code       TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_email_auth_codes_email ON email_auth_codes(email);
 `);
 
 // --- Lightweight column migrations -----------------------------------------
@@ -269,18 +279,15 @@ export const stmts = {
     "SELECT view_count FROM lectures WHERE id = ?"
   ),
 
-  // surveys
-  getSurvey: db.prepare(
-    "SELECT interest, level, time, updated_at FROM surveys WHERE user_id = ?"
+  // email auth codes
+  insertEmailAuthCode: db.prepare(
+    "INSERT INTO email_auth_codes (email, code, expires_at) VALUES (?, ?, ?)"
   ),
-  upsertSurvey: db.prepare(
-    `INSERT INTO surveys (user_id, interest, level, time, updated_at)
-     VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-     ON CONFLICT(user_id) DO UPDATE SET
-       interest = excluded.interest,
-       level = excluded.level,
-       time = excluded.time,
-       updated_at = CURRENT_TIMESTAMP`
+  findEmailAuthCode: db.prepare(
+    "SELECT * FROM email_auth_codes WHERE email = ? AND code = ? AND expires_at > CURRENT_TIMESTAMP"
+  ),
+  deleteEmailAuthCode: db.prepare(
+    "DELETE FROM email_auth_codes WHERE email = ? AND code = ?"
   ),
 };
 

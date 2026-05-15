@@ -749,49 +749,56 @@ logoutBtn.addEventListener("click", async () => {
 function setMode(nextMode) {
   mode = nextMode;
   const titleKey =
-    nextMode === "signup" ? "auth.signup"
+    nextMode === "signup-email" ? "auth.signup"
+    : nextMode === "signup-verify" ? "auth.signup"
     : nextMode === "find-id" ? "auth.findId"
     : nextMode === "find-password" ? "auth.findPw"
     : "auth.login";
   const submitKey =
-    nextMode === "signup" ? "auth.signup"
+    nextMode === "signup-email" ? "auth.submit"
+    : nextMode === "signup-verify" ? "auth.signup"
     : nextMode === "login" ? "auth.login"
     : "auth.submit";
   const titleKo =
-    nextMode === "signup" ? "회원가입"
+    nextMode === "signup-email" ? "회원가입"
+    : nextMode === "signup-verify" ? "회원가입"
     : nextMode === "find-id" ? "아이디 찾기"
     : nextMode === "find-password" ? "비밀번호 찾기"
     : "로그인";
   const submitKo =
-    nextMode === "signup" ? "회원가입"
+    nextMode === "signup-email" ? "인증코드 받기"
+    : nextMode === "signup-verify" ? "회원가입"
     : nextMode === "login" ? "로그인"
     : "전송";
   modalTitle.textContent = t(titleKey) || titleKo;
   modalTitle.dataset.i18n = titleKey;
   modalTitle.dataset.i18nOriginal = titleKo;
-  submitBtn.textContent = t(submitKey) || submitKo;
-  submitBtn.dataset.i18n = submitKey;
+  submitBtn.textContent = submitKo;
   submitBtn.dataset.i18nOriginal = submitKo;
 
   const usernameLabel = form.querySelector(".field-username");
   const passwordLabel = form.querySelector(".field-password");
   const emailLabel = emailField;
+  const codeLabel = document.getElementById("code-field");
 
-  const showEmail = nextMode !== "login";
+  const showEmail = nextMode === "signup-email" || nextMode === "find-id" || nextMode === "find-password";
+  const showCode = nextMode === "signup-verify";
   const showRecovery = nextMode === "login";
   const showRecoveryAlt = nextMode === "find-id" || nextMode === "find-password";
-  const showUsername = nextMode === "login" || nextMode === "signup";
-  const showPassword = nextMode === "login" || nextMode === "signup";
+  const showUsername = nextMode === "login" || nextMode === "signup-verify";
+  const showPassword = nextMode === "login" || nextMode === "signup-verify";
 
   usernameLabel.hidden = !showUsername;
   passwordLabel.hidden = !showPassword;
   emailLabel.hidden = !showEmail;
+  if (codeLabel) codeLabel.hidden = !showCode;
   recoveryLinks.hidden = !showRecovery;
   recoveryLinksAlt.hidden = !showRecoveryAlt;
 
   usernameLabel.style.display = showUsername ? "flex" : "none";
   passwordLabel.style.display = showPassword ? "flex" : "none";
   emailLabel.style.display = showEmail ? "flex" : "none";
+  if (codeLabel) codeLabel.style.display = showCode ? "flex" : "none";
   recoveryLinks.style.display = showRecovery ? "flex" : "none";
   recoveryLinksAlt.style.display = showRecoveryAlt ? "flex" : "none";
 
@@ -807,13 +814,16 @@ function setMode(nextMode) {
   form.querySelector("input[name=username]").required = showUsername;
   form.querySelector("input[name=password]").required = showPassword;
   form.querySelector("input[name=email]").required = showEmail;
+  if (codeLabel) {
+    form.querySelector("input[name=code]").required = showCode;
+  }
 
   // Tell the browser/password manager whether this is sign-in vs sign-up so
   // it doesn't surface a "save existing password" popup over a fresh signup
   // (which can synthesize stray click events that look like backdrop clicks).
   const pwInput = form.querySelector("input[name=password]");
   if (pwInput) {
-    pwInput.autocomplete = nextMode === "signup" ? "new-password" : "current-password";
+    pwInput.autocomplete = nextMode === "signup-verify" ? "new-password" : "current-password";
   }
 
   // Reset error region (also strips any demo-fallback button if present).
@@ -824,9 +834,10 @@ function setMode(nextMode) {
   infoEl.hidden = true;
   form.reset();
   if (!emailLabel.hidden) {
-    form.querySelector("input[name=email]").value = "";
-  }
-  if (!usernameLabel.hidden) {
+    form.querySelector("input[name=email]").focus();
+  } else if (!codeLabel?.hidden) {
+    form.querySelector("input[name=code]").focus();
+  } else if (!usernameLabel.hidden) {
     form.querySelector("input[name=username]").focus();
   } else {
     form.querySelector("input[name=email]").focus();
@@ -849,7 +860,7 @@ function closeModal() {
 }
 
 loginBtn.addEventListener("click", () => openModal("login"));
-signupBtn.addEventListener("click", () => openModal("signup"));
+signupBtn.addEventListener("click", () => openModal("signup-email"));
 findIdBtn.addEventListener("click", () => openModal("find-id"));
 findPasswordBtn.addEventListener("click", () => openModal("find-password"));
 altFindIdBtn.addEventListener("click", () => openModal("find-id"));
@@ -934,8 +945,81 @@ form.addEventListener("submit", async (e) => {
   infoEl.hidden = true;
 
   try {
+    // Handle email verification step
+    if (mode === "signup-email") {
+      try {
+        const res = await fetch(`${API_BASE}/api/signup/send-code`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: data.email }),
+        });
+        const body = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          errorEl.textContent = body.error || "인증코드 전송 실패";
+          errorEl.hidden = false;
+          return;
+        }
+
+        // Success: move to signup-verify mode
+        infoEl.textContent = "인증코드를 이메일로 전송했습니다.";
+        infoEl.hidden = false;
+        // Store email for next step
+        sessionStorage.setItem("signup-email", data.email);
+        // Switch to verify mode
+        setMode("signup-verify");
+      } catch (netErr) {
+        if (isNetworkError(netErr)) {
+          errorEl.textContent = t("auth.serverError") || "서버에 연결할 수 없습니다.";
+          errorEl.hidden = false;
+        } else {
+          throw netErr;
+        }
+      }
+      return;
+    }
+
+    // Handle verification + signup
+    if (mode === "signup-verify") {
+      const storedEmail = sessionStorage.getItem("signup-email");
+      const verifyData = {
+        email: storedEmail || data.email,
+        code: data.code,
+        username: data.username,
+        password: data.password,
+      };
+
+      try {
+        const res = await fetch(`${API_BASE}/api/signup/verify-code`, {
+          method: "POST",
+          credentials: "include",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(verifyData),
+        });
+        const body = await res.json().catch(() => ({}));
+
+        if (!res.ok) {
+          errorEl.textContent = body.error || "회원가입 실패";
+          errorEl.hidden = false;
+          return;
+        }
+
+        clearDemoUser();
+        setLoggedIn(body.user);
+        sessionStorage.removeItem("signup-email");
+        closeModal();
+      } catch (netErr) {
+        if (isNetworkError(netErr)) {
+          errorEl.textContent = t("auth.serverError") || "서버에 연결할 수 없습니다.";
+          errorEl.hidden = false;
+        } else {
+          throw netErr;
+        }
+      }
+      return;
+    }
+
     let endpoint = "login";
-    if (mode === "signup") endpoint = "signup";
     if (mode === "find-id") endpoint = "find-username";
     if (mode === "find-password") endpoint = "forgot-password";
 
@@ -952,7 +1036,7 @@ form.addEventListener("submit", async (e) => {
       // preflight blocked, offline). The backend wasn't reached at all, so we
       // offer the user a local demo session instead of a dead-end error.
       if (isNetworkError(netErr)) {
-        if (mode === "login" || mode === "signup") {
+        if (mode === "login") {
           showDemoFallback(data);
         } else {
           // find-id / find-password require real email delivery; demo cannot help.
@@ -974,13 +1058,6 @@ form.addEventListener("submit", async (e) => {
       return;
     }
 
-    if (mode === "signup") {
-      openModal("login");
-      infoEl.textContent = t("auth.signupSuccess") || "회원가입이 완료되었습니다. 이제 로그인해주세요.";
-      infoEl.hidden = false;
-      return;
-    }
-
     if (mode === "find-id") {
       infoEl.textContent = body.message || t("auth.findIdSuccess") || "아이디 찾기 안내를 Gmail로 보냈습니다.";
       infoEl.hidden = false;
@@ -989,8 +1066,7 @@ form.addEventListener("submit", async (e) => {
 
     if (mode === "find-password") {
       infoEl.textContent = body.message || t("auth.findPwSuccess") || "비밀번호 재설정 안내를 Gmail로 보냈습니다.";
-      infoEl.hidden = false;
-      return;
+      infoEl.hidden = false;      return;
     }
 
     // Successful real login — the backend is up, so any stale demo creds
