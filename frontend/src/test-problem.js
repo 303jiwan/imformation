@@ -3,6 +3,7 @@ import {
   TOTAL_PROBLEMS,
   TIME_PER_PROBLEM_MS,
   getTestCases,
+  getGradingCases,
   buildProblemQueue,
   loadProblemQueue,
   saveProblemQueue,
@@ -686,8 +687,8 @@ async function submitTest(reason = "manual") {
 
   // Build the grading plan up-front so the submit loop is difficulty-agnostic:
   //   easy   → sample 10 A values across [aMin, aMax] (or sweep all in mock mode)
-  //   medium → use getTestCases() output (3 cases, or explicit testCases)
-  //   killer → use the hardcoded testCases verbatim
+  //   medium → visible cases + hidden boundary/random cases (getGradingCases)
+  //   killer → visible cases + problem.hiddenTestCases when provided
   let plan;
   if (DIFFICULTY === "easy") {
     const As = judgeAvailable
@@ -704,12 +705,13 @@ async function submitTest(reason = "manual") {
       A,
     }));
   } else {
-    plan = getTestCases(problem).map((c) => ({
+    plan = getGradingCases(problem).map((c) => ({
       input: c.input,
       expected: c.expected,
-      label: `Case${c.id}`,
+      label: c.hidden ? `Hidden${c.id}` : `Case${c.id}`,
       A: c.A ?? null,
       values: c.values ?? null,
+      hidden: !!c.hidden,
     }));
   }
 
@@ -719,18 +721,26 @@ async function submitTest(reason = "manual") {
   if (reason === "timeout") {
     verdict = "timeout";
   } else if (!judgeAvailable) {
-    // Mock grading — sweep through samples for visual rhythm
+    // No-key mode: we cannot actually compile/run user code, so we have no
+    // way to confirm correctness. Persist `ungraded` rather than awarding
+    // `correct` based on a printf/main heuristic — that would let any
+    // syntactically-plausible program look right in builds shipped without
+    // VITE_JUDGE0_KEY. Easy still uses gradingSample for the visual sweep,
+    // medium/killer use the (now-expanded) plan, but neither path persists
+    // a credit-bearing verdict.
     let idx = 0;
     const stepEvery = Math.max(40, Math.min(200, Math.floor(1200 / plan.length)));
     await new Promise((resolve) => {
       const animator = setInterval(() => {
         if (idx >= plan.length) { clearInterval(animator); resolve(); return; }
         const tc = plan[idx];
-        overlaySub.textContent = `${tc.label} → 기대 출력 ${tc.expected}`;
+        const hint = tc.hidden ? "기대 출력 (숨김)" : `기대 출력 ${tc.expected}`;
+        overlaySub.textContent = `${tc.label} → ${hint}`;
         idx++;
       }, stepEvery);
     });
-    verdict = basicSanityChecks(code) ? "correct" : "wrong";
+    verdict = "ungraded";
+    overlaySub.textContent = "Judge0 키가 없어 자동 채점이 불가능해요 — 결과는 미채점으로 기록됩니다.";
   } else {
     // Real Judge0 grading — sequential, short-circuit on first failure
     let allPass = true;
@@ -775,7 +785,11 @@ async function submitTest(reason = "manual") {
       A: tc.A,
       values: tc.values,
       label: tc.label,
-      expected: tc.expected,
+      // Hidden cases are part of grading only — never persist their
+      // expected output to sessionStorage, since the result page would
+      // otherwise leak them back into the DOM.
+      expected: tc.hidden ? null : tc.expected,
+      hidden: !!tc.hidden,
     })),
     submittedAt: Date.now(),
     reason,

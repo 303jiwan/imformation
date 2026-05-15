@@ -76,6 +76,14 @@ const COPY = {
     sub:  "이 문제를 풀고 결과 페이지로 돌아온 게 맞나요? 다시 시도하려면 처음부터 시작해주세요.",
     enc:  ["메인으로 돌아가 다시 시작할 수 있어요."],
   },
+  ungraded: {
+    chip: "미채점",
+    chipClass: "result-hero__chip--wrong",
+    icon: "⚠️",
+    title: ["자동 채점이 불가능했어요"],
+    sub:  "Judge0 키가 설정되지 않아 코드를 실제로 실행하지 못했습니다. 결과는 정답·오답 어느 쪽으로도 기록되지 않았어요.",
+    enc:  ["관리자에게 VITE_JUDGE0_KEY 설정을 요청한 뒤 다시 시도해주세요."],
+  },
 };
 
 function pick(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
@@ -171,10 +179,11 @@ function renderPerProblem(progress, answers, queue) {
 /* ---------- Summary helpers ---------- */
 
 const VERDICT_META = {
-  correct: { label: "정답",     icon: "✓", segClass: "summary-bar__seg--correct", cardClass: "summary-card--correct" },
-  wrong:   { label: "오답",     icon: "✗", segClass: "summary-bar__seg--wrong",   cardClass: "summary-card--wrong"   },
-  timeout: { label: "시간 초과", icon: "⏱", segClass: "summary-bar__seg--timeout", cardClass: "summary-card--timeout" },
-  missing: { label: "미제출",   icon: "—", segClass: "summary-bar__seg--missing", cardClass: "summary-card--missing" },
+  correct:  { label: "정답",     icon: "✓", segClass: "summary-bar__seg--correct", cardClass: "summary-card--correct" },
+  wrong:    { label: "오답",     icon: "✗", segClass: "summary-bar__seg--wrong",   cardClass: "summary-card--wrong"   },
+  timeout:  { label: "시간 초과", icon: "⏱", segClass: "summary-bar__seg--timeout", cardClass: "summary-card--timeout" },
+  missing:  { label: "미제출",   icon: "—", segClass: "summary-bar__seg--missing", cardClass: "summary-card--missing" },
+  ungraded: { label: "미채점",   icon: "⚠", segClass: "summary-bar__seg--missing", cardClass: "summary-card--missing" },
 };
 
 /**
@@ -206,7 +215,7 @@ function weakConcepts(cards) {
 }
 
 function renderSummary(progress, answers, queue) {
-  let correct = 0, wrong = 0, timeout = 0, missing = 0;
+  let correct = 0, wrong = 0, timeout = 0, missing = 0, ungraded = 0;
   const cards = queue.map((id, idx) => {
     const p = PROBLEMS.find((pp) => pp.id === id) ?? PROBLEMS[0];
     const a = answers[p.id];
@@ -214,6 +223,7 @@ function renderSummary(progress, answers, queue) {
     if (v === "correct") correct++;
     else if (v === "wrong") wrong++;
     else if (v === "timeout") timeout++;
+    else if (v === "ungraded") ungraded++;
     else missing++;
     return { p, v, a, slot: idx + 1 };
   });
@@ -298,7 +308,7 @@ function renderSummary(progress, answers, queue) {
     <div class="result-hero">
       <span class="result-hero__chip result-hero__chip--correct">테스트 완료</span>
       <div class="summary-score">${score}<span class="summary-score__total"> / ${total}</span></div>
-      <p class="summary-score__sub">정답 ${correct} · 오답 ${wrong} · 시간 초과 ${timeout}${missing ? ` · 미제출 ${missing}` : ""}</p>
+      <p class="summary-score__sub">정답 ${correct} · 오답 ${wrong} · 시간 초과 ${timeout}${ungraded ? ` · 미채점 ${ungraded}` : ""}${missing ? ` · 미제출 ${missing}` : ""}</p>
       <h1 class="result-hero__title">${headlineMap[headlineKey].title}</h1>
       <p class="result-hero__sub">${headlineMap[headlineKey].sub}</p>
     </div>
