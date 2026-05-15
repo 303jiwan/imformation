@@ -16,6 +16,71 @@ export const CATALOG = {};
 
 // ===== Trail 0 (Codetree 101 — 프로그래밍 시작) =====
 // Trail 0 agent: insert lessons here.
+
+CATALOG["t0-ch1-1"] = {
+  trail: 0, ch: 1, no: 1, prereq: null,
+  problems: {
+    "t0-ch1-1-b1": { kind: "basic",    expected: "Hello\n",       input: "", judge0Lang: "c" },
+    "t0-ch1-1-p1": { kind: "practice", expected: "Hello\nWorld\n", input: "", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t0-ch1-2"] = {
+  trail: 0, ch: 1, no: 2, prereq: "t0-ch1-1",
+  problems: {
+    "t0-ch1-2-b1": { kind: "basic",    expected: "20\n",   input: "", judge0Lang: "c" },
+    "t0-ch1-2-p1": { kind: "practice", expected: "1\n2\n", input: "", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t0-ch1-3"] = {
+  trail: 0, ch: 1, no: 3, prereq: "t0-ch1-2",
+  problems: {
+    "t0-ch1-3-b1": { kind: "basic",    expected: "7\n",    input: "", judge0Lang: "c" },
+    "t0-ch1-3-p1": { kind: "practice", expected: "3.14\n", input: "", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t0-ch1-4"] = {
+  trail: 0, ch: 1, no: 4, prereq: "t0-ch1-3",
+  problems: {
+    "t0-ch1-4-b1": { kind: "basic",    expected: "8\n",  input: "", judge0Lang: "c" },
+    "t0-ch1-4-p1": { kind: "practice", expected: "24\n", input: "", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t0-ch2-1"] = {
+  trail: 0, ch: 2, no: 1, prereq: "t0-ch1-4",
+  problems: {
+    "t0-ch2-1-b1": { kind: "basic",    expected: "Codenergy\n",  input: "", judge0Lang: "c" },
+    "t0-ch2-1-p1": { kind: "practice", expected: "Hello\nWorld\n", input: "", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t0-ch2-2"] = {
+  trail: 0, ch: 2, no: 2, prereq: "t0-ch2-1",
+  problems: {
+    "t0-ch2-2-b1": { kind: "basic",    expected: "5\n",   input: "5\n", judge0Lang: "c" },
+    "t0-ch2-2-p1": { kind: "practice", expected: "7\n7\n", input: "7\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t0-ch2-3"] = {
+  trail: 0, ch: 2, no: 3, prereq: "t0-ch2-2",
+  problems: {
+    "t0-ch2-3-b1": { kind: "basic",    expected: "8\n",   input: "3 5\n", judge0Lang: "c" },
+    "t0-ch2-3-p1": { kind: "practice", expected: "1\n2\n", input: "1 2\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t0-ch2-4"] = {
+  trail: 0, ch: 2, no: 4, prereq: "t0-ch2-3",
+  problems: {
+    "t0-ch2-4-b1": { kind: "basic",    expected: "12\n", input: "3 4\n",  judge0Lang: "c" },
+    "t0-ch2-4-p1": { kind: "practice", expected: "7\n",  input: "10 3\n", judge0Lang: "c" },
+  },
+};
+
 // === END Trail 0 ===
 
 // ===== Trail 1 (Novice Low — 프로그래밍 기초) =====
