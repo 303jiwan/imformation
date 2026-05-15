@@ -378,6 +378,7 @@ function renderSummary(progress, answers, queue) {
 
     <div class="result-actions">
       <button type="button" class="result-back" id="restart-btn">다시 시작하기</button>
+      <button type="button" class="result-back" id="email-result-btn">결과 이메일 발송</button>
       <a href="index.html" class="result-next result-next--final" id="home-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
         메인으로 돌아가기 →
       </a>

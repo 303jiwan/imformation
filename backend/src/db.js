@@ -78,6 +78,16 @@ db.exec(`
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
   );
+
+  CREATE TABLE IF NOT EXISTS email_auth_codes (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    email      TEXT NOT NULL,
+    code       TEXT NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    expires_at DATETIME NOT NULL
+  );
+
+  CREATE INDEX IF NOT EXISTS idx_email_auth_codes_email ON email_auth_codes(email);
 `);
 
 // --- Prepared statements ----------------------------------------------------
@@ -149,6 +159,17 @@ export const stmts = {
      ON CONFLICT(user_id) DO UPDATE SET
        config = excluded.config,
        updated_at = CURRENT_TIMESTAMP`
+  ),
+
+  // email auth codes
+  insertEmailAuthCode: db.prepare(
+    "INSERT INTO email_auth_codes (email, code, expires_at) VALUES (?, ?, ?)"
+  ),
+  findEmailAuthCode: db.prepare(
+    "SELECT * FROM email_auth_codes WHERE email = ? AND code = ? AND expires_at > CURRENT_TIMESTAMP"
+  ),
+  deleteEmailAuthCode: db.prepare(
+    "DELETE FROM email_auth_codes WHERE email = ? AND code = ?"
   ),
 };
 
