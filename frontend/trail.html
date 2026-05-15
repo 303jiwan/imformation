@@ -1,9 +1,9 @@
-  <!doctype html>
+<!doctype html>
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Codenergy — 추천 시작 방식</title>
+    <title>Codenergy — 트레일</title>
     <style>
       .page-fade {
         position: fixed; inset: 0; background: #fff;
@@ -106,79 +106,86 @@
       </form>
     </div>
 
-    <section class="results-section">
-      <h1 class="results-heading">코드트리, 어떤 방식으로 시작해볼까요?</h1>
-
-      <div class="results-grid">
-        <button type="button" class="result-card result-card--start">
-          <span class="result-badge result-badge--green">코딩을 처음 시작하신다면</span>
-          <span class="result-eyebrow result-eyebrow--green">Codetree 101</span>
-          <span class="result-title">무료로 첫 트레일<br/>시작하기</span>
-          <svg class="result-scene result-scene--sprout" viewBox="0 0 320 110" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <ellipse cx="160" cy="92" rx="36" ry="6" fill="#a47b58" opacity="0.55"/>
-            <path d="M160 88 C 160 70 152 60 138 56 C 150 56 158 64 160 78 Z" fill="#22c55e"/>
-            <path d="M160 88 C 160 68 168 58 184 54 C 172 54 162 62 160 80 Z" fill="#22c55e"/>
-            <path d="M160 96 L160 70" stroke="#16a34a" stroke-width="2.5" stroke-linecap="round"/>
-            <rect x="0" y="96" width="320" height="14" fill="#c2a079"/>
-          </svg>
+    <main class="trail-page" id="trail-page" data-color="green">
+      <header class="trail-page__topbar">
+        <button type="button" class="trail-page__name" id="trail-name-btn" aria-haspopup="true" aria-expanded="false">
+          <span class="trail-page__name-eyebrow" id="trail-eyebrow">Trail 0. Codetree 101</span>
+          <span class="trail-page__name-title" id="trail-title">프로그래밍 시작</span>
+          <span class="trail-page__name-caret" aria-hidden="true">▾</span>
         </button>
+        <div class="trail-page__stats">
+          <div class="trail-stat trail-stat--streak">
+            <span class="trail-stat__icon" aria-hidden="true">▬</span>
+            <div>
+              <div class="trail-stat__value">0</div>
+              <div class="trail-stat__label">Day Streak</div>
+            </div>
+          </div>
+          <div class="trail-stat trail-stat--xp">
+            <div class="trail-stat__row">
+              <span class="trail-stat__label">경험치 목표</span>
+              <span class="trail-stat__chip">열심히</span>
+            </div>
+            <div class="trail-stat__bar"><span style="width: 0%"></span></div>
+            <div class="trail-stat__small">0 / 90 XP</div>
+          </div>
+          <div class="trail-stat trail-stat--points">
+            <div class="trail-stat__row"><span class="trail-stat__dot"></span><strong>4</strong>&nbsp;points</div>
+            <div class="trail-stat__row"><span aria-hidden="true">🎁</span>&nbsp;나의 추천</div>
+          </div>
+        </div>
+      </header>
 
-        <button type="button" class="result-card result-card--diagnose">
-          <span class="result-meta">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-              <circle cx="12" cy="12" r="9"/>
-              <path d="M12 7 V12 L15 14"/>
-            </svg>
-            평균 30분 소요
-          </span>
-          <span class="result-badge result-badge--purple">어디서 시작할지 막막하다면?</span>
-          <span class="result-eyebrow result-eyebrow--purple">지피지기면 백전백승, 갭체크</span>
-          <span class="result-title">맞춤 진단하고<br/>챕터 무료로 받기</span>
-          <svg class="result-scene result-scene--game" viewBox="0 0 720 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-            <rect x="0" y="100" width="300" height="30" fill="#5e5854"/>
-            <path d="M0 100 L20 84 L40 100 L60 84 L80 100 L100 84 L120 100 L140 84 L160 100 L180 84 L200 100 L220 84 L240 100 L260 84 L280 100 L300 84 L300 100 Z" fill="#22c55e"/>
-            <rect x="420" y="100" width="300" height="30" fill="#5e5854"/>
-            <path d="M420 100 L440 84 L460 100 L480 84 L500 100 L520 84 L540 100 L560 84 L580 100 L600 84 L620 100 L640 84 L660 100 L680 84 L700 100 L720 84 L720 100 Z" fill="#22c55e"/>
-            <g transform="rotate(20 348 70)">
-              <rect x="324" y="50" width="48" height="36" rx="6" fill="#ef6f4f" stroke="#b14a2f" stroke-width="2"/>
-            </g>
-            <g transform="translate(298 38)">
-              <path d="M0 0 L-6 -10 M0 0 L0 -12 M0 0 L6 -10" stroke="#111" stroke-width="2" stroke-linecap="round"/>
-            </g>
-            <g transform="translate(514 70)">
-              <rect x="-44" y="-20" width="88" height="32" rx="6" fill="#22c55e"/>
-              <text x="0" y="2" text-anchor="middle" font-family="-apple-system, sans-serif" font-size="14" font-weight="700" fill="#fff">Solved</text>
-              <path d="M0 14 L0 30" stroke="#16a34a" stroke-width="3"/>
-            </g>
-          </svg>
-        </button>
-      </div>
+      <div class="trail-page__body">
+        <aside class="trail-page__chapters" id="trail-chapters" aria-label="챕터 목록"></aside>
 
-      <div class="results-skip">
-        <a class="results-skip__link" href="codetrails.html">직접 둘러볼게요 →</a>
+        <section class="trail-page__lesson">
+          <div class="trail-gapcheck">
+            <div class="trail-gapcheck__text">
+              <p>정밀 진단을 통해 나에게 딱 맞는<br/>학습 시작점을 찾고 싶나요?</p>
+              <a class="trail-gapcheck__btn" href="survey.html">갭체크 시작하기</a>
+            </div>
+            <div class="trail-gapcheck__art" aria-hidden="true">
+              <span class="g-shape g-shape--orange"></span>
+              <span class="g-shape g-shape--yellow"></span>
+              <span class="g-shape g-shape--green"></span>
+              <span class="g-shape g-shape--blue"></span>
+            </div>
+          </div>
+
+          <div class="trail-lesson">
+            <div class="trail-lesson__head">
+              <div>
+                <div class="trail-lesson__eyebrow">Lesson 1.</div>
+                <h2 class="trail-lesson__title" id="lesson-title">출력 입문</h2>
+                <span class="trail-lesson__tag">Foundation</span>
+              </div>
+              <div class="trail-lesson__progress">
+                <div class="trail-lesson__bar"><span style="width: 0%"></span></div>
+                <span class="trail-lesson__percent">0%</span>
+              </div>
+            </div>
+
+            <table class="trail-lesson__table">
+              <thead>
+                <tr>
+                  <th class="col-step">단계</th>
+                  <th class="col-prob">문제</th>
+                  <th class="col-time">시간</th>
+                  <th class="col-xp">XP</th>
+                  <th class="col-diff">난이도</th>
+                </tr>
+              </thead>
+              <tbody id="lesson-rows"></tbody>
+            </table>
+          </div>
+
+          <button type="button" class="trail-cta" id="lesson-cta">레슨 시작하기 →</button>
+        </section>
       </div>
-    </section>
+    </main>
 
     <script type="module" src="/src/main.js"></script>
-    <script type="module">
-      // Wire the right-side "맞춤 진단하고 챕터 무료로 받기" card to the
-      // coding-test concept-selection screen.
-      const fade = document.getElementById('page-fade');
-      const diagnoseBtn = document.querySelector('.result-card--diagnose');
-      if (diagnoseBtn) {
-        diagnoseBtn.addEventListener('click', () => {
-          if (fade) fade.classList.remove('is-hidden');
-          setTimeout(() => { window.location.href = 'test-concepts.html'; }, 180);
-        });
-      }
-      // "무료로 첫 트레일 시작하기" → Codetree 101 (trail 0) 학습 화면.
-      const startBtn = document.querySelector('.result-card--start');
-      if (startBtn) {
-        startBtn.addEventListener('click', () => {
-          if (fade) fade.classList.remove('is-hidden');
-          setTimeout(() => { window.location.href = 'trail.html?trail=0'; }, 180);
-        });
-      }
-    </script>
+    <script type="module" src="/src/trail.js"></script>
   </body>
 </html>

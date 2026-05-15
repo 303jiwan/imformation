@@ -155,7 +155,7 @@
           </div>
           <div class="trail-actions">
             <button type="button" class="trail-secondary">상세 보기</button>
-            <button type="button" class="trail-primary trail-primary--green">바로 시작하기 →</button>
+            <button type="button" class="trail-primary trail-primary--green" data-trail="0">바로 시작하기 →</button>
           </div>
         </article>
 
@@ -176,7 +176,7 @@
           </div>
           <div class="trail-actions">
             <button type="button" class="trail-secondary">상세 보기</button>
-            <button type="button" class="trail-primary trail-primary--yellow">바로 시작하기 →</button>
+            <button type="button" class="trail-primary trail-primary--yellow" data-trail="1">바로 시작하기 →</button>
           </div>
         </article>
 
@@ -198,7 +198,7 @@
           </div>
           <div class="trail-actions">
             <button type="button" class="trail-secondary">상세 보기</button>
-            <button type="button" class="trail-primary trail-primary--orange">바로 시작하기 →</button>
+            <button type="button" class="trail-primary trail-primary--orange" data-trail="2">바로 시작하기 →</button>
           </div>
         </article>
 
@@ -220,7 +220,7 @@
           </div>
           <div class="trail-actions">
             <button type="button" class="trail-secondary">상세 보기</button>
-            <button type="button" class="trail-primary trail-primary--red">바로 시작하기 →</button>
+            <button type="button" class="trail-primary trail-primary--red" data-trail="3">바로 시작하기 →</button>
           </div>
         </article>
 
@@ -241,7 +241,7 @@
           </div>
           <div class="trail-actions">
             <button type="button" class="trail-secondary">상세 보기</button>
-            <button type="button" class="trail-primary trail-primary--blue">바로 시작하기 →</button>
+            <button type="button" class="trail-primary trail-primary--blue" data-trail="4">바로 시작하기 →</button>
           </div>
         </article>
 
@@ -262,7 +262,7 @@
           </div>
           <div class="trail-actions">
             <button type="button" class="trail-secondary">상세 보기</button>
-            <button type="button" class="trail-primary trail-primary--purple">바로 시작하기 →</button>
+            <button type="button" class="trail-primary trail-primary--purple" data-trail="5">바로 시작하기 →</button>
           </div>
         </article>
 
@@ -283,12 +283,23 @@
           </div>
           <div class="trail-actions">
             <button type="button" class="trail-secondary">상세 보기</button>
-            <button type="button" class="trail-primary trail-primary--dark">바로 시작하기 →</button>
+            <button type="button" class="trail-primary trail-primary--dark" data-trail="6">바로 시작하기 →</button>
           </div>
         </article>
       </div>
     </section>
 
     <script type="module" src="/src/main.js"></script>
+    <script type="module">
+      // Wire each trail card's "바로 시작하기 →" button to trail.html?trail=N.
+      const fade = document.getElementById('page-fade');
+      document.querySelectorAll('.trail-primary[data-trail]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          const id = btn.getAttribute('data-trail');
+          if (fade) fade.classList.remove('is-hidden');
+          setTimeout(() => { window.location.href = `trail.html?trail=${id}`; }, 180);
+        });
+      });
+    </script>
   </body>
 </html>

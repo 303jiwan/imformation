@@ -1,1 +1,0 @@
-import"./main-CousPi8R.js";const e=document.getElementById("survey-form"),t=document.getElementById("page-fade");e.addEventListener("submit",s=>{s.preventDefault();const n=Object.fromEntries(new FormData(e));try{sessionStorage.setItem("survey",JSON.stringify(n))}catch{}t&&t.classList.remove("is-hidden"),setTimeout(()=>{window.location.href="results.html"},180)});

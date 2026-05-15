@@ -1,1 +1,0 @@
-import"./main-CousPi8R.js";const e=document.getElementById("page-fade"),t=document.querySelector(".result-card--diagnose");t&&t.addEventListener("click",()=>{e&&e.classList.remove("is-hidden"),setTimeout(()=>{window.location.href="test-concepts.html"},180)});

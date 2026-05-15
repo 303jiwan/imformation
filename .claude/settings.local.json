@@ -1,20 +1,9 @@
-{
-  "permissions": {
-    "allow": [
-      "Bash(npm run *)"
-    ]
-  },
-  "hooks": {
-    "Stop": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "shell": "powershell",
-            "command": "powershell -NoProfile -ExecutionPolicy Bypass -File \"C:\\Users\\seok\\imformation\\.claude\\scripts\\memory-cleanup-pending.ps1\""
-          }
-        ]
-      }
-    ]
-  }
+﻿{
+    "permissions":  {
+                        "allow":  [
+                                      "Bash(npm run *)",
+                                      "Bash(node --input-type=module -e \"import\\(\u0027./src/test-problems.js\u0027\\).then\\(m =\u003e { console.log\\(\u0027count:\u0027, m.PROBLEMS.length\\); const cc = {}; for \\(const p of m.PROBLEMS\\) for \\(const c of p.concepts\\) cc[c] = \\(cc[c]||0\\)+1; console.log\\(JSON.stringify\\(cc\\)\\); for \\(const p of m.PROBLEMS\\) { try { p.expected\\(p.aDefault\\); p.expected\\(p.aMin\\); p.expected\\(p.aMax\\); } catch\\(e\\) { console.error\\(\u0027id\u0027, p.id, e.message\\); } } console.log\\(\u0027OK\u0027\\); }\\);\")",
+                                      "Bash(powershell *)"
+                                  ]
+                    }
 }

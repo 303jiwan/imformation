@@ -16,6 +16,8 @@ export default defineConfig({
         testProblem: resolve(__dirname, 'test-problem.html'),
         testResult: resolve(__dirname, 'test-result.html'),
         avatar: resolve(__dirname, 'avatar.html'),
+        codetrails: resolve(__dirname, 'codetrails.html'),
+        trail: resolve(__dirname, 'trail.html'),
       },
     },
   },

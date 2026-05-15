@@ -3986,3 +3986,323 @@ body.is-resizing-problem * {
   color: var(--purple);
   border-bottom-color: var(--purple);
 }
+
+/* ---------- Trail Page (trail.html) ---------- */
+.trail-page {
+  --trail-hex: #22c55e;
+  --trail-deep: #16a34a;
+  --trail-soft: #ecfdf5;
+  --trail-chip: #dcfce7;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 28px 24px 80px;
+  color: #111;
+}
+.trail-page__topbar {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 16px;
+  align-items: stretch;
+  margin-bottom: 24px;
+}
+.trail-page__name {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background: var(--trail-hex);
+  color: #fff;
+  border: none;
+  border-radius: 14px;
+  padding: 16px 20px;
+  cursor: pointer;
+  font: inherit;
+  box-shadow: 0 6px 0 0 var(--trail-deep);
+}
+.trail-page__name-eyebrow {
+  font-size: 12px;
+  font-weight: 700;
+  opacity: 0.9;
+}
+.trail-page__name-title {
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+}
+.trail-page__name-caret {
+  font-size: 14px;
+  margin-top: 4px;
+  opacity: 0.85;
+}
+.trail-page__stats {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 1fr;
+  gap: 12px;
+}
+.trail-stat {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 12px 14px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  font-size: 13px;
+  color: #333;
+}
+.trail-stat--streak {
+  flex-direction: row;
+  align-items: center;
+  gap: 10px;
+}
+.trail-stat__icon {
+  width: 28px; height: 28px;
+  border-radius: 999px;
+  background: var(--trail-soft);
+  color: var(--trail-deep);
+  display: inline-flex; align-items: center; justify-content: center;
+  font-weight: 700;
+}
+.trail-stat__value { font-size: 18px; font-weight: 800; line-height: 1; }
+.trail-stat__label { font-size: 11px; color: #666; }
+.trail-stat__row {
+  display: flex; align-items: center; gap: 6px; font-size: 12px;
+}
+.trail-stat__chip {
+  font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 999px;
+  background: var(--trail-chip); color: var(--trail-deep);
+}
+.trail-stat__bar {
+  position: relative;
+  height: 5px;
+  background: #f1f1f1;
+  border-radius: 999px;
+  overflow: hidden;
+}
+.trail-stat__bar span {
+  display: block; height: 100%; background: var(--trail-hex); border-radius: 999px;
+}
+.trail-stat__small { font-size: 10px; color: #888; align-self: flex-end; }
+.trail-stat--points strong { font-weight: 800; }
+.trail-stat__dot {
+  width: 10px; height: 10px; border-radius: 999px;
+  background: #facc15; display: inline-block;
+}
+
+.trail-page__body {
+  display: grid;
+  grid-template-columns: minmax(280px, 360px) 1fr;
+  gap: 16px;
+  align-items: start;
+}
+@media (max-width: 900px) {
+  .trail-page__topbar,
+  .trail-page__body { grid-template-columns: 1fr; }
+}
+
+/* ----- Chapter / hexagon nodes ----- */
+.trail-page__chapters {
+  background: #fff;
+  border-radius: 14px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.chapter-head {
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid var(--trail-hex);
+  color: var(--trail-deep);
+  border-radius: 999px;
+  padding: 6px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  margin: 14px 0 8px;
+}
+.chapter-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.chapter-node {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.chapter-node[data-offset="left"]  { transform: translateX(-44px); }
+.chapter-node[data-offset="right"] { transform: translateX(44px); }
+.hex {
+  width: 64px;
+  height: 72px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
+  background: #e5e7eb;
+  color: #fff;
+  font-weight: 800;
+  font-size: 22px;
+  box-shadow: 0 4px 0 0 rgba(0,0,0,0.08);
+}
+.chapter-node.is-active .hex {
+  background: #fff;
+  color: var(--trail-deep);
+  border: none;
+  outline: 2px solid var(--trail-hex);
+  outline-offset: -4px;
+}
+.chapter-node.is-locked .hex {
+  background: var(--trail-hex);
+  opacity: 0.85;
+}
+.chapter-node.is-locked .hex-lock { font-size: 22px; }
+.chapter-node__label {
+  font-size: 12px;
+  color: #444;
+  text-align: center;
+  max-width: 140px;
+}
+
+/* ----- Lesson panel (right side) ----- */
+.trail-page__lesson {
+  background: #fff;
+  border: 1px solid #ececec;
+  border-radius: 14px;
+  padding: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  outline: 2px solid var(--trail-hex);
+  outline-offset: -2px;
+  min-height: 560px;
+}
+.trail-gapcheck {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: #f9fafb;
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.trail-gapcheck__text p {
+  font-size: 13px;
+  color: #333;
+  line-height: 1.45;
+  margin-bottom: 8px;
+}
+.trail-gapcheck__btn {
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--trail-deep);
+  background: #fff;
+  border: 1px solid var(--trail-hex);
+  border-radius: 8px;
+  padding: 6px 12px;
+  text-decoration: none;
+}
+.trail-gapcheck__art {
+  display: grid;
+  grid-template-columns: repeat(2, 22px);
+  gap: 8px;
+}
+.g-shape { width: 22px; height: 22px; border-radius: 4px; display: inline-block; }
+.g-shape--orange { background: #f97316; }
+.g-shape--yellow { background: #eab308; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.g-shape--green  { background: #22c55e; clip-path: polygon(0 0, 100% 50%, 0 100%); }
+.g-shape--blue   { background: #3b82f6; clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+
+.trail-lesson__head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 12px;
+  border-bottom: 1px solid #f1f1f1;
+  padding-bottom: 10px;
+}
+.trail-lesson__eyebrow { font-size: 12px; color: #888; }
+.trail-lesson__title   { font-size: 22px; font-weight: 800; color: #111; }
+.trail-lesson__tag {
+  display: inline-block;
+  font-size: 11px; font-weight: 700;
+  padding: 3px 10px; border-radius: 999px;
+  background: var(--trail-chip); color: var(--trail-deep);
+  margin-top: 6px; margin-right: 4px;
+}
+.trail-lesson__progress {
+  display: flex; align-items: center; gap: 8px;
+  font-size: 11px; color: #666; min-width: 160px;
+}
+.trail-lesson__bar {
+  position: relative; width: 100px; height: 5px;
+  background: #f1f1f1; border-radius: 999px; overflow: hidden;
+}
+.trail-lesson__bar span {
+  display: block; height: 100%; background: var(--trail-hex);
+}
+
+.trail-lesson__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+.trail-lesson__table thead th {
+  text-align: left;
+  font-size: 11px;
+  color: #888;
+  font-weight: 600;
+  padding: 8px 6px;
+  border-bottom: 1px solid #f1f1f1;
+}
+.trail-lesson__table tbody td {
+  padding: 10px 6px;
+  border-bottom: 1px solid #fafafa;
+  color: #333;
+}
+.col-step { width: 80px; color: #777; }
+.col-time, .col-xp { width: 50px; color: #555; }
+.col-diff { width: 70px; }
+.col-prob .bean { color: #b45309; margin-right: 6px; font-size: 9px; }
+.diff {
+  display: inline-block;
+  font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 999px;
+}
+.diff--easy   { background: #dbeafe; color: #2563eb; }
+.diff--medium { background: #fef3c7; color: #b45309; }
+.diff--hard   { background: #fee2e2; color: #b91c1c; }
+
+.trail-cta {
+  margin-top: auto;
+  background: var(--trail-hex);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 18px;
+  font-size: 14px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 0 0 var(--trail-deep);
+}
+.trail-cta:hover { filter: brightness(1.04); }
+
+/* dark trail (Trail 6) — invert chip text colour for legibility */
+.trail-page[data-color="dark"] .trail-stat__chip,
+.trail-page[data-color="dark"] .trail-lesson__tag { color: #fff; background: #374151; }
+.trail-page[data-color="dark"] .chapter-head { color: #111; }
+
