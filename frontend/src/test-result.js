@@ -13,6 +13,91 @@ import { PROBLEMS, TOTAL_PROBLEMS, loadProblemQueue, QUEUE_KEY } from "./test-pr
 const PROGRESS_KEY = "codenergy:test:progress";
 const ANSWERS_KEY  = "codenergy:test:answers";
 const TIMER_KEY    = "codenergy:test:timer";
+const TEST_EMAIL_KEY = "codenergy:test:email";
+// One-shot guard so the auto-send does not fire again when the user revisits
+// the summary screen (e.g. via "이어서 학습하기" round-trip).
+const EMAIL_SENT_KEY = "codenergy:test:emailSent";
+
+const API_BASE = "http://localhost:3000";
+
+/* ---------- Email auto-send helpers ---------- */
+
+/** Prefer the logged-in user's email; fall back to the one captured on test-login. */
+async function resolveEmail() {
+  try {
+    const r = await fetch(`${API_BASE}/api/me`, { credentials: "include" });
+    if (r.ok) {
+      const me = await r.json();
+      if (me?.email) return me.email;
+    }
+  } catch (_) {}
+  try {
+    const raw = sessionStorage.getItem(TEST_EMAIL_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (parsed?.email) return parsed.email;
+    }
+  } catch (_) {}
+  return null;
+}
+
+/**
+ * Aggregate English concept slugs (matching backend CONCEPT_INFO keys) from
+ * each problem's `concepts` array. A slug is "weak" if it appears in any
+ * non-correct attempt, "strong" if it appears only in correct attempts.
+ */
+function aggregateConceptSlugs(cards) {
+  const weak = new Set();
+  const correct = new Set();
+  for (const { p, v } of cards) {
+    const slugs = Array.isArray(p?.concepts) ? p.concepts : [];
+    for (const s of slugs) {
+      if (v === "correct") correct.add(s);
+      else weak.add(s);
+    }
+  }
+  const strong = [];
+  for (const s of correct) if (!weak.has(s)) strong.push(s);
+  return { weakConcepts: [...weak], strongConcepts: strong };
+}
+
+function buildEmailPayload(email, cards, counts) {
+  const { weakConcepts, strongConcepts } = aggregateConceptSlugs(cards);
+  return {
+    email,
+    testType: "default",
+    summary: {
+      correct: counts.correct,
+      wrong: counts.wrong,
+      timeout: counts.timeout,
+      // Backend treats ungraded (no Judge0 key) the same as missing.
+      missing: counts.missing + counts.ungraded,
+      total: counts.total,
+    },
+    results: cards.map(({ slot, p, v }) => ({
+      slot,
+      title: p.title,
+      concept: conceptOf(p),
+      verdict: v,
+    })),
+    weakConcepts,
+    strongConcepts,
+  };
+}
+
+async function postResultEmail(payload) {
+  const res = await fetch(`${API_BASE}/api/test/result-email`, {
+    method: "POST",
+    credentials: "include",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `이메일 전송 실패 (${res.status})`);
+  }
+  return res.json();
+}
 
 const fade  = document.getElementById("page-fade");
 const shell = document.getElementById("result-shell");
@@ -378,17 +463,17 @@ function renderSummary(progress, answers, queue) {
       ${recHtml}
     </div>
 
-    <div class="result-encouragement">
+    <div class="result-encouragement" id="email-status" data-state="idle">
       <span class="result-encouragement__icon" aria-hidden="true">✨</span>
-      <p class="result-encouragement__text">
+      <p class="result-encouragement__text" id="email-status-text">
         <strong>이 진단 결과를 바탕으로 학습 경로를 추천해드릴게요.</strong>
-        곧 등록하신 이메일로 상세 분석을 보내드립니다.
+        잠시 후 결과와 추천 트레일이 이메일로 발송됩니다.
       </p>
     </div>
 
     <div class="result-actions">
       <button type="button" class="result-back" id="restart-btn">다시 시작하기</button>
-      <button type="button" class="result-back" id="email-result-btn">결과 이메일 발송</button>
+      <button type="button" class="result-back" id="email-result-btn">이메일로 결과 받기</button>
       <a href="index.html" class="result-next result-next--final" id="home-btn" style="text-decoration:none;display:inline-flex;align-items:center;justify-content:center;">
         메인으로 돌아가기 →
       </a>
@@ -404,49 +489,71 @@ function renderSummary(progress, answers, queue) {
     setTimeout(() => { window.location.href = "test-concepts.html"; }, 180);
   });
 
-  document.getElementById("email-result-btn").addEventListener("click", async () => {
-    const email = prompt("결과를 받을 이메일을 입력해주세요:");
-    if (!email) return;
+  const counts = { correct, wrong, timeout, missing, ungraded, total };
+  const statusEl = document.getElementById("email-status");
+  const statusText = document.getElementById("email-status-text");
 
-    // Calculate score and weak concepts
-    const correct = queue.filter((id) => answers[id]?.verdict === "correct").length;
-    const total = queue.length;
-    const score = Math.round((correct / total) * 100);
-    
-    // Identify weak concepts
-    const weakConcepts = [];
-    for (const id of queue) {
-      if (answers[id]?.verdict !== "correct") {
-        const problem = PROBLEMS.find((p) => p.id === id);
-        if (problem?.concepts) {
-          weakConcepts.push(...problem.concepts);
-        }
-      }
+  function setStatus(state, html) {
+    if (!statusEl || !statusText) return;
+    statusEl.dataset.state = state;
+    statusText.innerHTML = html;
+  }
+
+  // Auto-send the result email once per finished test. The guard key includes
+  // the answer-hash so retaking the test (new answers) re-triggers a send.
+  const guardKey = `${EMAIL_SENT_KEY}:${JSON.stringify(queue)}:${correct}-${wrong}-${timeout}-${missing}`;
+  const alreadySent = sessionStorage.getItem(guardKey);
+
+  (async () => {
+    if (alreadySent) {
+      setStatus("done", `<strong>✅ 결과가 이미 이메일(<code>${escapeHtml(alreadySent)}</code>)로 발송되었어요.</strong> 받은 메일에서 추천 트레일을 바로 시작할 수 있습니다.`);
+      return;
     }
-    // Keep unique weak concepts
-    const uniqueWeak = [...new Set(weakConcepts)];
-
+    const email = await resolveEmail();
+    if (!email) {
+      setStatus(
+        "no-email",
+        `<strong>📭 등록된 이메일이 없어요.</strong> 아래 “이메일로 결과 받기”에서 받을 주소를 입력하시면 상세 분석과 추천 트레일을 보내드릴게요.`,
+      );
+      return;
+    }
+    setStatus("sending", `<strong>📨 결과를 <code>${escapeHtml(email)}</code>로 보내는 중…</strong>`);
     try {
-      const res = await fetch(`${API_BASE}/api/test/result-email`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          email,
-          testType: "default",
-          score,
-          weakConcepts: uniqueWeak.slice(0, 5),
-        }),
-      });
-
-      if (!res.ok) {
-        const error = await res.json().catch(() => ({}));
-        alert(error.error || "이메일 발송 실패");
-        return;
-      }
-
-      alert("결과가 이메일로 발송되었습니다!");
+      await postResultEmail(buildEmailPayload(email, cards, counts));
+      try { sessionStorage.setItem(guardKey, email); } catch (_) {}
+      setStatus(
+        "done",
+        `<strong>✅ 결과가 <code>${escapeHtml(email)}</code>로 발송되었어요.</strong> 메일에서 추천 트레일을 바로 시작할 수 있습니다.`,
+      );
     } catch (err) {
-      alert("서버 연결 실패: " + err.message);
+      setStatus(
+        "error",
+        `<strong>⚠️ 이메일 전송에 실패했어요.</strong> 잠시 후 “이메일로 결과 받기” 버튼으로 다시 시도해 주세요. (${escapeHtml(err.message || "알 수 없는 오류")})`,
+      );
+    }
+  })();
+
+  document.getElementById("email-result-btn").addEventListener("click", async () => {
+    const fallback = await resolveEmail();
+    const email = prompt("결과를 받을 이메일을 입력해주세요:", fallback || "");
+    if (!email) return;
+    if (!email.includes("@")) {
+      alert("올바른 이메일을 입력해 주세요.");
+      return;
+    }
+    setStatus("sending", `<strong>📨 결과를 <code>${escapeHtml(email)}</code>로 보내는 중…</strong>`);
+    try {
+      await postResultEmail(buildEmailPayload(email, cards, counts));
+      try { sessionStorage.setItem(guardKey, email); } catch (_) {}
+      setStatus(
+        "done",
+        `<strong>✅ 결과가 <code>${escapeHtml(email)}</code>로 발송되었어요.</strong> 메일에서 추천 트레일을 바로 시작할 수 있습니다.`,
+      );
+    } catch (err) {
+      setStatus(
+        "error",
+        `<strong>⚠️ 이메일 전송에 실패했어요.</strong> ${escapeHtml(err.message || "알 수 없는 오류")}`,
+      );
     }
   });
 }
