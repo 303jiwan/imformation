@@ -17,7 +17,9 @@
       "Bash(node -e \"import\\('./src/db.js'\\).then\\(\\(\\) => { console.log\\('db loaded ok'\\); process.exit\\(0\\); }\\).catch\\(e => { console.error\\('FAIL:', e.message\\); process.exit\\(1\\); }\\);\")",
       "PowerShell(npm install *)",
       "PowerShell(codex *)",
-      "PowerShell($env:PATH -split ';' | Where-Object { $_ -match 'npm|nodejs' })"
+      "PowerShell($env:PATH -split ';' | Where-Object { $_ -match 'npm|nodejs' })",
+      "Skill(codex:setup)",
+      "Bash(npx playwright *)"
     ]
   }
 }

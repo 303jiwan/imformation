@@ -280,14 +280,12 @@ function renderChapters(trail) {
         <span class="chapter-node__label">${node}</span>
       `;
       item.addEventListener("click", () => {
-        const wasSelected = item.classList.contains("is-selected");
+        if (item.classList.contains("is-selected")) return;
         document.querySelectorAll(".chapter-node.is-selected").forEach((n) => {
           n.classList.remove("is-selected");
         });
-        if (!wasSelected) {
-          item.classList.add("is-selected");
-          renderLessonForNode(trail, lessonId, node);
-        }
+        item.classList.add("is-selected");
+        renderLessonForNode(trail, lessonId, node);
       });
       list.appendChild(item);
     });
@@ -392,6 +390,7 @@ function init() {
   renderTrailMenu(trail);
   renderChapters(trail);
   renderLesson(trail);
+  document.querySelector(".chapter-node")?.click();
 }
 
 if (document.readyState === "loading") {

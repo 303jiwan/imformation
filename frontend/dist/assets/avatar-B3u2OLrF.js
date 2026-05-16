@@ -1,4 +1,4 @@
-import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-Cptly1tc.js";function a(t,e=.25){if(typeof t!="string"||!t.startsWith("#"))return t;let r=t.length===4?"#"+t.slice(1).split("").map(l=>l+l).join(""):t;const s=parseInt(r.slice(1,3),16),o=parseInt(r.slice(3,5),16),n=parseInt(r.slice(5,7),16),c=Math.max(0,Math.min(1,1-e));return"#"+[s,o,n].map(l=>Math.round(l*c).toString(16).padStart(2,"0")).join("")}const H=[{id:"hair-short",name:"짧은",thumbnail:"✂️",svgFragment:(t="#1f2937")=>{const e=a(t,.3);return`<g class="outfit-hair hair-short">
+import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-Cptly1tc.js";function a(t,e=.25){if(typeof t!="string"||!t.startsWith("#"))return t;let r=t.length===4?"#"+t.slice(1).split("").map(l=>l+l).join(""):t;const s=parseInt(r.slice(1,3),16),o=parseInt(r.slice(3,5),16),n=parseInt(r.slice(5,7),16),c=Math.max(0,Math.min(1,1-e));return"#"+[s,o,n].map(l=>Math.round(l*c).toString(16).padStart(2,"0")).join("")}const R=[{id:"hair-short",name:"짧은",thumbnail:"✂️",svgFragment:(t="#1f2937")=>{const e=a(t,.3);return`<g class="outfit-hair hair-short">
         <path d="M60 78 Q62 30 120 26 Q178 30 180 78 Q170 58 155 54 Q138 62 120 58 Q102 62 86 58 Q72 58 60 78 Z" fill="${t}"/>
         <path d="M82 56 Q102 36 152 40 Q140 56 120 58 Q100 58 82 56 Z" fill="${e}"/>
       </g>`}},{id:"hair-long",name:"긴",thumbnail:"💇",svgFragment:(t="#5b3a1d")=>{const e=a(t,.25);return`<g class="outfit-hair hair-long">
@@ -23,7 +23,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-Cptly1tc.js";function
         <path d="M54 100 Q62 84 72 94 Q82 104 92 90 Q102 76 112 90 Q122 104 132 90 Q142 76 152 90 Q162 104 172 90 Q182 76 186 100" stroke="${e}" stroke-width="4" fill="none" stroke-linecap="round"/>
       </g>`}},{id:"hair-buzz",name:"버즈컷",thumbnail:"🪒",svgFragment:(t="#374151")=>`<g class="outfit-hair hair-buzz">
       <path d="M62 82 Q64 38 120 34 Q176 38 178 82 Q178 62 120 58 Q62 62 62 82 Z" fill="${t}"/>
-    </g>`}],q=[{id:"top-tee",name:"티셔츠",thumbnail:"👕",svgFragment:(t="#2563eb")=>{const e=a(t,.2);return`<g class="outfit-top top-tee">
+    </g>`}],G=[{id:"top-tee",name:"티셔츠",thumbnail:"👕",svgFragment:(t="#2563eb")=>{const e=a(t,.2);return`<g class="outfit-top top-tee">
         <path d="M52 138 C62 122 86 118 120 118 C154 118 178 122 188 138 L188 158 C182 165 174 178 174 182 L174 214 L66 214 L66 182 C62 172 56 162 52 158 Z" fill="${t}" stroke="${e}" stroke-width="2" stroke-linejoin="round"/>
         <path d="M66 142 Q120 158 174 142" fill="none" stroke="${e}" stroke-width="1.5"/>
       </g>`}},{id:"top-hoodie",name:"후드티",thumbnail:"🧥",svgFragment:(t="#a855f7")=>{const e=a(t,.25);return`<g class="outfit-top top-hoodie">
@@ -59,7 +59,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-Cptly1tc.js";function
         <line x1="120" y1="134" x2="120" y2="155" stroke="${e}" stroke-width="2"/>
         <circle cx="120" cy="159" r="2" fill="${e}"/>
         <circle cx="120" cy="168" r="2" fill="${e}"/>
-      </g>`}}],R=[{id:"bot-jeans",name:"청바지",thumbnail:"👖",svgFragment:(t="#1f2937")=>{const e=a(t,.3);return`<g class="outfit-bottom bot-jeans">
+      </g>`}}],z=[{id:"bot-jeans",name:"청바지",thumbnail:"👖",svgFragment:(t="#1f2937")=>{const e=a(t,.3);return`<g class="outfit-bottom bot-jeans">
         <path d="M66 213 L174 213 L176 234 L148 300 L138 300 L120 238 L120 235 L112 238 L102 300 L92 300 L64 234 Z" fill="${t}" stroke="${e}" stroke-width="2" stroke-linejoin="round"/>
         <rect x="66" y="213" width="108" height="7" fill="${e}"/>
         <line x1="120" y1="220" x2="120" y2="237" stroke="${e}" stroke-width="1.5"/>
@@ -89,7 +89,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-Cptly1tc.js";function
         <rect x="66" y="213" width="108" height="6" fill="${e}"/>
         <ellipse cx="105" cy="297" rx="18" ry="4" fill="${e}"/>
         <ellipse cx="135" cy="297" rx="18" ry="4" fill="${e}"/>
-      </g>`}}],G=[{id:"hat-cap",name:"야구모자",thumbnail:"🧢",svgFragment:(t="#1f2937")=>{const e=a(t,.3);return`<g class="outfit-hat hat-cap">
+      </g>`}}],J=[{id:"hat-cap",name:"야구모자",thumbnail:"🧢",svgFragment:(t="#1f2937")=>{const e=a(t,.3);return`<g class="outfit-hat hat-cap">
         <path d="M60 82 Q62 42 120 38 Q178 42 180 82 Z" fill="${t}" stroke="${e}" stroke-width="2"/>
         <ellipse cx="148" cy="88" rx="52" ry="8" fill="${e}"/>
         <text x="120" y="72" text-anchor="middle" font-family="Arial,sans-serif" font-size="26" font-weight="800" fill="#ffffff">C</text>
@@ -114,7 +114,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-Cptly1tc.js";function
         <path d="M80 82 Q82 44 120 40 Q158 44 160 82 Z" fill="${t}" stroke="${e}" stroke-width="2"/>
         <ellipse cx="120" cy="84" rx="70" ry="9" fill="${e}"/>
         <path d="M90 48 Q120 38 150 48" fill="none" stroke="${e}" stroke-width="3" stroke-linecap="round"/>
-      </g>`}}],z=[{id:"glasses-round",name:"동그란",thumbnail:"👓",svgFragment:(t="#000000")=>`<g class="outfit-glasses glasses-round">
+      </g>`}}],D=[{id:"glasses-round",name:"동그란",thumbnail:"👓",svgFragment:(t="#000000")=>`<g class="outfit-glasses glasses-round">
       <circle cx="104" cy="82" r="11" fill="#ffffff" fill-opacity="0.18" stroke="${t}" stroke-width="2.5"/>
       <circle cx="136" cy="82" r="11" fill="#ffffff" fill-opacity="0.18" stroke="${t}" stroke-width="2.5"/>
       <line x1="115" y1="82" x2="125" y2="82" stroke="${t}" stroke-width="2.5"/>
@@ -153,7 +153,7 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-Cptly1tc.js";function
       <line x1="117" y1="82" x2="123" y2="82" stroke="${t}" stroke-width="2.5"/>
       <line x1="91"  y1="80" x2="70"  y2="82" stroke="${t}" stroke-width="2.5" stroke-linecap="round"/>
       <line x1="149" y1="80" x2="170" y2="82" stroke="${t}" stroke-width="2.5" stroke-linecap="round"/>
-    </g>`}],J=[{id:"earring-stud",name:"스터드",thumbnail:"💎",svgFragment:(t="#fcd34d")=>{const e=a(t,.4);return`<g class="outfit-other earring-stud">
+    </g>`}],P=[{id:"earring-stud",name:"스터드",thumbnail:"💎",svgFragment:(t="#fcd34d")=>{const e=a(t,.4);return`<g class="outfit-other earring-stud">
         <circle cx="58"  cy="92" r="4" fill="${t}" stroke="${e}" stroke-width="1.5"/>
         <circle cx="182" cy="92" r="4" fill="${t}" stroke="${e}" stroke-width="1.5"/>
       </g>`}},{id:"earring-hoop",name:"링",thumbnail:"⭕",svgFragment:(t="#fcd34d")=>`<g class="outfit-other earring-hoop">
@@ -178,33 +178,33 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-Cptly1tc.js";function
       </g>`}},{id:"earring-feather",name:"깃털",thumbnail:"🪶",svgFragment:(t="#86efac")=>`<g class="outfit-other earring-feather">
       <path d="M58 88 C54 94 52 100 56 106 C60 102 62 96 58 88 Z" fill="${t}"/>
       <path d="M182 88 C178 94 176 100 180 106 C184 102 186 96 182 88 Z" fill="${t}"/>
-    </g>`}],tt={hair:H,top:q,bottom:R,hat:G,glasses:z,other:J},et=new Map([...H,...q,...R,...G,...z,...J].map(t=>[t.id,t]));function rt(t){return tt[t]||[]}function it(t){return t==null?null:et.get(t)||null}function st(t,e){if(!t)return"";const r=t.svgFragment;return typeof r=="function"?r(e):typeof r=="string"?r:""}const m=[{id:"tone-1",label:"가장 밝은",base:"#fff5d6",shadow:"#fce8a4"},{id:"tone-2",label:"밝은 톤",base:"#fde68a",shadow:"#fbbf24"},{id:"tone-3",label:"중간 톤",base:"#f4c084",shadow:"#d97706"},{id:"tone-4",label:"구릿빛 톤",base:"#c89878",shadow:"#92622f"},{id:"tone-5",label:"어두운 톤",base:"#8b5a3c",shadow:"#5a3a25"},{id:"tone-6",label:"가장 어두운",base:"#5a3a25",shadow:"#3a2415"}];function ot(t){return m.find(e=>e.id===t)||m.find(e=>e.id==="tone-2")||m[0]}const g={body:{skinTone:"tone-2",hair:{style:"hair-short",color:"#1f2937"}},clothing:{top:{style:"top-tee",color:"#2563eb"},bottom:{style:"bot-jeans",color:"#1f2937"}},accessories:{hat:null,glasses:null,other:null}};function j(t){if(!t||typeof t!="object")return JSON.parse(JSON.stringify(g));const e=g,r=t.body&&typeof t.body=="object"?t.body:{},s=m.some(d=>d.id===r.skinTone)?r.skinTone:e.body.skinTone,o=r.hair&&typeof r.hair=="object"?r.hair:{},n=typeof o.style=="string"&&o.style?o.style:e.body.hair.style,c=typeof o.color=="string"&&o.color?o.color:e.body.hair.color,l=t.clothing&&typeof t.clothing=="object"?t.clothing:{},f=l.top&&typeof l.top=="object"?l.top:{},v=typeof f.style=="string"&&f.style?f.style:e.clothing.top.style,L=typeof f.color=="string"&&f.color?f.color:e.clothing.top.color,h=l.bottom&&typeof l.bottom=="object"?l.bottom:{},V=typeof h.style=="string"&&h.style?h.style:e.clothing.bottom.style,X=typeof h.color=="string"&&h.color?h.color:e.clothing.bottom.color,C=t.accessories&&typeof t.accessories=="object"&&!Array.isArray(t.accessories)?t.accessories:{};function Q(d){return!d||typeof d!="object"||typeof d.style!="string"||!d.style?null:{style:d.style,color:typeof d.color=="string"?d.color:"#000000"}}return{body:{skinTone:s,hair:{style:n,color:c}},clothing:{top:{style:v,color:L},bottom:{style:V,color:X}},accessories:{hat:Q(C.hat),glasses:Q(C.glasses),other:Q(C.other)}}}const at=(t,e)=>`
+    </g>`}],rt={hair:R,top:G,bottom:z,hat:J,glasses:D,other:P},it=new Map([...R,...G,...z,...J,...D,...P].map(t=>[t.id,t]));function st(t){return rt[t]||[]}function ot(t){return t==null?null:it.get(t)||null}function at(t,e){if(!t)return"";const r=t.svgFragment;return typeof r=="function"?r(e):typeof r=="string"?r:""}const m=[{id:"tone-1",label:"가장 밝은",base:"#fff5d6",shadow:"#fce8a4"},{id:"tone-2",label:"밝은 톤",base:"#fde68a",shadow:"#fbbf24"},{id:"tone-3",label:"중간 톤",base:"#f4c084",shadow:"#d97706"},{id:"tone-4",label:"구릿빛 톤",base:"#c89878",shadow:"#92622f"},{id:"tone-5",label:"어두운 톤",base:"#8b5a3c",shadow:"#5a3a25"},{id:"tone-6",label:"가장 어두운",base:"#5a3a25",shadow:"#3a2415"}];function nt(t){return m.find(e=>e.id===t)||m.find(e=>e.id==="tone-2")||m[0]}const g={body:{skinTone:"tone-2",hair:{style:"hair-short",color:"#1f2937"}},clothing:{top:{style:"top-tee",color:"#2563eb"},bottom:{style:"bot-jeans",color:"#1f2937"}},accessories:{hat:null,glasses:null,other:null}};function j(t){if(!t||typeof t!="object")return JSON.parse(JSON.stringify(g));const e=g,r=t.body&&typeof t.body=="object"?t.body:{},s=m.some(d=>d.id===r.skinTone)?r.skinTone:e.body.skinTone,o=r.hair&&typeof r.hair=="object"?r.hair:{},n=typeof o.style=="string"&&o.style?o.style:e.body.hair.style,c=typeof o.color=="string"&&o.color?o.color:e.body.hair.color,l=t.clothing&&typeof t.clothing=="object"?t.clothing:{},f=l.top&&typeof l.top=="object"?l.top:{},C=typeof f.style=="string"&&f.style?f.style:e.clothing.top.style,Q=typeof f.color=="string"&&f.color?f.color:e.clothing.top.color,h=l.bottom&&typeof l.bottom=="object"?l.bottom:{},tt=typeof h.style=="string"&&h.style?h.style:e.clothing.bottom.style,et=typeof h.color=="string"&&h.color?h.color:e.clothing.bottom.color,M=t.accessories&&typeof t.accessories=="object"&&!Array.isArray(t.accessories)?t.accessories:{};function F(d){return!d||typeof d!="object"||typeof d.style!="string"||!d.style?null:{style:d.style,color:typeof d.color=="string"?d.color:"#000000"}}return{body:{skinTone:s,hair:{style:n,color:c}},clothing:{top:{style:C,color:Q},bottom:{style:tt,color:et}},accessories:{hat:F(M.hat),glasses:F(M.glasses),other:F(M.other)}}}const lt=(t,e)=>`
   <g class="char-legs">
     <rect x="98"  y="212" width="17" height="88" rx="8"  fill="${t}" stroke="${e}" stroke-width="1.5"/>
     <rect x="125" y="212" width="17" height="88" rx="8"  fill="${t}" stroke="${e}" stroke-width="1.5"/>
     <ellipse cx="106" cy="302" rx="14" ry="6" fill="#1f2937"/>
     <ellipse cx="133" cy="302" rx="14" ry="6" fill="#1f2937"/>
   </g>
-`,nt=(t,e)=>`
+`,ct=(t,e)=>`
   <g class="char-body">
     <rect x="109" y="126" width="22" height="17" rx="5" fill="${t}" stroke="${e}" stroke-width="1.5"/>
     <path d="M72 140 Q72 134 80 132 L160 132 Q168 134 168 140 L170 213 L70 213 Z"
           fill="${t}" stroke="${e}" stroke-width="1.5" stroke-linejoin="round"/>
   </g>
-`,lt=(t,e)=>`
+`,dt=(t,e)=>`
   <g class="char-arms">
     <rect x="51" y="142" width="20" height="74" rx="10" fill="${t}" stroke="${e}" stroke-width="1.5"/>
     <rect x="169" y="142" width="20" height="74" rx="10" fill="${t}" stroke="${e}" stroke-width="1.5"/>
     <circle cx="61"  cy="220" r="10" fill="${t}" stroke="${e}" stroke-width="1.5"/>
     <circle cx="179" cy="220" r="10" fill="${t}" stroke="${e}" stroke-width="1.5"/>
   </g>
-`,ct=(t,e)=>`
+`,ft=(t,e)=>`
   <g class="char-head">
     <ellipse cx="60"  cy="86" rx="7"  ry="10" fill="${t}" stroke="${e}" stroke-width="1.5"/>
     <ellipse cx="180" cy="86" rx="7"  ry="10" fill="${t}" stroke="${e}" stroke-width="1.5"/>
     <circle  cx="120" cy="82" r="60"  fill="${t}" stroke="${e}" stroke-width="2"/>
   </g>
-`,dt=`
+`,ht=`
   <g class="char-face char-face--default">
     <circle cx="104" cy="80" r="4"   fill="#1f2937"/>
     <circle cx="136" cy="80" r="4"   fill="#1f2937"/>
@@ -213,21 +213,21 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-Cptly1tc.js";function
     <path d="M108 98 Q120 108 132 98" stroke="#1f2937" stroke-width="2.5"
           fill="none" stroke-linecap="round"/>
   </g>
-`;function u(t,e){if(!t||!t.style)return"";const r=it(t.style);return r?st(r,t.color):""}function ft(t={}){const e=j(t),r=ot(e.body.skinTone),s=r.base,o=r.shadow,n=u(e.body.hair),c=u(e.clothing.top),l=u(e.clothing.bottom),f=u(e.accessories.hat),v=u(e.accessories.glasses),L=u(e.accessories.other);return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320"
+`;function u(t,e){if(!t||!t.style)return"";const r=ot(t.style);return r?at(r,t.color):""}function ut(t={}){const e=j(t),r=nt(e.body.skinTone),s=r.base,o=r.shadow,n=u(e.body.hair),c=u(e.clothing.top),l=u(e.clothing.bottom),f=u(e.accessories.hat),C=u(e.accessories.glasses),Q=u(e.accessories.other);return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320"
      class="codenergy-character"
      role="img" aria-label="Codenergy 아바타">
-  ${at(s,o)}
-  ${nt(s,o)}
   ${lt(s,o)}
+  ${ct(s,o)}
+  ${dt(s,o)}
   ${l}
   ${c}
-  ${ct(s,o)}
-  ${dt}
-  ${L}
+  ${ft(s,o)}
+  ${ht}
+  ${Q}
   ${n}
-  ${v}
+  ${C}
   ${f}
-</svg>`.trim()}const S="http://localhost:3000",P="codenergy:avatar:config",ht="codenergy:avatar:equipped",ut="codenergy:auth:hint",D="codenergy:demo:user",x={body:{label:"신체",subs:[{id:"skin",label:"피부",hasColor:!1,allowNone:!1},{id:"hair",label:"머리",hasColor:!0,allowNone:!1}]},clothing:{label:"의상",subs:[{id:"top",label:"상의",hasColor:!0,allowNone:!1},{id:"bottom",label:"하의",hasColor:!0,allowNone:!1}]},accessories:{label:"악세사리",subs:[{id:"hat",label:"모자",hasColor:!0,allowNone:!0},{id:"glasses",label:"안경",hasColor:!0,allowNone:!0},{id:"other",label:"기타",hasColor:!0,allowNone:!0}]}},y={hair:["#1f2937","#5b3a1d","#8b5e34","#c9a47a","#e6b34a","#9ca3af","#ef4444","#a855f7","#22c55e"],top:["#ffffff","#1f2937","#a855f7","#3b82f6","#ef4444","#10b981","#fbbf24","#f97316","#22c55e"],bottom:["#1e3a8a","#374151","#3b82f6","#92400e","#ffffff","#000000","#a855f7","#ef4444","#10b981"],hat:["#1f2937","#404040","#cbd5e1","#3b82f6","#a855f7","#ef4444","#fbbf24","#92400e","#10b981"],glasses:["#000000","#374151","#92400e","#ef4444","#3b82f6","#a855f7","#10b981","#fbbf24","#9ca3af"],other:["#fcd34d","#9ca3af","#ef4444","#3b82f6","#a855f7","#10b981","#fbbf24","#f97316","#000000"]};function A(){return JSON.parse(JSON.stringify(g))}function gt(){try{localStorage.removeItem(ht)}catch{}try{const t=localStorage.getItem(P);return t?j(JSON.parse(t)):A()}catch{return A()}}function K(){try{localStorage.setItem(P,JSON.stringify(i))}catch{}}async function yt(){try{const t=await fetch(`${S}/api/avatar`,{method:"GET",credentials:"include"});if(!t.ok)return null;const e=await t.json().catch(()=>null);return e&&e.avatar?j(e.avatar):null}catch{return null}}async function kt(){const t=await fetch(`${S}/api/avatar`,{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({avatar:i})});if(!t.ok){let e="save failed";try{const r=await t.json();r&&r.error&&(e=r.error)}catch{}throw new Error(e)}return t.json().catch(()=>({ok:!0}))}function w(){try{const e=localStorage.getItem(ut);if(e==="logged-in")return!0;if(e==="logged-out")return!1;if(localStorage.getItem(D))return!0}catch{}const t=document.getElementById("my-wrap");return!!(t&&!t.hidden)}const F=document.getElementById("avatar-root");let i=gt(),k="body",p="skin",M=null;function mt(){F.innerHTML="",sessionStorage.setItem("codenergy:redirectAfterLogin","avatar.html");function t(){const r=document.getElementById("auth-modal");if(!r||!r.hidden)return;const s=document.getElementById("login-btn");s&&s.click(),r.hidden&&(r.hidden=!1)}t();const e=document.getElementById("auth-modal");if(e){const r=new MutationObserver(()=>{e.hidden&&(r.disconnect(),w()?B():location.replace("index.html"))});r.observe(e,{attributes:!0,attributeFilter:["hidden"]})}}function pt(){F.innerHTML=`
+</svg>`.trim()}const Z="http://localhost:3000",K="codenergy:avatar:config",gt="codenergy:avatar:equipped",yt="codenergy:auth:hint",U="codenergy:demo:user",w={body:{label:"신체",subs:[{id:"skin",label:"피부",hasColor:!1,allowNone:!1},{id:"hair",label:"머리",hasColor:!0,allowNone:!1}]},clothing:{label:"의상",subs:[{id:"top",label:"상의",hasColor:!0,allowNone:!1},{id:"bottom",label:"하의",hasColor:!0,allowNone:!1}]},accessories:{label:"악세사리",subs:[{id:"hat",label:"모자",hasColor:!0,allowNone:!0},{id:"glasses",label:"안경",hasColor:!0,allowNone:!0},{id:"other",label:"기타",hasColor:!0,allowNone:!0}]}},y={hair:["#1f2937","#5b3a1d","#8b5e34","#c9a47a","#e6b34a","#9ca3af","#ef4444","#a855f7","#22c55e"],top:["#ffffff","#1f2937","#a855f7","#3b82f6","#ef4444","#10b981","#fbbf24","#f97316","#22c55e"],bottom:["#1e3a8a","#374151","#3b82f6","#92400e","#ffffff","#000000","#a855f7","#ef4444","#10b981"],hat:["#1f2937","#404040","#cbd5e1","#3b82f6","#a855f7","#ef4444","#fbbf24","#92400e","#10b981"],glasses:["#000000","#374151","#92400e","#ef4444","#3b82f6","#a855f7","#10b981","#fbbf24","#9ca3af"],other:["#fcd34d","#9ca3af","#ef4444","#3b82f6","#a855f7","#10b981","#fbbf24","#f97316","#000000"]};function O(){return JSON.parse(JSON.stringify(g))}function kt(){try{localStorage.removeItem(gt)}catch{}try{const t=localStorage.getItem(K);return t?j(JSON.parse(t)):O()}catch{return O()}}function Y(){try{localStorage.setItem(K,JSON.stringify(i))}catch{}}async function mt(){try{const t=await fetch(`${Z}/api/avatar`,{method:"GET",credentials:"include"});if(!t.ok)return null;const e=await t.json().catch(()=>null);return e&&e.avatar?j(e.avatar):null}catch{return null}}async function pt(){const t=await fetch(`${Z}/api/avatar`,{method:"POST",credentials:"include",headers:{"Content-Type":"application/json"},body:JSON.stringify({avatar:i})});if(!t.ok){let e="save failed";try{const r=await t.json();r&&r.error&&(e=r.error)}catch{}throw new Error(e)}return t.json().catch(()=>({ok:!0}))}function v(){try{const e=localStorage.getItem(yt);if(e==="logged-in")return!0;if(e==="logged-out")return!1;if(localStorage.getItem(U))return!0}catch{}const t=document.getElementById("my-wrap");return!!(t&&!t.hidden)}const x=document.getElementById("avatar-root");let i=kt(),k="body",p="skin",T=null,L=!1,N=!1;function bt(){x.innerHTML="",sessionStorage.setItem("codenergy:redirectAfterLogin","avatar.html");function t(){const r=document.getElementById("auth-modal");if(!r||!r.hidden)return;const s=document.getElementById("login-btn");s&&s.click(),r.hidden&&(r.hidden=!1)}t();const e=document.getElementById("auth-modal");if(e){const r=new MutationObserver(()=>{e.hidden&&(r.disconnect(),!x.querySelector(".avatar-card")&&(v()?A():location.replace("index.html")))});r.observe(e,{attributes:!0,attributeFilter:["hidden"]})}}function $t(){x.innerHTML=`
     <div class="avatar-page-wrap">
       <div class="avatar-card">
         <div class="avatar-username" id="avatar-username">me</div>
@@ -245,15 +245,15 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-Cptly1tc.js";function
         <div class="avatar-toast" id="avatar-toast" role="status" aria-live="polite"></div>
       </div>
     </div>
-  `,Z(),U(),T(),b(),$(),_t(),F.addEventListener("click",bt)}function bt(t){const e=t.target.closest("[data-action]");if(e){if(e.dataset.action==="back"){Ft();return}if(e.dataset.action==="finish"){Tt();return}}const r=t.target.closest(".avatar-tab[data-primary]");if(r){k=r.dataset.primary,p=x[k].subs[0].id,U(),T(),b(),$();return}const s=t.target.closest(".avatar-tab[data-secondary]");if(s){p=s.dataset.secondary,T(),b(),$();return}const o=t.target.closest(".avatar-item[data-id]");if(o){const c=o.dataset.id;Mt(c);return}const n=t.target.closest(".avatar-color-chip[data-color]");if(n){Qt(p,n.dataset.color),Y();return}}function Z(){const t=document.getElementById("avatar-character");t&&(t.innerHTML=ft(i))}function U(){const t=document.getElementById("avatar-primary");t&&(t.innerHTML=Object.entries(x).map(([e,r])=>`
+  `,I(),W(),_(),b(),$(),St(),N||(x.addEventListener("click",xt),N=!0)}function xt(t){const e=t.target.closest("[data-action]");if(e){if(e.dataset.action==="back"){_t();return}if(e.dataset.action==="finish"){Et();return}}const r=t.target.closest(".avatar-tab[data-primary]");if(r){k=r.dataset.primary,p=w[k].subs[0].id,W(),_(),b(),$();return}const s=t.target.closest(".avatar-tab[data-secondary]");if(s){p=s.dataset.secondary,_(),b(),$();return}const o=t.target.closest(".avatar-item[data-id]");if(o){const c=o.dataset.id;Tt(c);return}const n=t.target.closest(".avatar-color-chip[data-color]");if(n){Ft(p,n.dataset.color),V();return}}function I(){const t=document.getElementById("avatar-character");t&&(t.innerHTML=ut(i))}function W(){const t=document.getElementById("avatar-primary");t&&(t.innerHTML=Object.entries(w).map(([e,r])=>`
     <button type="button"
             class="avatar-tab${e===k?" is-active":""}"
             data-primary="${e}">${r.label}</button>
-  `).join(""))}function T(){const t=document.getElementById("avatar-secondary");if(!t)return;const e=x[k].subs;t.innerHTML=e.map(r=>`
+  `).join(""))}function _(){const t=document.getElementById("avatar-secondary");if(!t)return;const e=w[k].subs;t.innerHTML=e.map(r=>`
     <button type="button"
             class="avatar-tab${r.id===p?" is-active":""}"
             data-secondary="${r.id}">${r.label}</button>
-  `).join("")}function I(){const t=x[k].subs;return t.find(e=>e.id===p)||t[0]}function b(){const t=document.getElementById("avatar-grid");if(!t)return;const e=I(),r=[];if(e.id==="skin")m.forEach(s=>{const o=i.body.skinTone===s.id;r.push(`
+  `).join("")}function B(){const t=w[k].subs;return t.find(e=>e.id===p)||t[0]}function b(){const t=document.getElementById("avatar-grid");if(!t)return;const e=B(),r=[];if(e.id==="skin")m.forEach(s=>{const o=i.body.skinTone===s.id;r.push(`
         <button type="button"
                 class="avatar-item avatar-item--skin${o?" is-equipped":""}"
                 data-id="${s.id}">
@@ -262,24 +262,24 @@ import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-Cptly1tc.js";function
           </span>
           <span>${s.label}</span>
         </button>
-      `)});else{if(e.allowNone){const n=_(e.id)==null;r.push(`
+      `)});else{if(e.allowNone){const n=E(e.id)==null;r.push(`
         <button type="button"
                 class="avatar-item avatar-item--none${n?" is-equipped":""}"
                 data-id="__none__">
           <span class="avatar-item__thumb">✕</span>
           <span>없음</span>
         </button>
-      `)}const s=rt(e.id),o=_(e.id);s.forEach(n=>{const c=o===n.id;r.push(`
+      `)}const s=st(e.id),o=E(e.id);s.forEach(n=>{const c=o===n.id;r.push(`
         <button type="button"
                 class="avatar-item${c?" is-equipped":""}"
                 data-id="${n.id}">
           <span class="avatar-item__thumb">${n.thumbnail||""}</span>
           <span>${n.name||""}</span>
         </button>
-      `)})}t.innerHTML=r.join("")}function $(){const t=document.getElementById("avatar-color-row");if(!t)return;const e=I();if(!e.hasColor){t.innerHTML="";return}if(k==="accessories"&&_(e.id)==null){t.innerHTML="";return}const r=y[e.id]||[],s=$t(e.id);t.innerHTML=r.map(o=>`
+      `)})}t.innerHTML=r.join("")}function $(){const t=document.getElementById("avatar-color-row");if(!t)return;const e=B();if(!e.hasColor){t.innerHTML="";return}if(k==="accessories"&&E(e.id)==null){t.innerHTML="";return}const r=y[e.id]||[],s=wt(e.id);t.innerHTML=r.map(o=>`
     <button type="button"
             class="avatar-color-chip${s&&s.toLowerCase()===o.toLowerCase()?" is-selected":""}"
             style="background-color:${o};"
             data-color="${o}"
             aria-label="${o}"></button>
-  `).join("")}function _(t){return t==="skin"?i.body.skinTone:t==="hair"?i.body.hair?i.body.hair.style:null:t==="top"?i.clothing.top?i.clothing.top.style:null:t==="bottom"?i.clothing.bottom?i.clothing.bottom.style:null:t==="hat"?i.accessories.hat?i.accessories.hat.style:null:t==="glasses"?i.accessories.glasses?i.accessories.glasses.style:null:t==="other"&&i.accessories.other?i.accessories.other.style:null}function $t(t){return t==="hair"?i.body.hair?i.body.hair.color:null:t==="top"?i.clothing.top?i.clothing.top.color:null:t==="bottom"?i.clothing.bottom?i.clothing.bottom.color:null:t==="hat"?i.accessories.hat?i.accessories.hat.color:null:t==="glasses"?i.accessories.glasses?i.accessories.glasses.color:null:t==="other"&&i.accessories.other?i.accessories.other.color:null}function xt(t){i.body.skinTone=t}function wt(t){const e=i.body.hair&&i.body.hair.color||y.hair[0];i.body.hair={style:t||g.body.hair.style,color:e}}function vt(t){const e=i.clothing.top&&i.clothing.top.color||y.top[0];i.clothing.top={style:t||g.clothing.top.style,color:e}}function Lt(t){const e=i.clothing.bottom&&i.clothing.bottom.color||y.bottom[0];i.clothing.bottom={style:t||g.clothing.bottom.style,color:e}}function Ct(t,e){if(e==null)i.accessories[t]=null;else{const r=i.accessories[t],s=r&&r.color||y[t]&&y[t][0]||"#000000";i.accessories[t]={style:e,color:s}}}function Qt(t,e){if(t==="hair"){i.body.hair&&(i.body.hair.color=e);return}if(t==="top"){i.clothing.top&&(i.clothing.top.color=e);return}if(t==="bottom"){i.clothing.bottom&&(i.clothing.bottom.color=e);return}if(t==="hat"){i.accessories.hat&&(i.accessories.hat.color=e);return}if(t==="glasses"){i.accessories.glasses&&(i.accessories.glasses.color=e);return}if(t==="other"){i.accessories.other&&(i.accessories.other.color=e);return}}function Mt(t){const e=I();e.id==="skin"?xt(t):e.id==="hair"?wt(t==="__none__"?null:t):e.id==="top"?vt(t==="__none__"?null:t):e.id==="bottom"?Lt(t==="__none__"?null:t):Ct(e.id,t==="__none__"?null:t),Y()}function Y(){K(),Z(),b(),$()}function Ft(){location.href="index.html"}async function Tt(){try{await kt(),O("저장 완료",!1),setTimeout(()=>{location.href="index.html"},600)}catch{O("저장 실패",!0)}}function O(t,e){const r=document.getElementById("avatar-toast");r&&(r.textContent=t,r.classList.toggle("is-error",!!e),r.classList.add("is-show"),M&&clearTimeout(M),M=setTimeout(()=>r.classList.remove("is-show"),2400))}function _t(){const t=document.getElementById("avatar-username");if(!t)return;const e=document.getElementById("my-name"),r=e?e.textContent.trim():"";if(r&&r!=="사용자 이름"){t.textContent=r;return}try{const s=localStorage.getItem(D);if(s){const o=JSON.parse(s);if(o&&o.username){t.textContent=o.username;return}}}catch{}fetch(`${S}/api/me`,{credentials:"include"}).then(s=>s.ok?s.json():null).then(s=>{if(s&&s.user&&s.user.username){const o=document.getElementById("avatar-username");o&&(o.textContent=s.user.username)}}).catch(()=>{})}function B(){w()?pt():mt()}let W=!1;async function E(){if(W=!0,B(),w()){const t=await yt();t&&(i=t,K(),Z(),b(),$())}}window.addEventListener("codenergy:auth",E);w()?E():setTimeout(()=>{W||E()},2e3);const N=document.getElementById("my-wrap");N&&new MutationObserver(()=>B()).observe(N,{attributes:!0,attributeFilter:["hidden"]});
+  `).join("")}function E(t){return t==="skin"?i.body.skinTone:t==="hair"?i.body.hair?i.body.hair.style:null:t==="top"?i.clothing.top?i.clothing.top.style:null:t==="bottom"?i.clothing.bottom?i.clothing.bottom.style:null:t==="hat"?i.accessories.hat?i.accessories.hat.style:null:t==="glasses"?i.accessories.glasses?i.accessories.glasses.style:null:t==="other"&&i.accessories.other?i.accessories.other.style:null}function wt(t){return t==="hair"?i.body.hair?i.body.hair.color:null:t==="top"?i.clothing.top?i.clothing.top.color:null:t==="bottom"?i.clothing.bottom?i.clothing.bottom.color:null:t==="hat"?i.accessories.hat?i.accessories.hat.color:null:t==="glasses"?i.accessories.glasses?i.accessories.glasses.color:null:t==="other"&&i.accessories.other?i.accessories.other.color:null}function vt(t){i.body.skinTone=t}function Lt(t){const e=i.body.hair&&i.body.hair.color||y.hair[0];i.body.hair={style:t||g.body.hair.style,color:e}}function Ct(t){const e=i.clothing.top&&i.clothing.top.color||y.top[0];i.clothing.top={style:t||g.clothing.top.style,color:e}}function Qt(t){const e=i.clothing.bottom&&i.clothing.bottom.color||y.bottom[0];i.clothing.bottom={style:t||g.clothing.bottom.style,color:e}}function Mt(t,e){if(e==null)i.accessories[t]=null;else{const r=i.accessories[t],s=r&&r.color||y[t]&&y[t][0]||"#000000";i.accessories[t]={style:e,color:s}}}function Ft(t,e){if(t==="hair"){i.body.hair&&(i.body.hair.color=e);return}if(t==="top"){i.clothing.top&&(i.clothing.top.color=e);return}if(t==="bottom"){i.clothing.bottom&&(i.clothing.bottom.color=e);return}if(t==="hat"){i.accessories.hat&&(i.accessories.hat.color=e);return}if(t==="glasses"){i.accessories.glasses&&(i.accessories.glasses.color=e);return}if(t==="other"){i.accessories.other&&(i.accessories.other.color=e);return}}function Tt(t){const e=B();e.id==="skin"?vt(t):e.id==="hair"?Lt(t==="__none__"?null:t):e.id==="top"?Ct(t==="__none__"?null:t):e.id==="bottom"?Qt(t==="__none__"?null:t):Mt(e.id,t==="__none__"?null:t),V()}function V(){L=!0,Y(),I(),b(),$()}function _t(){L&&!window.confirm("저장되지 않은 변경사항이 있어요. 저장하지 않고 나가시겠어요?")||(location.href="index.html")}async function Et(){try{await pt(),L=!1,H("저장 완료",!1),setTimeout(()=>{location.href="index.html"},600)}catch{H("저장 실패",!0)}}function H(t,e){const r=document.getElementById("avatar-toast");r&&(r.textContent=t,r.classList.toggle("is-error",!!e),r.classList.add("is-show"),T&&clearTimeout(T),T=setTimeout(()=>r.classList.remove("is-show"),2400))}function St(){const t=document.getElementById("avatar-username");if(!t)return;const e=document.getElementById("my-name"),r=e?e.textContent.trim():"";if(r&&r!=="사용자 이름"){t.textContent=r;return}try{const s=localStorage.getItem(U);if(s){const o=JSON.parse(s);if(o&&o.username){t.textContent=o.username;return}}}catch{}fetch(`${Z}/api/me`,{credentials:"include"}).then(s=>s.ok?s.json():null).then(s=>{if(s&&s.user&&s.user.username){const o=document.getElementById("avatar-username");o&&(o.textContent=s.user.username)}}).catch(()=>{})}function A(){v()?$t():bt()}let X=!1;async function S(){if(X=!0,A(),v()){const t=await mt();t&&(i=t,L=!1,Y(),I(),b(),$())}}window.addEventListener("codenergy:auth",S);v()?S():setTimeout(()=>{X||S()},2e3);const q=document.getElementById("my-wrap");q&&new MutationObserver(()=>A()).observe(q,{attributes:!0,attributeFilter:["hidden"]});

@@ -145,6 +145,8 @@ let config         = loadLocalConfig();
 let activePrimary  = 'body';
 let activeSecondary = 'skin';
 let toastTimer     = null;
+let isDirty        = false;
+let rootClickBound = false;
 
 // ---------------------------------------------------------------------------
 // Logged-out view
@@ -180,6 +182,9 @@ function renderEmpty() {
     const obs = new MutationObserver(() => {
       if (!modal.hidden) return; // modal still open or just opened
       obs.disconnect();
+      // If a parallel path (codenergy:auth event) already swapped in the editor,
+      // don't re-render — that would re-run all paints unnecessarily.
+      if (root.querySelector('.avatar-card')) return;
       if (isLoggedIn()) {
         render();
       } else {
@@ -222,7 +227,10 @@ function renderEditor() {
   paintColorRow();
   resolveUsername();
 
-  root.addEventListener('click', onRootClick);
+  if (!rootClickBound) {
+    root.addEventListener('click', onRootClick);
+    rootClickBound = true;
+  }
 }
 
 function onRootClick(e) {
@@ -466,6 +474,7 @@ function onItemClick(id) {
 }
 
 function commitChange() {
+  isDirty = true;
   saveLocalConfig();
   paintCharacter();
   paintGrid();
@@ -477,12 +486,17 @@ function commitChange() {
 // ---------------------------------------------------------------------------
 
 function onBack() {
+  if (isDirty) {
+    const ok = window.confirm('저장되지 않은 변경사항이 있어요. 저장하지 않고 나가시겠어요?');
+    if (!ok) return;
+  }
   location.href = 'index.html';
 }
 
 async function onFinish() {
   try {
     await saveRemoteConfig();
+    isDirty = false;
     showToast('저장 완료', false);
     setTimeout(() => { location.href = 'index.html'; }, 600);
   } catch (_) {
@@ -560,6 +574,7 @@ async function resolveAndRender() {
     const remote = await fetchRemoteConfig();
     if (remote) {
       config = remote;
+      isDirty = false;
       saveLocalConfig();
       paintCharacter();
       paintGrid();
