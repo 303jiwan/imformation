@@ -45,8 +45,9 @@ plan을 fenced code block(```markdown)으로 사용자에게 보여줘.
 1. plan을 임시 파일 `.claude/tmp/claude-move-plan.md`에 저장 (디렉토리가 없으면 만들어). 헤더로 "# Implementation Plan (review target)"을 붙이고 plan 본문을 그대로.
 2. codex companion을 백그라운드로 실행:
    ```bash
-   node "C:/Users/seok/.claude/plugins/cache/openai-codex/codex/1.0.4/scripts/codex-companion.mjs" adversarial-review "Review the implementation plan at .claude/tmp/claude-move-plan.md (treat it as a design proposal, not as code). Challenge the chosen approach, surface hidden tradeoffs, missing edge cases, and risky assumptions. The plan has not been implemented yet."
+   node "$USERPROFILE/.claude/plugins/cache/openai-codex/codex/1.0.4/scripts/codex-companion.mjs" adversarial-review "Review the implementation plan at .claude/tmp/claude-move-plan.md (treat it as a design proposal, not as code). Challenge the chosen approach, surface hidden tradeoffs, missing edge cases, and risky assumptions. The plan has not been implemented yet."
    ```
+   (`$USERPROFILE`는 Bash 툴에서도 Windows 환경변수로 자동 노출돼서 어느 머신에서든 현재 사용자 홈으로 풀린다. PowerShell에서 직접 돌릴 거면 `$env:USERPROFILE` 사용.)
    `Bash` 툴의 `run_in_background: true`로 띄워. timeout은 600000ms.
 3. 백그라운드 시작 직후 사용자에게 한 줄로 "Codex adversarial review 백그라운드로 시작했어요. 끝나면 결과 보여드릴게요." 라고 알리고, **그 자리에서 더 진행하지 말고 알림을 기다려.**
 4. 백그라운드 명령 완료 알림이 오면 결과를 Read해서 사용자에게 fenced code block으로 보여줘 (verbatim, 요약 금지).
@@ -95,7 +96,7 @@ Sonnet 에이전트가 끝나면:
 구현이 끝났으면 codex companion review를 백그라운드로 실행:
 
 ```bash
-node "C:/Users/seok/.claude/plugins/cache/openai-codex/codex/1.0.4/scripts/codex-companion.mjs" review ""
+node "$USERPROFILE/.claude/plugins/cache/openai-codex/codex/1.0.4/scripts/codex-companion.mjs" review ""
 ```
 
 `Bash` 툴의 `run_in_background: true`, timeout 600000ms. 시작 직후 한 줄로 "Codex review 백그라운드로 시작했어요. 끝나면 검증 결과 알려드릴게요." 라고 알리고 **알림을 기다려.**
