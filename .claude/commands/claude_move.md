@@ -4,6 +4,12 @@ description: prompt.md를 읽어 자세한 plan을 짜고, codex adversarial rev
 
 다음 절차를 정확히 따라줘. **사용자가 단계마다 승인하기 전까지 절대 `prompt.md`를 수정하거나 코드를 작성하지 마.**
 
+## 모델 할당
+
+- **2~5단계 (plan 작성 / codex 리뷰 결과 분석 / 리뷰 반영)** — 메인 Claude(Opus)가 직접 수행.
+- **7단계 (실제 코드 구현)** — **Sonnet 서브에이전트에 위임**한다. 메인 Opus는 코드를 직접 쓰지 말 것.
+- **8단계 (codex review 검증 결과 해석·보고)** — 다시 메인 Opus.
+
 ## 1. 읽기
 
 프로젝트 루트의 `prompt.md`를 Read 툴로 읽어. 비어있거나 공백만 있으면 "prompt.md가 비어있어요. 내용을 작성한 뒤 다시 `/claude_move`를 호출해주세요."라고 한 줄로 알리고 종료.
@@ -62,9 +68,27 @@ plan을 fenced code block(```markdown)으로 사용자에게 보여줘.
 - Write 툴로 `prompt.md`를 빈 문자열(`""`)로 덮어써 (파일 자체는 남겨둠).
 - 한 줄로 "prompt.md 비웠고 plan대로 구현 시작합니다." 라고 알려.
 
-## 7. 구현
+## 7. 구현 (Sonnet 서브에이전트에 위임)
 
-확정된 plan을 사용자의 실제 요청으로 간주하고 코드를 작성해. 평소처럼 TaskCreate로 단계 트래킹, 필요한 파일 읽고, Edit/Write로 변경, npm run build 등으로 자체 검증.
+확정된 plan을 **Sonnet 서브에이전트**에 통째로 넘겨 코드 작성을 위임해. 메인 Opus는 이 단계에서 직접 Edit/Write로 코드를 수정하지 말 것.
+
+`Agent` 툴을 호출:
+- `subagent_type`: `"general-purpose"`
+- `model`: `"sonnet"`
+- `description`: `"claude_move 구현"` (3~5단어)
+- `prompt`: **self-contained**로 작성. 다음을 모두 포함:
+  1. 확정된 plan 전문 (5단계까지 마무리된 최종본)
+  2. 작업 디렉토리: `c:\Users\USER\imformation` (윈도우 환경, PowerShell)
+  3. 관련 파일 경로/제약/검증 방법을 plan에서 그대로 발췌
+  4. 명시적 지시: "plan을 그대로 구현해라. 필요한 파일은 Read로 읽고 Edit/Write로 변경, 빌드/테스트가 plan에 명시돼 있으면 실행해 검증. 작업이 끝나면 변경한 파일 목록과 수행한 검증 결과를 200자 내로 보고."
+  5. 임의로 scope 확장(리팩터링, 추가 기능)하지 말라는 제약
+- 백그라운드 실행은 하지 말고(`run_in_background` 미설정), 결과를 받아서 처리.
+
+Sonnet 에이전트가 끝나면:
+1. 에이전트 보고를 사용자에게 짧게 요약해 알린다.
+2. **에이전트의 보고는 의도일 뿐**이라, 실제 변경된 파일들을 `git status` / Read / Grep으로 검증해 plan과 일치하는지 확인.
+3. 명백한 누락/오류가 보이면 같은 Sonnet 에이전트에 `SendMessage`(또는 새 Agent 호출)로 수정 지시. 사소한 불일치만 남았으면 메인 Opus가 직접 Edit로 마무리해도 됨(예외 상황).
+4. 검증이 끝나면 8단계로.
 
 ## 8. codex review 검증
 

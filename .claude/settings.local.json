@@ -14,7 +14,9 @@
       "Bash(git add *)",
       "Bash(GIT_EDITOR=true git cherry-pick --continue)",
       "Bash(node --input-type=module -e \"import\\('node:sqlite'\\).then\\(\\({DatabaseSync}\\) => { const db = new DatabaseSync\\('backend/data/app.db'\\); const cols = db.prepare\\('PRAGMA table_info\\(lectures\\)'\\).all\\(\\); console.log\\('lectures:', cols.map\\(c => c.name\\)\\); const sc = db.prepare\\('PRAGMA table_info\\(surveys\\)'\\).all\\(\\); console.log\\('surveys:', sc.map\\(c => c.name + ':' + c.type\\)\\); }\\);\")",
-      "Bash(node -e \"import\\('./src/db.js'\\).then\\(\\(\\) => { console.log\\('db loaded ok'\\); process.exit\\(0\\); }\\).catch\\(e => { console.error\\('FAIL:', e.message\\); process.exit\\(1\\); }\\);\")"
+      "Bash(node -e \"import\\('./src/db.js'\\).then\\(\\(\\) => { console.log\\('db loaded ok'\\); process.exit\\(0\\); }\\).catch\\(e => { console.error\\('FAIL:', e.message\\); process.exit\\(1\\); }\\);\")",
+      "PowerShell(npm install *)",
+      "PowerShell(codex *)"
     ]
   }
 }
