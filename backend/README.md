@@ -61,6 +61,59 @@ session cookie (`sid`) is present.
 | GET  | `/api/test/state` | — | `{progress, answers[]}` for the current user. |
 | POST | `/api/test/email-sample` | `{email}` | Public — captures the test-login "email me my results" field. |
 
+### 채점 (auth required)
+
+자체 gcc 채점기. 인증 쿠키(`sid`)가 없으면 401. Docker가 없고 `GRADER_UNSAFE_NOCONTAINER=0` 이면 503.
+
+| Method | Path | Body | Notes |
+|---|---|---|---|
+| POST | `/api/grade/run` | `{source, stdins[], cpuTimeLimit?, memoryLimit?}` | 컴파일 + 실행만 (expected 비교 없음). `{compile, cases[]}` 반환. |
+| POST | `/api/grade/submit` | `{source, stdins[], expected[], hidden[], cpuTimeLimit?, memoryLimit?}` | 채점 (expected 비교). `{compile, passed, total, firstFail?, cases[]}` 반환. hidden=true 케이스의 `stdout`·`expected` 는 마스킹됨. |
+
+#### 응답 코드
+
+| 상태 | 의미 |
+|---|---|
+| 200 | 채점 완료 (컴파일 오류도 200; `compile.ok===false` 확인) |
+| 400 | 요청 바디 검증 실패 |
+| 401 | 로그인 필요 |
+| 408 | 채점 타임아웃 / 큐 대기 초과 |
+| 429 | 레이트리밋 초과 (`Retry-After: 60` 헤더 포함) |
+| 503 | 채점 서비스 불가 (Docker 미설치 + `GRADER_UNSAFE_NOCONTAINER=0`) |
+
+#### verdict 값
+
+`"ok" | "wrong" | "tle" | "runtime" | "compile" | "system" | "output_limit"`
+
+#### curl 예제
+
+```bash
+# 채점 실행 (로그인 쿠키 필요)
+curl -i -b cookies.txt -X POST http://localhost:3000/api/grade/run \
+  -H "Content-Type: application/json" \
+  -d '{"source":"#include<stdio.h>\nint main(){printf(\"1\");return 0;}","stdins":[""]}'
+
+# 채점 제출
+curl -i -b cookies.txt -X POST http://localhost:3000/api/grade/submit \
+  -H "Content-Type: application/json" \
+  -d '{"source":"#include<stdio.h>\nint main(){int a;scanf(\"%d\",&a);printf(\"%d\",a*2);return 0;}","stdins":["3\n"],"expected":["6"],"hidden":[false]}'
+```
+
+#### Docker 설치 안내
+
+프로덕션에서는 `GRADER_UNSAFE_NOCONTAINER=0` (기본) + Docker Desktop 또는 Docker Engine을 설치해야 합니다.
+
+```bash
+# Docker 설치 후 이미지 미리 받기 (최초 1회, 약 400MB)
+docker pull gcc:9
+```
+
+개발 환경에서 Docker 없이 빠르게 테스트하려면:
+```
+GRADER_UNSAFE_NOCONTAINER=1   # backend/.env 에 추가
+```
+단, 이 설정은 샌드박스가 없어 악의적인 코드가 서버에 직접 실행될 수 있으므로 **공개 배포에 절대 사용하지 마세요**.
+
 ### curl examples
 
 ```bash

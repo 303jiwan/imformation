@@ -5,8 +5,8 @@ import { defineConfig, devices } from '@playwright/test';
  *
  * - Runs only Chromium for fast CI feedback.
  * - Boots `npm run dev` automatically on port 5174.
- * - Forces Judge0 env vars to empty so the problem screen falls back to
- *   mock-mode execution (no external network calls during tests).
+ * - 채점 백엔드(localhost:3000)가 없을 때 /api/grade/* 는 503/네트워크 오류를
+ *   반환하고, judge.js 는 자동으로 mock 경로로 폴백합니다.
  */
 export default defineConfig({
   testDir: './tests/e2e',
@@ -33,10 +33,9 @@ export default defineConfig({
     reuseExistingServer: !process.env.CI,
     timeout: 60_000,
     env: {
-      // Force the problem page into mock-execution mode so tests don't need
-      // to hit RapidAPI's Judge0 endpoint (avoids flake + quota burn).
-      VITE_JUDGE0_KEY: '',
-      VITE_JUDGE0_HOST: '',
+      // 테스트 환경에서는 백엔드가 없으므로 /api/grade/* 호출이 네트워크 오류로
+      // 실패하고, judge.js 내부에서 mock 경로로 자동 폴백됩니다.
+      VITE_API_BASE: 'http://localhost:3000',
     },
   },
 });

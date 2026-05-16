@@ -12,8 +12,8 @@
       .mascot { opacity: 0; }
     </style>
     <script type="module" crossorigin src="/assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
-    <script type="module" crossorigin src="/assets/main-CRMJu4iF.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/main-l86MyUFA.css">
+    <script type="module" crossorigin src="/assets/main-BdEoN6hA.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/main-D1zHMKGQ.css">
   </head>
   <body>
     <div class="page-fade" id="page-fade"></div>
@@ -93,10 +93,13 @@
           <span>Gmail</span>
           <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
         </label>
-        <label class="field-code" id="code-field" hidden>
-          <span>인증코드</span>
-          <input name="code" type="text" placeholder="인증코드 6자리" autocomplete="off" />
-        </label>
+        <div class="field-code" id="code-field" hidden>
+          <label>
+            <span>인증코드</span>
+            <input name="code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="인증코드 6자리" autocomplete="one-time-code" />
+          </label>
+          <button type="button" class="link-button code-resend" id="resend-code-btn">재전송</button>
+        </div>
         <p class="modal-info" id="modal-info" hidden></p>
         <p class="modal-error" id="modal-error" hidden></p>
         <div class="modal-recovery" id="modal-recovery">

@@ -13,11 +13,37 @@
 
 export const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3000";
 
-// 채점 서비스 가용 여부 (503 수신 시 false로 전환)
+// 채점 서비스 가용 여부 (503 수신/네트워크 실패 시 false로 전환)
 let _judgeAvailable = true;
 
 /** 채점 서비스가 현재 사용 가능한지 반환합니다. */
 export function judgeAvailable() { return _judgeAvailable; }
+
+/** fetch + 백엔드 미가용(네트워크 throw/503) 통합 처리. 폴백 토글까지 책임짐. */
+async function gradeFetch(path, body) {
+  let res;
+  try {
+    res = await fetch(`${API_BASE}${path}`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    // 백엔드 자체가 안 떠 있는 경우 fetch가 throw — mock 폴백을 위해 가용성 끔.
+    _judgeAvailable = false;
+    throw new Error("grader unavailable");
+  }
+  if (res.status === 503) {
+    _judgeAvailable = false;
+    throw new Error("grader unavailable");
+  }
+  if (!res.ok) {
+    const errBody = await res.json().catch(() => ({}));
+    throw new Error(errBody.error || `grader ${res.status}`);
+  }
+  return await res.json();
+}
 
 /**
  * C 소스를 여러 stdin으로 한 번에 실행합니다 (expected 비교 없음).
@@ -28,21 +54,7 @@ export function judgeAvailable() { return _judgeAvailable; }
  * @returns {Promise<{ compile: {ok:boolean, output:string}, cases: CaseResult[] }>}
  */
 export async function runCMany(source, stdins, { cpuTimeLimit, memoryLimit } = {}) {
-  const res = await fetch(`${API_BASE}/api/grade/run`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ source, stdins, cpuTimeLimit, memoryLimit }),
-  });
-  if (res.status === 503) {
-    _judgeAvailable = false;
-    throw new Error("grader unavailable");
-  }
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `grader ${res.status}`);
-  }
-  return await res.json();
+  return await gradeFetch("/api/grade/run", { source, stdins, cpuTimeLimit, memoryLimit });
 }
 
 /**
@@ -54,28 +66,14 @@ export async function runCMany(source, stdins, { cpuTimeLimit, memoryLimit } = {
  * @returns {Promise<{ compile, passed, total, firstFail?, cases? }>}
  */
 export async function submitCMany(source, casesPlan, { cpuTimeLimit, memoryLimit } = {}) {
-  const res = await fetch(`${API_BASE}/api/grade/submit`, {
-    method: "POST",
-    credentials: "include",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      source,
-      stdins:   casesPlan.map((c) => c.stdin),
-      expected: casesPlan.map((c) => c.expected),
-      hidden:   casesPlan.map((c) => !!c.hidden),
-      cpuTimeLimit,
-      memoryLimit,
-    }),
+  return await gradeFetch("/api/grade/submit", {
+    source,
+    stdins:   casesPlan.map((c) => c.stdin),
+    expected: casesPlan.map((c) => c.expected),
+    hidden:   casesPlan.map((c) => !!c.hidden),
+    cpuTimeLimit,
+    memoryLimit,
   });
-  if (res.status === 503) {
-    _judgeAvailable = false;
-    throw new Error("grader unavailable");
-  }
-  if (!res.ok) {
-    const body = await res.json().catch(() => ({}));
-    throw new Error(body.error || `grader ${res.status}`);
-  }
-  return await res.json();
 }
 
 /**
