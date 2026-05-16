@@ -833,14 +833,18 @@ function setMode(nextMode) {
   errorEl.classList.remove("modal-error--offline");
   infoEl.hidden = true;
   form.reset();
+  const focusInput = (sel) => {
+    const el = form.querySelector(sel);
+    if (el) el.focus();
+  };
   if (!emailLabel.hidden) {
-    form.querySelector("input[name=email]").focus();
-  } else if (!codeLabel?.hidden) {
-    form.querySelector("input[name=code]").focus();
+    focusInput("input[name=email]");
+  } else if (codeLabel && !codeLabel.hidden) {
+    focusInput("input[name=code]");
   } else if (!usernameLabel.hidden) {
-    form.querySelector("input[name=username]").focus();
+    focusInput("input[name=username]");
   } else {
-    form.querySelector("input[name=email]").focus();
+    focusInput("input[name=email]");
   }
 }
 

@@ -19,7 +19,12 @@
       "PowerShell(codex *)",
       "PowerShell($env:PATH -split ';' | Where-Object { $_ -match 'npm|nodejs' })",
       "Skill(codex:setup)",
-      "Bash(npx playwright *)"
+      "Bash(npx playwright *)",
+      "Read(//c/Users/USER/**)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ],
+  "enableAllProjectMcpServers": true
 }
