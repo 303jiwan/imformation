@@ -1,121 +1,210 @@
-# Implementation Plan (review target)
+# Implementation Plan (review target) — v2 (codex adversarial review 반영)
 
-# Implementation Plan — 아바타 페이지 전면 재설계
+# Implementation Plan — 자체 채점기 도입 (Backend gcc + Docker)
 
-## 목표 (Goal)
-현재 아바타 페이지(`avatar.html` + `src/avatar/*` + `src/avatar.js`) 코드를 모두 제거하고, `image.png` 시안에 맞춰 **사용자명 배지 → 캐릭터 미리보기 → 3단(Body/Clothing/Accessories) 탭 → 색상 팔레트 → 아이템 그리드 → Back/Finish Editing** 구조의 새 아바타 에디터를 구현한다. 로그아웃 상태에서 아바타로 진입하려는 모든 경로(헤더 nav 버튼, `/avatar.html` 직접 접속)에서 로그인 모달이 뜨도록 보장한다.
+## Goal
+외부 Judge0 (RapidAPI) 의존을 제거하고, 백엔드에 자체 채점 라우터를 두어 **제출 1건당 컴파일 1회 + stdin만 갈아끼우며 N회 실행**하는 구조로 전환한다. 케이스 수 상한(현재 10개)을 풀고 외부 API 키·콜 제한을 없앤다. **인증/레이트리밋/동시성 보호를 첫 출시부터 포함한다 (codex 지적 반영).**
 
-## 변경할 파일 (Files)
+## Files to change
 
-### 삭제/완전 재작성
-- `frontend/src/avatar.js` — 컨트롤러 처음부터 새로. 새 schema와 새 UI 트리에 맞춰.
-- `frontend/src/avatar/character.js` — 새 schema(`body / clothing / accessories`)에 맞춰 SVG 합성 로직 새로. 기본 캐릭터는 단순 SVG(머리/몸/팔/다리 + 피부톤/표정 고정).
-- `frontend/src/avatar/outfits.js` — 새 카탈로그. 카테고리당 7~8개 항목(악세사리는 "없음" + 7개). 이미지의 4×2 그리드에 맞춤.
-- `frontend/src/avatar/avatar.css` — 시안에 맞춰 다크 보라 배경 + 둥근 카드 + 탭/팔레트/그리드 스타일 처음부터.
+### Backend (신규/수정)
+- `backend/src/grader.js` (신규) — gcc + Docker 샌드박스 채점 모듈 + Express 라우터 + in-process 큐
+- `backend/src/index.js` — `graderRouter` 마운트
+- `backend/.env.example` — `GRADER_*` 환경변수 추가
+- `backend/README.md` — `/api/grade/*` 엔드포인트 표 + Docker 설치 안내 + 인증/제한 정책 명시
 
-### 부분 수정
-- `frontend/avatar.html` — `<section class="avatar-page" id="avatar-root">` 내부 skeleton(`<div class="avatar-stage"><div class="avatar-character"></div></div><div class="avatar-editor"></div>`)을 비우고 `id="avatar-root"`만 남긴다. `.avatar-toast` div도 제거(컨트롤러가 렌더링하면서 만들도록). 헤더/모달 마크업과 script 임포트는 그대로.
-- `frontend/tests/e2e/avatar.spec.ts` — 새 selector와 새 schema에 맞춰 케이스 4개를 업데이트. 로그아웃→로그인 모달 케이스만 그대로 통과해야 함.
-- `frontend/tests/e2e/avatar-editor.spec.ts` — 마찬가지로 새 selector/schema로 마이그레이션. 백엔드 mock(`GET/POST /api/avatar`) 형식과 토스트 케이스 유지.
+### Frontend
+- `frontend/src/judge.js` — Judge0 호출 코드 전면 교체. `runC` 시그니처 유지(호환), `runCMany`·`submitCMany` 신규. `judgeAvailable`는 getter 함수
+- `frontend/src/test-problem.js` — `runAllCases`는 `runCMany`, `submitTest`는 `submitCMany` 사용. 케이스 루프 제거
+- `frontend/src/lessons.js` — **(추가됨, 리뷰 반영)** `runC` 호출부의 `verdict === "accepted"`를 `=== "ok"`로 변경, `judgeAvailable` 호출 형태 변경, 503/네트워크 폴백 정리
+- `frontend/.env.example` — `VITE_JUDGE0_KEY` / `VITE_JUDGE0_HOST` 제거, `VITE_API_BASE` 추가
+- `frontend/tests/e2e/`의 setup이 env 강제하는 부분 — mock 분기를 "백엔드 503/네트워크 실패 → mock"으로 갱신
 
-### 변경 없음
-- `frontend/src/main.js` — `goAvatar()`가 로그아웃 시 `openLoginModal()`을 호출하는 분기가 이미 있음. 그대로 둠.
-- `backend/src/avatar.js` — config을 opaque JSON blob으로 저장(16KB 제한). 새 schema 그대로 통과.
-- `backend/src/db.js` — schema 변경 없음.
+### Repo
+- `CLAUDE.md` — "Backend persistence" 섹션 옆에 채점기 설명 추가, `judge.js`/`lessons.js` 줄 갱신
 
-## 새 데이터 스키마
+## Steps
 
-`localStorage["codenergy:avatar:config"]` 및 `POST /api/avatar` 바디:
+1. **백엔드 grader 골격 (Docker 없이 직접 실행 모드, 개발용) + 인증/제한 (리뷰 반영)**
+   - `backend/src/grader.js` 작성:
+     - `compileOnce(source, workDir)` — `gcc -O2 -std=c11 -o sol sol.c` (10s 타임아웃), `{ ok, output }`
+     - `runOne(binPath, stdin, { cpuMs, memMb })` — `child_process.spawn` + `setTimeout(kill SIGKILL)`, stdout/stderr 캡처. **출력 크기 상한 (`GRADER_MAX_OUTPUT_BYTES=64KB`)** 초과 시 truncate + `verdict: "output_limit"`
+     - `gradeMany({ source, stdins, expected? })` — 임시 디렉토리 → 컴파일 1회 → stdins 순회 → try/finally 정리. wall-clock 상한 (`GRADER_JOB_TIMEOUT_MS=30000`) 초과 시 전체 작업 중단
+   - **인증·제한 (1단계 필수)**:
+     - `loadSession` 미들웨어 적용 → 비로그인 401. (CLAUDE.md의 세션 쿠키 인증)
+     - 세션ID/IP 키로 **per-user 토큰버킷 레이트리밋**: `GRADER_RATE_PER_MIN=30`. 초과 시 429 + `Retry-After`
+     - **글로벌 동시성 제한** (`GRADER_MAX_CONCURRENT=4`): 동시에 도는 채점 작업 개수 캡. 초과분은 in-process FIFO 큐로 대기 (`GRADER_QUEUE_MAX=20`, 초과 시 503 "busy")
+     - 큐에 들어간 요청은 `GRADER_QUEUE_WAIT_MS=10000` 후에도 못 뽑히면 408
+   - Express `Router()`: `POST /run`, `POST /submit`. body 검증:
+     - 소스 길이 ≤ `GRADER_MAX_SOURCE_BYTES=100KB`
+     - `stdins.length` ≤ `GRADER_MAX_CASES=200`
+     - 각 stdin 길이 ≤ `GRADER_MAX_STDIN_BYTES=16KB`
+   - `GRADER_UNSAFE_NOCONTAINER=1`이어야만 직접 실행 분기 활성. 0(기본)인데 Docker도 안 깔려 있으면 라우터가 503 + 명확 메시지
+   - `backend/src/index.js`에 `app.use("/api/grade", graderRouter)` 마운트
+   - 손-검증: 정상 / 컴파일 에러 / 무한루프(TLE) / segfault / 큰 출력 / 비로그인 401 / 레이트리밋 429 / 큐 포화 503 — curl로 확인
 
-```js
-{
-  body: {
-    skinTone: "tone-2",                       // tone-1..tone-6 (id only)
-    hair:    { style: "hair-short", color: "#1f2937" }
-  },
-  clothing: {
-    top:     { style: "top-tee",   color: "#2563eb" },
-    bottom:  { style: "bot-jeans", color: "#1f2937" }
-  },
-  accessories: {
-    hat:     null | { style: "hat-cap",      color: "#ef4444" },
-    glasses: null | { style: "glasses-round", color: "#000000" },
-    other:   null | { style: "earring-stud",  color: "#fcd34d" }
-  }
-}
-```
+2. **Docker 샌드박스 래퍼 추가**
+   - `runInDocker(cmd, { stdin, cpuMs, memMb })`:
+     ```
+     docker run --rm -i --network=none --memory=128m --memory-swap=128m
+       --cpus=0.5 --pids-limit=64 --read-only
+       --tmpfs /tmp:rw,noexec,nosuid,size=16m
+       -v <hostWork>:/work:ro
+       --user 65534:65534
+       <GRADER_DOCKER_IMAGE> /work/sol
+     ```
+   - **성능**: 같은 컨테이너 안에서 컴파일 + 실행 N회를 sh 스크립트로 묶어 한 번에 실행 (acceptance 100케이스 5초 충족 목적)
+   - 호스트 보조 가드: `Promise.race(docker, sleep(cpuMs+1500))` 후 `docker kill`
+   - 컴파일·실행 분리 시 컴파일 컨테이너는 `/work` rw + root, 실행 컨테이너는 ro + nobody — Windows host에서 bind mount 권한 이슈 발생 시 named volume으로 대안
+   - `GRADER_UNSAFE_NOCONTAINER` 분기와 동일 인터페이스로 묶기 (`runSandboxed(...)` 한 함수가 분기)
+   - 악성 코드 4종 (`while(1)`, NULL deref, `/etc/passwd` read, fork bomb) 모두 호스트 영향 없이 의도 verdict로 응답하는지 수동 테스트
 
-- 기존 `codenergy:avatar:equipped` 및 기존 평면 schema는 마이그레이션 없이 그냥 무시(첫 로드 시 default로 덮어씀). 레거시 키는 한 번 `localStorage.removeItem()`.
-- sessionStorage 키는 추가/변경 없음.
+3. **프론트엔드 `judge.js` 재작성 (리뷰 반영: run/submit 분리)**
+   - 기존 RapidAPI 호출 / base64 / 키 검사 / STATUS 매핑 전부 삭제
+   - 신규 API:
+     ```js
+     export const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:3000";
+     let _judgeAvailable = true;
+     export function judgeAvailable() { return _judgeAvailable; }
 
-## UI 구조 (image.png 기반)
+     // /api/grade/run — expected 안 보냄, raw stdout/verdict만 받음 (코드 실행 / lessons.js)
+     export async function runCMany(source, stdins, { cpuTimeLimit, memoryLimit } = {}) {
+       const res = await fetch(`${API_BASE}/api/grade/run`, {
+         method: "POST", credentials: "include",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({ source, stdins, cpuTimeLimit, memoryLimit }),
+       });
+       if (res.status === 503) { _judgeAvailable = false; throw new Error("grader unavailable"); }
+       if (!res.ok) throw new Error(`grader ${res.status}`);
+       return await res.json();
+     }
 
-```
-┌─ avatar-page (다크 보라) ────────────────┐
-│  ┌─ avatar-card (둥근 카드) ─────────┐  │
-│  │  [사용자명 배지]                   │  │
-│  │  ┌─ stage (벽돌 패턴 배경) ────┐ │  │
-│  │  │      <SVG 캐릭터>            │ │  │
-│  │  └────────────────────────────┘ │  │
-│  │  ── tabs-primary: 신체│의상│악세 ─│  │
-│  │  ── tabs-secondary: (가변) ────  │  │
-│  │  ●●●●●●●●●  color row (옵션)    │  │
-│  │  ┌─ 4×2 item grid ─┐            │  │
-│  │  │ X  []  []  []   │            │  │
-│  │  │ [] []  []  []   │            │  │
-│  │  └─────────────────┘            │  │
-│  │  [ Back ]   [ Finish Editing ]   │  │
-│  └──────────────────────────────────┘  │
-└─────────────────────────────────────────┘
-```
+     // /api/grade/submit — expected[] 보냄. 백엔드가 case별 pass + firstFail만 돌려줌
+     // hidden 케이스는 expected를 보내되 백엔드 응답에서 expected/stdout을 마스킹해 받는다
+     export async function submitCMany(source, casesPlan, { cpuTimeLimit, memoryLimit } = {}) {
+       // casesPlan: [{ stdin, expected, hidden? }]
+       const res = await fetch(`${API_BASE}/api/grade/submit`, {
+         method: "POST", credentials: "include",
+         headers: { "Content-Type": "application/json" },
+         body: JSON.stringify({
+           source,
+           stdins: casesPlan.map(c => c.stdin),
+           expected: casesPlan.map(c => c.expected),
+           hidden: casesPlan.map(c => !!c.hidden),
+           cpuTimeLimit, memoryLimit,
+         }),
+       });
+       if (res.status === 503) { _judgeAvailable = false; throw new Error("grader unavailable"); }
+       if (!res.ok) throw new Error(`grader ${res.status}`);
+       return await res.json();
+     }
 
-- 라벨은 모두 한국어(CLAUDE.md `Korean copy throughout` 규칙):
-  - primary: `신체` / `의상` / `악세사리`
-  - secondary:
-    - 신체: `피부` / `머리`
-    - 의상: `상의` / `하의`
-    - 악세사리: `모자` / `안경` / `기타`
-- 색상 팔레트는 `hasColor: true`인 sub-카테고리(`머리`, `상의`, `하의`, `모자`, `안경`, `기타`)에서만 표시. `피부`는 표시 안 함(피부 그리드 자체가 색 선택 역할).
-- 악세사리 sub-카테고리는 `allowNone: true` — 그리드 첫 칸이 `X(없음)`.
-- `Back` 버튼은 변경사항을 저장하지 않고 `index.html`로 이동(`location.href = 'index.html'`).
-- `Finish Editing` 버튼은 `POST /api/avatar` 호출 후 성공 토스트 → `index.html`로 이동. 실패 시 빨간 토스트만 띄우고 페이지 유지.
+     // 호환: 기존 runC 호출자(lessons.js)를 위한 1건 래퍼.
+     // verdict는 백엔드 표준("ok"/"wrong"/...) 그대로. lessons.js는 step 5에서 "ok"로 마이그레이션.
+     export async function runC(source, stdin) {
+       const out = await runCMany(source, [stdin]);
+       const c = out.cases?.[0] || {};
+       return {
+         verdict: out.compile?.ok === false ? "compile" : (c.verdict || "system"),
+         stdout: c.stdout || "",
+         stderr: c.stderr || "",
+         compileOutput: out.compile?.output || "",
+         statusDescription: c.statusDescription || "",
+         timeMs: c.timeMs ?? null,
+         memoryKb: c.memoryKb ?? null,
+       };
+     }
 
-## 단계 (Steps)
+     export function normalizeOutput(s) { /* 유지 */ }
+     export function gradingSample(problem, count = 100) { /* 유지 */ }
+     ```
+   - verdict 표준: `"ok" | "wrong" | "tle" | "runtime" | "compile" | "system" | "output_limit"`
 
-1. **준비**: e2e 두 스펙(`avatar.spec.ts`, `avatar-editor.spec.ts`) 현재 케이스 목록을 메모. 신규 selector 목록 확정.
-2. **HTML 슬림화**: `avatar.html`의 `#avatar-root` 내부 자식을 비우고 `.avatar-toast`도 제거.
-3. **CSS 재작성**: `avatar.css` 전체를 새로. BEM(`avatar-card`, `avatar-stage`, `avatar-tabs--primary`, `avatar-tabs--secondary`, `avatar-color-row`, `avatar-grid`, `avatar-item`, `avatar-actions`, `avatar-toast`). 카드 폭 `min(420px, 92vw)`.
-4. **character.js 재작성**: 단일 export `renderCharacter(config)`. SVG viewBox `0 0 240 320`. 레이어 z-order: 다리 → 몸통 → 팔 → 하의 → 상의 → 머리 베이스(피부) → 표정(고정) → 귀걸이(other) → 머리카락 → 안경 → 모자. `SKIN_TONES` 6종, `normalizeConfig(raw)` 헬퍼 export.
-5. **outfits.js 재작성**: `CATALOG = { hair, top, bottom, hat, glasses, other }`. 항목: `{ id, name, thumbnail, svgFragment(color) }`. 카테고리당 7개. thumbnail은 단순 SVG 또는 이모지.
-6. **avatar.js 재작성**:
-   - 새 schema로 `loadLocalConfig()` / `saveLocalConfig()` / `fetchRemoteConfig()` / `saveRemoteConfig()`. 레거시 `codenergy:avatar:equipped` 키만 `removeItem()`.
-   - state: `config`, `activePrimary` (default `body`), `activeSecondary` (default `skin`).
-   - 로그아웃 분기(`renderEmpty`): 즉시 헤더 로그인 모달을 자동으로 띄우고 페이지 본문은 비워둠. 모달이 닫힐 때(취소/배경) `location.replace('index.html')`.
-   - 로그인 분기(`renderEditor`): 위 UI 구조 그대로 렌더링. 변경 시 `paintCharacter()` + `paintTabs()` + `paintGrid()` + `paintColorRow()`.
-   - `Finish Editing` 핸들러: `await saveRemoteConfig()` 성공 시 토스트 후 `location.href = 'index.html'`. 실패 시 에러 토스트만.
-7. **사용자명 배지**: 헤더의 `#my-name` / `localStorage["codenergy:demo:user"].username` / `/api/me` 응답에서 username 추출. fallback `'me'`.
-8. **빌드/dev 확인**: `npm run build` 통과 확인. `npm run dev`로 띄워 수동 확인.
-9. **e2e 마이그레이션**: 두 스펙을 새 selector/schema에 맞춰 수정.
-10. **e2e 실행**: `npm run test:e2e` 통과 확인.
+4. **`test-problem.js` 호출부 교체 (리뷰 반영: submit은 submitCMany 사용)**
+   - `runAllCases()`: for 루프 제거. `await runCMany(code, cases.map(c => c.input + "\n"))` 한 방. 응답의 `compile.ok===false` 분기로 모든 케이스 마킹, 아니면 `cases[i]`에 결과 주입
+   - `submitTest()`:
+     - easy 경로 `gradingSample(problem, 10)` → `gradingSample(problem, 100)` (PoC 후 조정)
+     - 시퀀셜 for-루프 + per-case `runC` 제거 → **`submitCMany(code, casesPlan)`** 한 번 호출
+     - `casesPlan` = `[{ stdin, expected, hidden }]`. 백엔드 응답의 `passed/total/firstFail` 그대로 표시
+     - mock 분기는 catch에서 처리 (judgeAvailable() === false 또는 fetch throw)
+     - hidden 케이스의 expected는 백엔드로는 보내지만 sessionStorage에는 기존처럼 `null`로 저장 (현재 코드 유지)
+   - `judgeAvailable`은 boolean이 아니라 함수 호출 (`if (!judgeAvailable())`)
 
-## 리스크 / 가정
+5. **`lessons.js` 마이그레이션 (리뷰 반영: 누락 caller 포함)**
+   - `import { runC, normalizeOutput, judgeAvailable } from "./judge.js"` 유지
+   - `if (!judgeAvailable)` → `if (!judgeAvailable())`
+   - `result.verdict === "accepted"` → `result.verdict === "ok"` (2곳: line 321, line 325)
+   - `runC` 호출은 그대로 (호환 래퍼 사용)
+   - 503/네트워크 에러 catch → 기존 mock/안내 경로로
+   - 손-검증: 강의 페이지에서 코드 실행 정상 동작 확인
 
-- **기존 e2e 스펙이 모두 깨진다** — 같은 PR 안에서 마이그레이션해야 함.
-- **레거시 사용자의 저장된 config** — `normalizeConfig()`가 default로 덮어씀. [?] 마이그레이션 필요 시 별도 작업.
-- **i18n 키** — 한국어 하드코딩으로만. [?] 추후 i18n 키 필요 시 별도.
-- **시안의 `Body/Clothing/Accessories` vs 한국어 라벨** — CLAUDE.md 규칙 우선해서 한국어 표기.
-- **face와 background** — prompt 명시 없음. 표정 고정 1종, 배경 단일 벽돌 패턴.
-- **사용자명 노출** — /api/me 응답이 늦으면 첫 페인트 때 `'me'` 표시 후 fetch 완료 시 갱신.
+6. **샘플링 정책 정리**
+   - `medium`/`killer`는 `getGradingCases(problem)` 그대로 사용
+   - `easy`만 `gradingSample(problem, 100)`
+   - 백엔드 `GRADER_MAX_CASES` 초과 시 프론트가 잘라서 보내고 `console.warn`
 
-## 검증 방법
+7. **환경 변수 / 문서**
+   - `backend/.env.example`:
+     ```
+     # 자체 채점기
+     GRADER_DOCKER_IMAGE=gcc:9
+     GRADER_COMPILE_TIMEOUT_MS=10000
+     GRADER_RUN_TIMEOUT_MS=2000
+     GRADER_MEMORY_MB=128
+     GRADER_MAX_CASES=200
+     GRADER_MAX_SOURCE_BYTES=102400
+     GRADER_MAX_STDIN_BYTES=16384
+     GRADER_MAX_OUTPUT_BYTES=65536
+     GRADER_JOB_TIMEOUT_MS=30000
+     GRADER_MAX_CONCURRENT=4
+     GRADER_QUEUE_MAX=20
+     GRADER_QUEUE_WAIT_MS=10000
+     GRADER_RATE_PER_MIN=30
+     GRADER_UNSAFE_NOCONTAINER=0
+     ```
+   - `frontend/.env.example`: `VITE_JUDGE0_*` 삭제, `VITE_API_BASE=http://localhost:3000` 추가
+   - `backend/README.md`: `/api/grade/run` / `/api/grade/submit` curl + 401/429/503 응답 정책 + Docker 설치 안내
+   - `CLAUDE.md`: `judge.js`/`grader.js`/`lessons.js` 줄 갱신
 
-1. **빌드**: `npm run build` 통과.
-2. **수동(dev)**: `npm run dev` 후
-   - 로그아웃 + 헤더 "아바타" 클릭 → 로그인 모달
-   - 로그아웃 + `/avatar.html` 직접 접속 → 로그인 모달
-   - 데모 로그인 + 아바타 페이지 → 사용자명 배지, 캐릭터, 3단 탭, 그리드, 색상 표시
-   - 신체→머리/피부, 의상→상의/하의, 악세사리→모자/안경/기타 (X 포함) 모두 즉시 반영
-   - `Finish Editing` 클릭 → 토스트 + index.html 이동
-   - 다시 아바타 페이지 들어가도 마지막 설정 유지
-3. **e2e**: `npm run test:e2e` 통과(두 스펙 마이그레이션 포함).
-4. **회귀**: index/pricing/test-* 콘솔 에러 없음.
+8. **E2E**
+   - `frontend/playwright.config.ts`: 빈 `VITE_JUDGE0_*` 강제 → 신규 mock 결정 로직(백엔드 미가용 → mock)에 맞게 갱신
+   - 백엔드 미기동 → 503 → mock 분기 → 기존 테스트 통과
+
+## Data / API / Storage
+
+- 신규 엔드포인트 (모두 **로그인 필요**, 429/503 가능):
+  - `POST /api/grade/run` body `{ source, stdins[], cpuTimeLimit?, memoryLimit? }`
+    → `{ compile:{ok,output}, cases:[{stdout, stderr, verdict, timeMs, memoryKb, statusDescription?}] }`
+  - `POST /api/grade/submit` body `{ source, stdins[], expected[], hidden[], cpuTimeLimit?, memoryLimit? }`
+    → `{ compile, passed, total, firstFail?: {index, label, verdict, expected?, actual?}, cases?: [{verdict, pass, timeMs, memoryKb}] }`
+    - hidden=true 케이스는 응답 cases[i]에서 `stdout`·`expected` 마스킹(누락), pass만 노출. firstFail이 hidden인 경우 expected/actual도 마스킹
+- verdict 집합: `"ok" | "wrong" | "tle" | "runtime" | "compile" | "system" | "output_limit"`
+- SessionStorage 키 변경 없음
+- DB 스키마 변경 없음
+- 인증: `loadSession` 미들웨어로 비로그인 401 (CLAUDE.md의 쿠키 세션)
+
+## Risks / Assumptions
+
+- **Windows + Docker bind mount 권한** — `--user 65534`로 떨어뜨릴 때 Windows host bind mount는 권한 매핑이 달라 실행 실패 가능. 대응: 컴파일 root + 실행 nobody 분리 또는 named volume [?]
+- **Docker 데몬 호출 비용** — 호출당 100~300ms. step 2의 sh 묶음 전략으로 컨테이너 1회만 띄움
+- **gcc:9 이미지 ~1GB** — README에 사전 pull 안내
+- **인증 + 레이트리밋의 부작용** — Playwright e2e는 비로그인 → 401 → mock 폴백으로 흘러야 함. test fixture에서 백엔드 미기동을 가정하니 영향 없음
+- **세션 기반 레이트리밋의 우회** — 로그인 자체가 무료 자동가입이라 진짜 abuse 방어는 약함. 다만 "1회 가입 = 분당 30콜" 정도면 자동화된 마이닝 페이로드는 비효율로 차단 가능. 후속에 captcha/이메일 인증 의무화로 강화
+- **[?] easy grading count 기본값** — 10 → 100. PoC 후 조정
+- **[?] judgeAvailable 함수화로 인한 호환** — `if (!judgeAvailable)` 형태를 쓰는 호출자가 lessons.js 외에 더 있으면 모두 함수 호출로 변경 필요. 마이그레이션 시 grep으로 전수 확인
+- **호환 래퍼 runC 의 동작** — `verdict === "accepted"`를 쓰는 잔존 호출자가 있을 가능성 → migration 전 grep으로 0건 확인 (현재 lessons.js 외엔 없음을 codex 리뷰가 확인)
+
+## Verification
+
+- 백엔드 단위 손-검증 (curl):
+  - 정상 / 컴파일 에러 / TLE / segfault / 큰 출력 / 비로그인 / 레이트리밋 초과 / 큐 포화
+  - 100케이스 부하 → 5초 내 응답 (Docker 모드, 한 컨테이너 안에서 sh 묶음)
+- 보안 회귀 4종 (악성 코드) — 호스트 영향 zero (CPU·메모리·디스크·네트워크)
+- 동시성 — 5개 동시 요청 → 4개는 처리, 1개 큐 대기 → 큐가 비면 처리 (`GRADER_MAX_CONCURRENT=4`)
+- 레이트리밋 — 한 세션이 분당 31번째 요청에 429 (`Retry-After` 헤더)
+- 프론트 통합:
+  - `npm run dev` → 로그인 후 `test-problem.html` "코드 실행"·"제출 및 채점" 동작
+  - 강의 페이지(lessons) 코드 실행 동작 (verdict 마이그레이션 검증)
+  - 백엔드 끈 채로 새로고침 → 자동 mock 폴백
+- E2E: `npm run test:e2e` 통과
+- 빌드: `npm run build` 에러 없음 (frontend Vite 번들에 RapidAPI 흔적 0)

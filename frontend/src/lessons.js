@@ -296,7 +296,7 @@ async function runCode() {
   renderCaseTabs();
   renderResultBody();
 
-  if (!judgeAvailable) {
+  if (!judgeAvailable()) {
     // mock
     const ok = code.trim().length >= 20 && /main\s*\(/.test(code) && /printf\s*\(/.test(code);
     c.actual = ok ? normalizeOutput(c.expected) : "";
@@ -314,15 +314,28 @@ async function runCode() {
   try {
     result = await runC(code, c.input ? c.input + "\n" : "");
   } catch (err) {
+    // 503/네트워크 실패 시 mock 경로로 폴백
+    if (!judgeAvailable()) {
+      setRunLoading(false);
+      const ok = code.trim().length >= 20 && /main\s*\(/.test(code) && /printf\s*\(/.test(code);
+      c.actual = ok ? normalizeOutput(c.expected) : "";
+      c.ran = true;
+      c.pass = ok && normalizeOutput(c.actual) === normalizeOutput(c.expected);
+      $("lp-detail-time").textContent = `${Math.round(40 + Math.random() * 80)}ms`;
+      $("lp-detail-mem").textContent = `${8 + Math.floor(Math.random() * 6)}MB`;
+      renderCaseTabs();
+      renderResultBody();
+      return;
+    }
     result = { verdict: "system", stdout: "", stderr: "", compileOutput: "", statusDescription: err?.message || String(err), timeMs: null, memoryKb: null };
   }
   const actual = normalizeOutput(result.stdout);
   const expected = normalizeOutput(c.expected);
-  const ok = result.verdict === "accepted" && actual === expected;
+  const ok = result.verdict === "ok" && actual === expected;
   c.ran = true;
   c.pass = ok;
   c.actual =
-    result.verdict === "accepted" ? actual :
+    result.verdict === "ok" ? actual :
     result.verdict === "compile" ? (result.compileOutput || "(컴파일 오류)").trim() :
     result.verdict === "tle" ? "(시간 초과)" :
     result.verdict === "runtime" ? `(런타임 오류)\n${result.stderr || result.statusDescription}` :

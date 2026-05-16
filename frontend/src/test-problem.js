@@ -10,7 +10,7 @@ import {
   problemDifficulty,
   QUEUE_KEY,
 } from "./test-problems.js";
-import { runC, normalizeOutput, gradingSample, judgeAvailable } from "./judge.js";
+import { runCMany, submitCMany, normalizeOutput, gradingSample, judgeAvailable } from "./judge.js";
 
 /* =====================================================================
    Test problem screen — Codetree-style focused workspace.
@@ -584,7 +584,7 @@ async function runAllCases() {
   renderCaseTabs();
   renderCaseBody();
 
-  if (!judgeAvailable) {
+  if (!judgeAvailable()) {
     runMockAllCases(code);
     return;
   }
@@ -593,53 +593,59 @@ async function runAllCases() {
   let totalTimeMs = 0;
   let maxMemKb = 0;
 
-  for (let i = 0; i < cases.length; i++) {
-    const c = cases[i];
-    let result;
-    try {
-      result = await runC(code, c.input + "\n");
-    } catch (err) {
-      result = {
-        verdict: "system",
-        stdout: "", stderr: "", compileOutput: "",
-        statusDescription: err?.message || String(err),
-        timeMs: null, memoryKb: null,
-      };
-    }
+  try {
+    const out = await runCMany(code, cases.map((c) => c.input + "\n"));
 
-    if (result.verdict === "compile") {
-      // One compile error means every case fails with the same message; skip
-      // the remaining API calls to save quota.
-      const msg = (result.compileOutput || "(컴파일 오류)").trim();
-      for (let j = i; j < cases.length; j++) {
-        cases[j].ran = true;
-        cases[j].pass = false;
-        cases[j].actual = msg;
-        cases[j].verdict = "compile";
+    if (out.compile?.ok === false) {
+      // 컴파일 오류 — 모든 케이스에 동일 메시지
+      const msg = (out.compile.output || "(컴파일 오류)").trim();
+      for (const c of cases) {
+        c.ran = true;
+        c.pass = false;
+        c.actual = msg;
+        c.verdict = "compile";
       }
-      break;
+    } else {
+      const caseResults = out.cases || [];
+      for (let i = 0; i < cases.length; i++) {
+        const c = cases[i];
+        const r = caseResults[i] || { verdict: "system", stdout: "", stderr: "", statusDescription: "결과 없음", timeMs: null, memoryKb: null };
+
+        const actual = normalizeOutput(r.stdout);
+        const expected = normalizeOutput(c.expected);
+        const ok = r.verdict === "ok" && actual === expected;
+
+        c.ran = true;
+        c.pass = ok;
+        c.verdict = r.verdict;
+        c.actual =
+          r.verdict === "ok"           ? actual :
+          r.verdict === "tle"          ? "(시간 초과)" :
+          r.verdict === "runtime"      ? `(런타임 오류)\n${r.stderr || r.statusDescription}` :
+          r.verdict === "output_limit" ? `(출력 초과)\n${r.stdout.slice(0, 200)}` :
+          r.verdict === "system"       ? `(시스템 오류)\n${r.statusDescription}` :
+          actual || `(${r.statusDescription})`;
+
+        if (r.timeMs)   totalTimeMs += r.timeMs;
+        if (r.memoryKb) maxMemKb = Math.max(maxMemKb, r.memoryKb);
+
+        renderCaseTabs();
+      }
     }
-
-    const actual = normalizeOutput(result.stdout);
-    const expected = normalizeOutput(c.expected);
-    const ok = result.verdict === "accepted" && actual === expected;
-
-    c.ran = true;
-    c.pass = ok;
-    c.verdict = result.verdict;
-    c.actual =
-      result.verdict === "accepted" ? actual :
-      result.verdict === "tle"     ? "(시간 초과)" :
-      result.verdict === "runtime" ? `(런타임 오류)\n${result.stderr || result.statusDescription}` :
-      result.verdict === "network" ? `(네트워크 오류)\n${result.statusDescription}` :
-      result.verdict === "system"  ? `(시스템 오류)\n${result.statusDescription}` :
-      actual || `(${result.statusDescription})`;
-
-    if (result.timeMs)   totalTimeMs += result.timeMs;
-    if (result.memoryKb) maxMemKb = Math.max(maxMemKb, result.memoryKb);
-
-    // Update the cases row so the dot color reflects the latest result.
-    renderCaseTabs();
+  } catch (err) {
+    // 503/네트워크 실패 → mock 폴백
+    if (!judgeAvailable()) {
+      setRunLoading(false);
+      runMockAllCases(code);
+      return;
+    }
+    const msg = `(시스템 오류)\n${err?.message || String(err)}`;
+    for (const c of cases) {
+      c.ran = true;
+      c.pass = false;
+      c.actual = msg;
+      c.verdict = "system";
+    }
   }
 
   detailTime.textContent = totalTimeMs ? `${totalTimeMs}ms (총 ${cases.length}개)` : "—";
@@ -686,23 +692,22 @@ async function submitTest(reason = "manual") {
   overlayTitle.textContent = reason === "timeout" ? "시간 초과 — 자동 제출" : "채점 중…";
 
   // Build the grading plan up-front so the submit loop is difficulty-agnostic:
-  //   easy   → sample 10 A values across [aMin, aMax] (or sweep all in mock mode)
+  //   easy   → sample 100 A values across [aMin, aMax] (or sweep all if span < 100)
   //   medium → visible cases + hidden boundary/random cases (getGradingCases)
   //   killer → visible cases + problem.hiddenTestCases when provided
   let plan;
   if (DIFFICULTY === "easy") {
-    const As = judgeAvailable
-      ? gradingSample(problem, 10)
-      : (() => {
-          const arr = [];
-          for (let A = problem.aMin; A <= problem.aMax; A++) arr.push(A);
-          return arr;
-        })();
+    let As = gradingSample(problem, 100);
+    if (As.length > 200) {
+      console.warn(`[grader] easy 케이스 ${As.length}개 → 200개로 잘라냄`);
+      As = As.slice(0, 200);
+    }
     plan = As.map((A) => ({
       input: String(A),
       expected: problem.expected(A),
       label: `A = ${A}`,
       A,
+      hidden: false,
     }));
   } else {
     plan = getGradingCases(problem).map((c) => ({
@@ -720,62 +725,48 @@ async function submitTest(reason = "manual") {
   let verdict;
   if (reason === "timeout") {
     verdict = "timeout";
-  } else if (!judgeAvailable) {
-    // No-key mode: we cannot actually compile/run user code, so we have no
-    // way to confirm correctness. Persist `ungraded` rather than awarding
-    // `correct` based on a printf/main heuristic — that would let any
-    // syntactically-plausible program look right in builds shipped without
-    // VITE_JUDGE0_KEY. Easy still uses gradingSample for the visual sweep,
-    // medium/killer use the (now-expanded) plan, but neither path persists
-    // a credit-bearing verdict.
-    let idx = 0;
-    const stepEvery = Math.max(40, Math.min(200, Math.floor(1200 / plan.length)));
-    await new Promise((resolve) => {
-      const animator = setInterval(() => {
-        if (idx >= plan.length) { clearInterval(animator); resolve(); return; }
-        const tc = plan[idx];
-        const hint = tc.hidden ? "기대 출력 (숨김)" : `기대 출력 ${tc.expected}`;
-        overlaySub.textContent = `${tc.label} → ${hint}`;
-        idx++;
-      }, stepEvery);
-    });
-    verdict = "ungraded";
-    overlaySub.textContent = "Judge0 키가 없어 자동 채점이 불가능해요 — 결과는 미채점으로 기록됩니다.";
   } else {
-    // Real Judge0 grading — sequential, short-circuit on first failure
-    let allPass = true;
-    let stoppedReason = null;
-    for (let i = 0; i < plan.length; i++) {
-      const tc = plan[i];
-      overlaySub.textContent = `${tc.label} 검증 중… (${i + 1}/${plan.length})`;
-      let result;
-      try {
-        result = await runC(code, tc.input + "\n");
-      } catch (err) {
-        allPass = false;
-        stoppedReason = `네트워크 오류: ${err?.message || err}`;
-        break;
+    // 백엔드 채점 시도 → 실패 시 ungraded 폴백
+    try {
+      const casesPlan = plan.map((tc) => ({
+        stdin: tc.input + "\n",
+        expected: tc.expected,
+        hidden: !!tc.hidden,
+      }));
+      const result = await submitCMany(code, casesPlan);
+
+      if (result.compile?.ok === false) {
+        overlaySub.textContent = "컴파일 오류 — 채점 종료";
+        verdict = "wrong";
+      } else {
+        verdict = result.passed === result.total ? "correct" : "wrong";
+        if (result.firstFail != null && verdict === "wrong") {
+          const failLabel = plan[result.firstFail]?.label || `케이스 ${result.firstFail + 1}`;
+          overlaySub.textContent = `${failLabel}에서 오답 — ${result.passed}/${result.total} 통과`;
+        } else if (verdict === "correct") {
+          overlaySub.textContent = `${result.passed}/${result.total} 모두 통과`;
+        }
       }
-      if (result.verdict === "compile") {
-        allPass = false;
-        stoppedReason = "컴파일 오류";
-        break;
+    } catch (err) {
+      // 503/네트워크 오류 → ungraded
+      if (!judgeAvailable()) {
+        let idx = 0;
+        const stepEvery = Math.max(40, Math.min(200, Math.floor(1200 / plan.length)));
+        await new Promise((resolve) => {
+          const animator = setInterval(() => {
+            if (idx >= plan.length) { clearInterval(animator); resolve(); return; }
+            const tc = plan[idx];
+            const hint = tc.hidden ? "기대 출력 (숨김)" : `기대 출력 ${tc.expected}`;
+            overlaySub.textContent = `${tc.label} → ${hint}`;
+            idx++;
+          }, stepEvery);
+        });
+        overlaySub.textContent = "채점 서비스에 연결할 수 없어 자동 채점이 불가능해요 — 결과는 미채점으로 기록됩니다.";
+      } else {
+        overlaySub.textContent = `채점 오류: ${err?.message || String(err)}`;
       }
-      if (result.verdict !== "accepted") {
-        allPass = false;
-        stoppedReason = result.statusDescription;
-        break;
-      }
-      const actual = normalizeOutput(result.stdout);
-      const expected = normalizeOutput(tc.expected);
-      if (actual !== expected) {
-        allPass = false;
-        stoppedReason = `${tc.label}에서 출력 불일치`;
-        break;
-      }
+      verdict = "ungraded";
     }
-    verdict = allPass ? "correct" : "wrong";
-    if (stoppedReason) overlaySub.textContent = `${stoppedReason} — 채점 종료`;
   }
 
   saveAnswer(problem.id, {
