@@ -176,7 +176,7 @@ html.nav-resizing .nav-collapse {
   position: relative;
   min-height: 90vh;
   margin: 0 16px;
-  padding: 120px 24px 80px;
+  padding: 120px 24px clamp(200px, 24vh, 260px);
   text-align: center;
   background:
     radial-gradient(ellipse 900px 420px at 50% 105%, var(--green) 0%, rgba(34,197,94,0.55) 35%, rgba(0,0,0,0) 75%),
@@ -733,7 +733,7 @@ html.nav-resizing .nav-collapse {
   bottom: 0;
   left: 50%;
   transform: translate(-50%, 50%);
-  width: 190px;
+  width: clamp(130px, 18vw, 190px);
   pointer-events: none;
   z-index: 5;
   opacity: 0;
@@ -4816,3 +4816,28 @@ body.is-resizing-problem * {
   0%   { background-position: 100% 0; }
   100% { background-position: -100% 0; }
 }
+
+/* ---------- Lesson problem-tab fullscreen mode ---------- */
+body.lp-problem-active .nav,
+body.lp-problem-active #auth-modal,
+body.lp-problem-active .lesson-shell__head,
+body.lp-problem-active .lesson-tabs,
+body.lp-problem-active .lesson-shell__foot { display: none; }
+body.lp-problem-active .lessons-page { padding: 0; margin: 0; max-width: none; }
+body.lp-problem-active .lesson-shell { display: block; }
+body.lp-problem-active #pane-concept { display: none; }
+body.lp-problem-active #pane-problem { display: block; }
+body.lp-problem-active .problem-workspace {
+  height: calc(100vh - 57px);
+}
+
+.lp-back-to-concept {
+  margin-left: 12px; padding: 6px 12px; border-radius: 8px;
+  background: transparent; color: #4b5563; border: 1px solid #e5e7eb;
+  font-size: 13px; cursor: pointer; font-family: inherit; font-weight: 600;
+}
+.lp-back-to-concept:hover { background: #f9fafb; color: #111; }
+
+/* dock view switching by data-mode (scoped to lp-dock) */
+#lp-dock[data-mode="result"] #lp-view-tests,
+#lp-dock[data-mode="tests"]  #lp-view-result { display: none; }

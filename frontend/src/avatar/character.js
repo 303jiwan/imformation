@@ -1,35 +1,33 @@
-// Base character + composition for the Codenergy avatar feature.
+// character.js — 새 schema (plan step 4)
 //
-// Character is drawn inside a 320x480 viewBox. Outfits in outfits.js share the
-// same coordinate space.
-//
-// Schema (see avatar.js DEFAULT_CONFIG):
+// Schema:
 //   {
-//     hair:    { style, color },
-//     top:     { style, color },
-//     bottom:  { style, color },
-//     face:    { style },
-//     skinTone: 'tone-1'..'tone-6',
-//     accessories: [{ type: 'hat'|'glasses'|'earrings', style, color }],
-//     background: 'default'|'sky'|'sunset'|'mint'|'lavender',
+//     body: {
+//       skinTone: 'tone-1'..'tone-6',
+//       hair: { style, color }
+//     },
+//     clothing: {
+//       top:    { style, color },
+//       bottom: { style, color }
+//     },
+//     accessories: {
+//       hat:     null | { style, color },
+//       glasses: null | { style, color },
+//       other:   null | { style, color }
+//     }
 //   }
 //
-// Layer z-order (back to front):
-//   1. background
-//   2. shadow
-//   3. legs
-//   4. body / torso
-//   5. bottom
-//   6. arms
-//   7. top
-//   8. head + ears
-//   9. earrings (rendered against ears, before hair drape)
-//  10. hair
-//  11. face
-//  12. glasses
-//  13. hat
+// SVG viewBox: 0 0 240 320
+// root class: codenergy-character
+//
+// Layer z-order (back → front):
+//   다리 → 몸통 → 팔 → 하의 → 상의 → 머리(피부 베이스) → 표정(고정) → 귀걸이(other) → 머리카락 → 안경 → 모자
 
 import { getById, renderOutfitFragment } from './outfits.js';
+
+// ---------------------------------------------------------------------------
+// Skin tones
+// ---------------------------------------------------------------------------
 
 export const SKIN_TONES = [
   { id: 'tone-1', label: '가장 밝은',   base: '#fff5d6', shadow: '#fce8a4' },
@@ -40,248 +38,183 @@ export const SKIN_TONES = [
   { id: 'tone-6', label: '가장 어두운', base: '#5a3a25', shadow: '#3a2415' },
 ];
 
-export const DEFAULT_SKIN_TONE = 'tone-2';
-
 function lookupSkinTone(id) {
   return SKIN_TONES.find((t) => t.id === id)
-      || SKIN_TONES.find((t) => t.id === DEFAULT_SKIN_TONE)
-      || SKIN_TONES[0];
+    || SKIN_TONES.find((t) => t.id === 'tone-2')
+    || SKIN_TONES[0];
 }
 
 // ---------------------------------------------------------------------------
-// Base SVG fragments (parameterized by skin tone).
+// Defaults
+// ---------------------------------------------------------------------------
+
+export const DEFAULT_CONFIG = {
+  body: {
+    skinTone: 'tone-2',
+    hair: { style: 'hair-short', color: '#1f2937' },
+  },
+  clothing: {
+    top:    { style: 'top-tee',   color: '#2563eb' },
+    bottom: { style: 'bot-jeans', color: '#1f2937' },
+  },
+  accessories: {
+    hat:     null,
+    glasses: null,
+    other:   null,
+  },
+};
+
+// ---------------------------------------------------------------------------
+// normalizeConfig
+// ---------------------------------------------------------------------------
+
+export function normalizeConfig(raw) {
+  if (!raw || typeof raw !== 'object') return JSON.parse(JSON.stringify(DEFAULT_CONFIG));
+
+  const def = DEFAULT_CONFIG;
+
+  // body
+  const rawBody = raw.body && typeof raw.body === 'object' ? raw.body : {};
+  const skinTone = SKIN_TONES.some((t) => t.id === rawBody.skinTone)
+    ? rawBody.skinTone
+    : def.body.skinTone;
+  const rawHair = rawBody.hair && typeof rawBody.hair === 'object' ? rawBody.hair : {};
+  const hairStyle = typeof rawHair.style === 'string' && rawHair.style
+    ? rawHair.style : def.body.hair.style;
+  const hairColor = typeof rawHair.color === 'string' && rawHair.color
+    ? rawHair.color : def.body.hair.color;
+
+  // clothing
+  const rawClothing = raw.clothing && typeof raw.clothing === 'object' ? raw.clothing : {};
+  const rawTop = rawClothing.top && typeof rawClothing.top === 'object' ? rawClothing.top : {};
+  const topStyle = typeof rawTop.style === 'string' && rawTop.style
+    ? rawTop.style : def.clothing.top.style;
+  const topColor = typeof rawTop.color === 'string' && rawTop.color
+    ? rawTop.color : def.clothing.top.color;
+  const rawBot = rawClothing.bottom && typeof rawClothing.bottom === 'object' ? rawClothing.bottom : {};
+  const botStyle = typeof rawBot.style === 'string' && rawBot.style
+    ? rawBot.style : def.clothing.bottom.style;
+  const botColor = typeof rawBot.color === 'string' && rawBot.color
+    ? rawBot.color : def.clothing.bottom.color;
+
+  // accessories
+  const rawAcc = raw.accessories && typeof raw.accessories === 'object' && !Array.isArray(raw.accessories)
+    ? raw.accessories : {};
+  function normAcc(v) {
+    if (!v || typeof v !== 'object') return null;
+    if (typeof v.style !== 'string' || !v.style) return null;
+    return { style: v.style, color: typeof v.color === 'string' ? v.color : '#000000' };
+  }
+
+  return {
+    body: {
+      skinTone,
+      hair: { style: hairStyle, color: hairColor },
+    },
+    clothing: {
+      top:    { style: topStyle,  color: topColor },
+      bottom: { style: botStyle,  color: botColor },
+    },
+    accessories: {
+      hat:     normAcc(rawAcc.hat),
+      glasses: normAcc(rawAcc.glasses),
+      other:   normAcc(rawAcc.other),
+    },
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Base SVG fragments (coordinate space: 240×320)
 // ---------------------------------------------------------------------------
 
 const baseLegs = (skin, shadow) => `
   <g class="char-legs">
-    <rect x="132" y="340" width="22" height="110" rx="11" fill="${skin}" stroke="${shadow}" stroke-width="2"/>
-    <rect x="166" y="340" width="22" height="110" rx="11" fill="${skin}" stroke="${shadow}" stroke-width="2"/>
-    <ellipse cx="143" cy="456" rx="18" ry="8" fill="#1f2937"/>
-    <ellipse cx="177" cy="456" rx="18" ry="8" fill="#1f2937"/>
+    <rect x="98"  y="212" width="17" height="88" rx="8"  fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
+    <rect x="125" y="212" width="17" height="88" rx="8"  fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
+    <ellipse cx="106" cy="302" rx="14" ry="6" fill="#1f2937"/>
+    <ellipse cx="133" cy="302" rx="14" ry="6" fill="#1f2937"/>
   </g>
 `;
 
 const baseBody = (skin, shadow) => `
   <g class="char-body">
-    <rect x="148" y="200" width="24" height="22" rx="6" fill="${skin}" stroke="${shadow}" stroke-width="2"/>
-    <path d="M104 220 Q104 212 116 210 L204 210 Q216 212 216 220 L220 340 L100 340 Z"
-          fill="${skin}" stroke="${shadow}" stroke-width="2" stroke-linejoin="round"/>
+    <rect x="109" y="126" width="22" height="17" rx="5" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
+    <path d="M72 140 Q72 134 80 132 L160 132 Q168 134 168 140 L170 213 L70 213 Z"
+          fill="${skin}" stroke="${shadow}" stroke-width="1.5" stroke-linejoin="round"/>
   </g>
 `;
 
 const baseArms = (skin, shadow) => `
   <g class="char-arms">
-    <rect x="74" y="222" width="28" height="110" rx="14" fill="${skin}" stroke="${shadow}" stroke-width="2"/>
-    <rect x="218" y="222" width="28" height="110" rx="14" fill="${skin}" stroke="${shadow}" stroke-width="2"/>
-    <circle cx="88"  cy="338" r="14" fill="${skin}" stroke="${shadow}" stroke-width="2"/>
-    <circle cx="232" cy="338" r="14" fill="${skin}" stroke="${shadow}" stroke-width="2"/>
+    <rect x="51" y="142" width="20" height="74" rx="10" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
+    <rect x="169" y="142" width="20" height="74" rx="10" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
+    <circle cx="61"  cy="220" r="10" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
+    <circle cx="179" cy="220" r="10" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
   </g>
 `;
 
 const baseHead = (skin, shadow) => `
   <g class="char-head">
-    <ellipse cx="84"  cy="134" rx="9"  ry="14" fill="${skin}" stroke="${shadow}" stroke-width="2"/>
-    <ellipse cx="236" cy="134" rx="9"  ry="14" fill="${skin}" stroke="${shadow}" stroke-width="2"/>
-    <circle cx="160" cy="130" r="78" fill="${skin}" stroke="${shadow}" stroke-width="2.5"/>
+    <ellipse cx="60"  cy="86" rx="7"  ry="10" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
+    <ellipse cx="180" cy="86" rx="7"  ry="10" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
+    <circle  cx="120" cy="82" r="60"  fill="${skin}" stroke="${shadow}" stroke-width="2"/>
   </g>
 `;
 
 const DEFAULT_FACE = `
   <g class="char-face char-face--default">
-    <circle cx="138" cy="128" r="5" fill="#1f2937"/>
-    <circle cx="182" cy="128" r="5" fill="#1f2937"/>
-    <circle cx="140" cy="126" r="1.4" fill="#ffffff"/>
-    <circle cx="184" cy="126" r="1.4" fill="#ffffff"/>
-    <path d="M144 158 Q160 170 176 158" stroke="#1f2937" stroke-width="3"
+    <circle cx="104" cy="80" r="4"   fill="#1f2937"/>
+    <circle cx="136" cy="80" r="4"   fill="#1f2937"/>
+    <circle cx="105" cy="79" r="1.2" fill="#ffffff"/>
+    <circle cx="137" cy="79" r="1.2" fill="#ffffff"/>
+    <path d="M108 98 Q120 108 132 98" stroke="#1f2937" stroke-width="2.5"
           fill="none" stroke-linecap="round"/>
   </g>
 `;
 
-const SHADOW = `
-  <ellipse cx="160" cy="464" rx="74" ry="9" fill="#000" opacity="0.08"/>
-`;
-
 // ---------------------------------------------------------------------------
-// Backgrounds — full-bleed gradient or solid pad behind the character.
+// Fragment helpers
 // ---------------------------------------------------------------------------
 
-function renderBackground(name) {
-  const bg = name || 'default';
-  if (bg === 'default') {
-    // No background = transparent (page color shows through).
-    return '';
-  }
-  const gradients = {
-    sky:      ['#bae6fd', '#e0f2fe'],
-    sunset:   ['#fbbf24', '#fb7185'],
-    mint:     ['#a7f3d0', '#ecfdf5'],
-    lavender: ['#ddd6fe', '#f5f3ff'],
-  };
-  const stops = gradients[bg];
-  if (!stops) return '';
-  const id = `avatar-bg-${bg}`;
-  return `
-    <defs>
-      <linearGradient id="${id}" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="0" stop-color="${stops[0]}"/>
-        <stop offset="1" stop-color="${stops[1]}"/>
-      </linearGradient>
-    </defs>
-    <rect x="0" y="0" width="320" height="480" fill="url(#${id})"/>
-  `;
+function fragmentFor(slot, sub) {
+  if (!slot || !slot.style) return '';
+  const item = getById(slot.style);
+  if (!item) return '';
+  // sub may differ from category stored on item (e.g. 'other' mapped to earring IDs)
+  return renderOutfitFragment(item, slot.color);
 }
 
 // ---------------------------------------------------------------------------
-// Helpers for the new config schema.
+// renderCharacter
 // ---------------------------------------------------------------------------
 
-function getAccessory(accessories, type) {
-  if (!Array.isArray(accessories)) return null;
-  return accessories.find((a) => a && a.type === type) || null;
-}
-
-function fragmentForPart(part, expectedCategory) {
-  if (!part || !part.style) return '';
-  const item = getById(part.style);
-  if (!item || item.category !== expectedCategory) return '';
-  return renderOutfitFragment(item, part.color);
-}
-
-function fragmentForAccessory(acc) {
-  if (!acc || !acc.style) return '';
-  const item = getById(acc.style);
-  if (!item || item.category !== acc.type) return '';
-  return renderOutfitFragment(item, acc.color);
-}
-
-// ---------------------------------------------------------------------------
-// Public render
-// ---------------------------------------------------------------------------
-
-/**
- * Compose the full character SVG from a config object (new schema).
- *
- * Tolerant of legacy `equipped`-shape input (top/bottom/hat/face as plain ID
- * strings) — it migrates on the fly using DEFAULT_CONFIG colors.
- */
 export function renderCharacter(input = {}) {
-  const config = normalizeConfig(input);
+  const cfg = normalizeConfig(input);
 
-  const tone = lookupSkinTone(config.skinTone);
+  const tone = lookupSkinTone(cfg.body.skinTone);
   const skin = tone.base;
-  const shadowColor = tone.shadow;
+  const shadow = tone.shadow;
 
-  const bgLayer = renderBackground(config.background);
+  const hairFrag    = fragmentFor(cfg.body.hair, 'hair');
+  const topFrag     = fragmentFor(cfg.clothing.top, 'top');
+  const bottomFrag  = fragmentFor(cfg.clothing.bottom, 'bottom');
+  const hatFrag     = fragmentFor(cfg.accessories.hat, 'hat');
+  const glassesFrag = fragmentFor(cfg.accessories.glasses, 'glasses');
+  const otherFrag   = fragmentFor(cfg.accessories.other, 'other');
 
-  const topFrag    = fragmentForPart(config.top,    'top');
-  const bottomFrag = fragmentForPart(config.bottom, 'bottom');
-  const hairFrag   = fragmentForPart(config.hair,   'hair');
-  const faceFrag   = fragmentForPart(config.face,   'face');
-
-  const hat      = getAccessory(config.accessories, 'hat');
-  const glasses  = getAccessory(config.accessories, 'glasses');
-  const earrings = getAccessory(config.accessories, 'earrings');
-
-  const hatFrag      = fragmentForAccessory(hat);
-  const glassesFrag  = fragmentForAccessory(glasses);
-  const earringsFrag = fragmentForAccessory(earrings);
-
-  const faceLayer = faceFrag || DEFAULT_FACE;
-
-  return `
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 480"
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320"
      class="codenergy-character"
      role="img" aria-label="Codenergy 아바타">
-  ${bgLayer}
-  ${SHADOW}
-  ${baseLegs(skin, shadowColor)}
-  ${baseBody(skin, shadowColor)}
+  ${baseLegs(skin, shadow)}
+  ${baseBody(skin, shadow)}
+  ${baseArms(skin, shadow)}
   ${bottomFrag}
-  ${baseArms(skin, shadowColor)}
   ${topFrag}
-  ${baseHead(skin, shadowColor)}
-  ${earringsFrag}
+  ${baseHead(skin, shadow)}
+  ${DEFAULT_FACE}
+  ${otherFrag}
   ${hairFrag}
-  ${faceLayer}
   ${glassesFrag}
   ${hatFrag}
 </svg>`.trim();
 }
-
-// ---------------------------------------------------------------------------
-// Defaults & legacy migration
-// ---------------------------------------------------------------------------
-
-export const DEFAULT_CONFIG = {
-  hair:     { style: 'hair-short', color: '#1f2937' },
-  top:      { style: 'top-tshirt-white', color: '#ffffff' },
-  bottom:   { style: 'bottom-jeans-blue', color: '#3b82f6' },
-  face:     { style: 'face-smile' },
-  skinTone: DEFAULT_SKIN_TONE,
-  accessories: [],
-  background: 'default',
-};
-
-// Legacy alias kept so unrelated imports don't break during the migration
-// window. New code should reference DEFAULT_CONFIG.
-export const DEFAULT_EQUIPPED = {
-  top: 'top-tshirt-white',
-  bottom: 'bottom-jeans-blue',
-  hat: null,
-  face: 'face-smile',
-  skinTone: DEFAULT_SKIN_TONE,
-};
-
-// Accept both shapes (new config + legacy equipped) and produce a normalized
-// config. Defensive — never throws on partial/unknown input.
-function normalizeConfig(input) {
-  if (!input || typeof input !== 'object') return DEFAULT_CONFIG;
-
-  // New shape: hair/top/bottom are objects with {style,color}.
-  const looksNew = input.hair && typeof input.hair === 'object'
-                || input.top  && typeof input.top  === 'object'
-                || Array.isArray(input.accessories);
-
-  if (looksNew) {
-    return {
-      hair:     input.hair     || DEFAULT_CONFIG.hair,
-      top:      input.top      || DEFAULT_CONFIG.top,
-      bottom:   input.bottom   || DEFAULT_CONFIG.bottom,
-      face:     input.face     || DEFAULT_CONFIG.face,
-      skinTone: input.skinTone || DEFAULT_CONFIG.skinTone,
-      accessories: Array.isArray(input.accessories) ? input.accessories : [],
-      background:  input.background || DEFAULT_CONFIG.background,
-    };
-  }
-
-  // Legacy `equipped` shape (string IDs). Migrate with default colors.
-  const accessories = [];
-  if (input.hat) accessories.push({ type: 'hat', style: input.hat, color: '#1f2937' });
-
-  return {
-    hair:     DEFAULT_CONFIG.hair,
-    top:      input.top    ? { style: input.top,    color: defaultColorFor(input.top,    'top')    } : DEFAULT_CONFIG.top,
-    bottom:   input.bottom ? { style: input.bottom, color: defaultColorFor(input.bottom, 'bottom') } : DEFAULT_CONFIG.bottom,
-    face:     input.face   ? { style: input.face } : DEFAULT_CONFIG.face,
-    skinTone: input.skinTone || DEFAULT_CONFIG.skinTone,
-    accessories,
-    background: DEFAULT_CONFIG.background,
-  };
-}
-
-function defaultColorFor(styleId, category) {
-  if (category === 'top') {
-    if (styleId === 'top-tshirt-white')   return '#ffffff';
-    if (styleId === 'top-hoodie-purple')  return '#a855f7';
-    if (styleId === 'top-shirt-formal')   return '#f8fafc';
-    if (styleId === 'top-hoodie-black')   return '#1f2937';
-  }
-  if (category === 'bottom') {
-    if (styleId === 'bottom-jeans-blue')  return '#3b82f6';
-    if (styleId === 'bottom-shorts')      return '#22c55e';
-    if (styleId === 'bottom-slacks')      return '#1f2937';
-  }
-  return '#3b82f6';
-}
-
-export { normalizeConfig };

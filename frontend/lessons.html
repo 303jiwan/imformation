@@ -10,6 +10,11 @@
         z-index: 9999; opacity: 1; pointer-events: auto;
       }
     </style>
+    <link
+      rel="stylesheet"
+      data-name="vs/editor/editor.main"
+      href="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/editor/editor.main.css"
+    />
   </head>
   <body>
     <div class="page-fade" id="page-fade"></div>
@@ -135,23 +140,143 @@
         <article class="lesson-pane lesson-pane--concept" id="pane-concept" data-tab="concept"></article>
 
         <article class="lesson-pane lesson-pane--problem" id="pane-problem" data-tab="problem" hidden>
-          <aside class="lesson-problem-list" id="problem-list" aria-label="문제 목록"></aside>
-          <section class="lesson-problem-detail" id="problem-detail">
-            <header class="lesson-problem-detail__head">
-              <h2 id="problem-title">문제</h2>
-              <span class="diff" id="problem-diff"></span>
-            </header>
-            <div class="lesson-problem-detail__desc" id="problem-desc"></div>
-            <div class="lesson-problem-detail__example" id="problem-example"></div>
-            <label class="lesson-editor-label" for="lesson-editor">코드 (C)</label>
-            <textarea id="lesson-editor" class="lesson-editor" spellcheck="false" autocomplete="off"
-              placeholder="#include <stdio.h>&#10;int main() {&#10;  // 여기에 코드를 작성하세요&#10;  return 0;&#10;}"></textarea>
-            <div class="lesson-actions">
-              <button type="button" class="ghost" id="lesson-reset">코드 초기화</button>
-              <button type="button" class="cta" id="lesson-submit">제출</button>
+          <div class="problem-topbar">
+            <div class="problem-topbar__left">
+              <a class="problem-topbar__brand" href="codetrails.html">Codenergy ▲</a>
+              <span class="problem-topbar__feature" id="lp-feature-label">Lesson · 1/1</span>
+              <button type="button" class="lp-back-to-concept" id="lp-back-btn">← 개념 보기</button>
             </div>
-            <div class="lesson-result" id="lesson-result" hidden></div>
-          </section>
+            <div class="problem-topbar__center"></div>
+            <div class="problem-topbar__right"></div>
+          </div>
+
+          <main class="problem-workspace" id="lp-workspace">
+            <section class="problem-panel" aria-label="문제 설명">
+              <div class="problem-panel__tabs">
+                <button class="problem-panel-tab is-active">문제</button>
+              </div>
+              <div class="problem-panel__body">
+                <h1 class="problem-panel__h1" id="lp-problem-heading">문제</h1>
+                <p class="problem-panel__desc" id="lp-problem-desc"></p>
+
+                <div class="problem-section" id="lp-section-input">
+                  <h2 class="problem-section__h">입력</h2>
+                  <div class="problem-section__body" id="lp-section-input-body"></div>
+                </div>
+
+                <div class="problem-example" id="lp-section-examples">
+                  <h2 class="problem-example__h">입력 예제</h2>
+                  <div id="lp-examples-body"></div>
+                </div>
+              </div>
+            </section>
+
+            <div class="problem-splitter" id="lp-splitter" role="separator"
+                 aria-orientation="vertical" aria-label="문제와 코드 영역 크기 조절"
+                 tabindex="0"></div>
+
+            <section class="problem-right" aria-label="C 코드 작업 공간">
+              <div class="problem-editor">
+                <div class="problem-editor__head">
+                  <button type="button" class="problem-editor__lang" disabled>
+                    <span>C</span>
+                    <span aria-hidden="true">▾</span>
+                  </button>
+                  <div class="problem-editor__actions">
+                    <button type="button" class="problem-editor__btn" id="lp-reset-btn">
+                      <span aria-hidden="true">↻</span> 코드 초기화
+                    </button>
+                    <span class="problem-editor__status">연결됨</span>
+                  </div>
+                </div>
+                <div class="problem-editor__container" id="lp-editor-container"></div>
+                <div class="problem-editor__loading" id="lp-editor-loading">에디터를 불러오는 중…</div>
+                <textarea class="problem-editor__textarea" id="lp-editor-fallback" hidden spellcheck="false"></textarea>
+              </div>
+
+              <aside class="problem-dock" id="lp-dock" data-mode="result" aria-label="실행 결과">
+                <div class="problem-dock__cases-row">
+                  <div class="problem-dock__cases-left">
+                    <div class="problem-dock__cases" id="lp-dock-cases" role="tablist"></div>
+                    <button type="button" class="problem-dock__add" id="lp-dock-add" aria-label="테스트케이스 추가" hidden>+</button>
+                  </div>
+                  <div class="problem-dock__cases-actions">
+                    <button type="button" class="problem-dock__reset" id="lp-dock-reset" hidden>
+                      <span aria-hidden="true">↻</span> 테스트케이스 초기화
+                    </button>
+                    <button type="button" class="problem-dock__close" id="lp-dock-close" aria-label="결과 패널 닫기">
+                      닫기 <span aria-hidden="true">×</span>
+                    </button>
+                  </div>
+                </div>
+
+                <div class="problem-dock__view problem-dock__view--result" id="lp-view-result">
+                  <div class="problem-verdict is-pending" id="lp-dock-verdict">
+                    아직 실행하지 않았어요. <span style="color:#fff;text-decoration:underline;">코드 실행</span>을 눌러보세요.
+                  </div>
+
+                  <div class="problem-io">
+                    <div class="problem-io__head">
+                      <span>입력</span>
+                      <div class="problem-io__icons">
+                        <button type="button" class="problem-io__icon" data-copy="lp-case-input" aria-label="복사">⎘</button>
+                      </div>
+                    </div>
+                    <pre id="lp-case-input"></pre>
+                  </div>
+
+                  <div class="problem-io">
+                    <div class="problem-io__head"><span>나의 출력</span></div>
+                    <pre id="lp-case-actual"><span class="problem-io__placeholder">— 실행 결과가 여기 표시됩니다 —</span></pre>
+                  </div>
+
+                  <div class="problem-io">
+                    <div class="problem-io__head">
+                      <span>정답</span>
+                      <div class="problem-io__icons">
+                        <button type="button" class="problem-io__icon" data-copy="lp-case-expected" aria-label="복사">⎘</button>
+                      </div>
+                    </div>
+                    <pre id="lp-case-expected"></pre>
+                  </div>
+
+                  <div class="problem-detail">
+                    <h4 class="problem-detail__h">상세 정보</h4>
+                    <div class="problem-detail__row"><span>수행 시간</span><span id="lp-detail-time">—</span></div>
+                    <div class="problem-detail__row"><span>메모리</span><span id="lp-detail-mem">—</span></div>
+                  </div>
+                </div>
+
+                <div class="problem-dock__view problem-dock__view--tests" id="lp-view-tests">
+                  <div class="problem-tests">
+                    <label class="problem-tests__label" for="lp-case-input-edit">입력</label>
+                    <textarea id="lp-case-input-edit" class="problem-tests__input" rows="4" spellcheck="false"></textarea>
+                  </div>
+                </div>
+              </aside>
+
+              <footer class="problem-actionbar">
+                <button type="button" class="problem-action" id="lp-action-cases">
+                  <span class="problem-action__icon" aria-hidden="true">🔍</span> 테스트케이스
+                </button>
+                <button type="button" class="problem-action is-active" id="lp-action-result">
+                  <span class="problem-action__icon" aria-hidden="true">⊟</span> 결과
+                </button>
+                <button type="button" class="problem-action problem-action--run" id="lp-action-run">
+                  <span class="problem-action__icon" aria-hidden="true">▷</span> 코드 실행
+                </button>
+                <button type="button" class="problem-action problem-action--submit" id="lp-action-submit">
+                  <span class="problem-action__icon" aria-hidden="true">↑</span> 제출 및 채점
+                </button>
+              </footer>
+            </section>
+          </main>
+
+          <div class="grading-overlay" id="lp-grading-overlay" aria-hidden="true">
+            <div class="grading-overlay__spinner" aria-hidden="true"></div>
+            <p class="grading-overlay__title">채점 중…</p>
+            <p class="grading-overlay__sub">잠시만 기다려 주세요.</p>
+          </div>
         </article>
 
         <footer class="lesson-shell__foot" id="lesson-foot" hidden>
@@ -159,6 +284,27 @@
         </footer>
       </section>
     </main>
+
+    <script src="https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/loader.min.js"></script>
+    <script>
+      window.MonacoEnvironment = {
+        getWorkerUrl: function () {
+          return (
+            "data:text/javascript;charset=utf-8," +
+            encodeURIComponent(
+              "self.MonacoEnvironment = { baseUrl: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/' };" +
+                "importScripts('https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs/base/worker/workerMain.js');"
+            )
+          );
+        },
+      };
+      require.config({
+        paths: { vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.45.0/min/vs" },
+      });
+      require(["vs/editor/editor.main"], function () {
+        window.dispatchEvent(new CustomEvent("monaco-ready"));
+      });
+    </script>
 
     <script type="module" src="/src/main.js"></script>
     <script type="module" src="/src/lessons.js"></script>
