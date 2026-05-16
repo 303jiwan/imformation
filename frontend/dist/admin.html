@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codenergy — 관리자</title>
+    <style>
+      :root { color-scheme: light; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+        background: #f6f7f9;
+        color: #111;
+      }
+      .admin-shell { max-width: 1200px; margin: 0 auto; padding: 24px; }
+      .admin-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 24px;
+      }
+      .admin-header h1 { margin: 0; font-size: 22px; letter-spacing: -0.01em; }
+      .admin-header .admin-back {
+        color: #6b7280;
+        text-decoration: none;
+        font-size: 14px;
+      }
+      .admin-header .admin-back:hover { color: #111; }
+      .admin-tabs {
+        display: flex;
+        gap: 4px;
+        border-bottom: 1px solid #e5e7eb;
+        margin-bottom: 16px;
+      }
+      .admin-tab {
+        padding: 10px 16px;
+        background: transparent;
+        border: none;
+        border-bottom: 2px solid transparent;
+        font: inherit;
+        cursor: pointer;
+        color: #6b7280;
+      }
+      .admin-tab.is-active { color: #111; border-bottom-color: #111; font-weight: 700; }
+      .admin-tab[disabled] { opacity: 0.5; cursor: not-allowed; }
+      .admin-panel { display: none; }
+      .admin-panel.is-active { display: block; }
+
+      .admin-table {
+        width: 100%;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        border-collapse: separate;
+        border-spacing: 0;
+        overflow: hidden;
+      }
+      .admin-table th, .admin-table td {
+        padding: 12px 14px;
+        text-align: left;
+        font-size: 14px;
+        border-bottom: 1px solid #f3f4f6;
+        vertical-align: middle;
+      }
+      .admin-table th {
+        background: #fafafa;
+        font-weight: 700;
+        color: #374151;
+        font-size: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.04em;
+      }
+      .admin-table tr:last-child td { border-bottom: none; }
+      .admin-table td.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+      .pill {
+        display: inline-block;
+        padding: 2px 8px;
+        font-size: 12px;
+        font-weight: 700;
+        border-radius: 999px;
+      }
+      .pill--admin    { background: #ede9fe; color: #6d28d9; }
+      .pill--suspended{ background: #fee2e2; color: #b91c1c; }
+      .pill--ok       { background: #dcfce7; color: #166534; }
+
+      .btn {
+        display: inline-block;
+        padding: 6px 12px;
+        border-radius: 8px;
+        border: 1px solid #d1d5db;
+        background: #fff;
+        font: inherit;
+        font-size: 13px;
+        cursor: pointer;
+        color: #111;
+      }
+      .btn:hover { background: #f3f4f6; }
+      .btn--danger  { border-color: #dc2626; color: #dc2626; }
+      .btn--danger:hover  { background: #fef2f2; }
+      .btn--warning { border-color: #d97706; color: #b45309; }
+      .btn--warning:hover { background: #fffbeb; }
+      .btn[disabled] { opacity: 0.5; cursor: not-allowed; }
+
+      .empty {
+        padding: 32px;
+        text-align: center;
+        color: #6b7280;
+        background: #fff;
+        border: 1px dashed #e5e7eb;
+        border-radius: 12px;
+      }
+      .admin-thumb {
+        width: 80px;
+        height: 48px;
+        object-fit: cover;
+        border-radius: 6px;
+        background: #f3f4f6;
+        display: block;
+      }
+      .admin-status {
+        padding: 16px 20px;
+        background: #fffbeb;
+        border: 1px solid #fde68a;
+        border-radius: 12px;
+        color: #92400e;
+        margin-bottom: 16px;
+      }
+      .admin-status.is-error { background: #fef2f2; border-color: #fecaca; color: #991b1b; }
+      .admin-actions { display: flex; gap: 8px; }
+    </style>
+    <script type="module" crossorigin src="/assets/admin-DjfVP9w0.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+  </head>
+  <body>
+    <div class="admin-shell">
+      <header class="admin-header">
+        <h1>관리자 페이지</h1>
+        <a href="index.html" class="admin-back">← 홈으로</a>
+      </header>
+
+      <div id="admin-status" class="admin-status" hidden></div>
+
+      <div class="admin-tabs">
+        <button type="button" class="admin-tab is-active" data-tab="lectures">강의 (<span id="count-lectures">0</span>)</button>
+        <button type="button" class="admin-tab" data-tab="users">사용자 (<span id="count-users">0</span>)</button>
+      </div>
+
+      <section class="admin-panel is-active" data-panel="lectures">
+        <div id="lectures-list"></div>
+      </section>
+
+      <section class="admin-panel" data-panel="users">
+        <div id="users-list"></div>
+      </section>
+    </div>
+
+  </body>
+</html>

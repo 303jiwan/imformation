@@ -79,9 +79,8 @@ const TRANSLATIONS = {
   en: {
     "title": "Codenergy — From Knowledge to Skill",
     "nav.codetrail": "Code Trail",
+    "nav.lectures": "Lectures",
     "nav.pricing": "Pricing",
-    "nav.reviews": "Reviews",
-    "nav.invite": "Invite",
     "nav.universities": "Universities",
     "nav.avatar": "Avatar",
     "action.login": "Log in",
@@ -91,7 +90,6 @@ const TRANSLATIONS = {
     "action.cancel": "Cancel",
     "action.close": "Close",
     "my.name": "User Name",
-    "my.mypage": "My Page",
     "my.history": "Learning History",
     "my.subscription": "Billing & Subscription",
     "my.invite": "Invite Friends",
@@ -152,16 +150,6 @@ const TRANSLATIONS = {
     "pricing.proF4": "Career consulting",
     "pricing.proF5": "Priority application alerts",
     "pricing.proBtn": "Start Pro",
-    "reviews.title": "⭐ User Reviews",
-    "reviews.r1Text": "\"It was crucial in passing my coding tests. The realistic problems gave me confidence.\"",
-    "reviews.r1Name": "Kim Dev",
-    "reviews.r1Co": "Hired at Samsung",
-    "reviews.r2Text": "\"The step-by-step learning system was excellent. I could learn systematically from basics to advanced.\"",
-    "reviews.r2Name": "Park Coding",
-    "reviews.r2Co": "Hired at Naver",
-    "reviews.r3Text": "\"I started after a friend recommended it — no regrets. I even landed a job!\"",
-    "reviews.r3Name": "Lee Programmer",
-    "reviews.r3Co": "Hired at Kakao",
     "invite.title": "🎁 Invite Friends",
     "invite.hero": "Grow together with friends!",
     "invite.heroSub": "Invite friends and you both get rewards",
@@ -418,7 +406,6 @@ applyLang(currentLang);
 
 // ---------------- Navigation Menu ----------------
 const menuLinks = document.querySelectorAll('.menu a');
-const reviewsModal = document.getElementById('reviews-modal');
 const inviteModal = document.getElementById('invite-modal');
 const universitiesModal = document.getElementById('universities-modal');
 
@@ -431,9 +418,6 @@ menuLinks.forEach(link => {
     switch(action) {
       case 'codetrail':
         showCodeTrail();
-        break;
-      case 'reviews':
-        showReviews();
         break;
       case 'invite':
         showInvite();
@@ -753,11 +737,6 @@ if (currentPage === 'history.html') initHistoryPage();
 if (currentPage === 'settings.html') initSettingsPage();
 if (currentPage === 'index.html' || currentPage === '') initHomePage();
 
-function showReviews() {
-  if (!reviewsModal) { window.location.href = 'index.html'; return; }
-  reviewsModal.hidden = false;
-}
-
 function showInvite() {
   if (!inviteModal) { window.location.href = 'index.html'; return; }
   if (!document.getElementById('my-wrap').hidden) {
@@ -779,6 +758,198 @@ document.addEventListener('click', (e) => {
     if (modal) modal.hidden = true;
   }
 });
+
+/* ---------- My-menu modals: learning history + subscription ---------- */
+// The my-menu lives in every page header, but the modals themselves are
+// injected once via JS so we don't have to add markup to 14 separate HTMLs.
+
+function injectMyMenuModals() {
+  if (document.getElementById('history-modal')) return;
+  const wrap = document.createElement('div');
+  wrap.innerHTML = `
+    <div id="history-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card history-modal">
+        <h3>📚 학습 기록</h3>
+        <div class="history-tabs" role="tablist">
+          <button type="button" class="history-tab is-active" data-tab="correct" role="tab">
+            맞은 문제 <span class="history-tab__count" id="history-correct-count">0</span>
+          </button>
+          <button type="button" class="history-tab" data-tab="wrong" role="tab">
+            틀린 문제 <span class="history-tab__count" id="history-wrong-count">0</span>
+          </button>
+        </div>
+        <div class="history-body" id="history-body">
+          <p class="history-empty">불러오는 중…</p>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close>닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="subscription-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card subscription-modal">
+        <h3>💳 결제 / 구독 관리</h3>
+        <div class="sub-card" id="sub-card">
+          <div class="sub-card__plan">불러오는 중…</div>
+        </div>
+        <div class="modal-actions">
+          <a href="pricing.html" class="cta sub-card__cta">요금제 보기 →</a>
+          <button type="button" class="ghost" data-close>닫기</button>
+        </div>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(wrap);
+}
+injectMyMenuModals();
+
+const historyModal = document.getElementById('history-modal');
+const subscriptionModal = document.getElementById('subscription-modal');
+
+const VERDICT_KO = {
+  correct: '정답', wrong: '오답', timeout: '시간 초과',
+  missing: '미제출', ungraded: '미채점',
+};
+
+function paintHistoryList(which, list, problems) {
+  const body = document.getElementById('history-body');
+  if (!list.length) {
+    body.innerHTML = `<p class="history-empty">${
+      which === 'correct'
+        ? '아직 맞힌 문제가 없어요. 코드테스트로 첫 정답을 만들어 보세요!'
+        : '틀린 문제가 없네요. 좋은 출발이에요!'
+    }</p>`;
+    return;
+  }
+  const rows = list.map((a) => {
+    const p = problems.find((pp) => String(pp.id) === String(a.problem_id));
+    const title = p?.title || `문제 ${a.problem_id}`;
+    const tag = p?.tag || '';
+    let date = '';
+    if (a.submitted_at) {
+      const d = new Date(a.submitted_at.replace(' ', 'T') + 'Z');
+      if (!isNaN(d)) date = d.toLocaleDateString('ko-KR');
+    }
+    const verdictLabel = VERDICT_KO[a.verdict] || a.verdict || '미채점';
+    return `
+      <li class="history-row history-row--${escapeHtml(a.verdict || 'missing')}">
+        <div class="history-row__main">
+          <div class="history-row__title">${escapeHtml(title)}</div>
+          <div class="history-row__meta">${escapeHtml(tag)}${tag && date ? ' · ' : ''}${escapeHtml(date)}</div>
+        </div>
+        <span class="history-row__chip">${escapeHtml(verdictLabel)}</span>
+      </li>`;
+  }).join('');
+  body.innerHTML = `<ul class="history-list">${rows}</ul>`;
+}
+
+async function openHistoryModal() {
+  if (!historyModal) return;
+  historyModal.hidden = false;
+  const body = document.getElementById('history-body');
+  body.innerHTML = '<p class="history-empty">불러오는 중…</p>';
+  document.getElementById('history-correct-count').textContent = '0';
+  document.getElementById('history-wrong-count').textContent = '0';
+  // Reset to "맞은 문제" tab.
+  historyModal.querySelectorAll('.history-tab').forEach((t) =>
+    t.classList.toggle('is-active', t.dataset.tab === 'correct'),
+  );
+  try {
+    const [stateRes, problemsMod] = await Promise.all([
+      fetch(`${API_BASE}/api/test/state`, { credentials: 'include' }),
+      import('./test-problems.js'),
+    ]);
+    if (stateRes.status === 401) {
+      body.innerHTML = '<p class="history-empty">로그인 후 학습 기록을 볼 수 있어요.</p>';
+      return;
+    }
+    if (!stateRes.ok) throw new Error('서버 오류');
+    const data = await stateRes.json();
+    const problems = problemsMod.PROBLEMS || [];
+    // Keep only the most recent attempt per problem so retries don't duplicate.
+    const latest = new Map();
+    for (const a of data.answers || []) {
+      if (!latest.has(a.problem_id)) latest.set(a.problem_id, a);
+    }
+    const all = [...latest.values()];
+    const correct = all.filter((a) => a.verdict === 'correct');
+    const wrong = all.filter((a) => a.verdict && a.verdict !== 'correct');
+    document.getElementById('history-correct-count').textContent = correct.length;
+    document.getElementById('history-wrong-count').textContent = wrong.length;
+    historyModal.__data = { correct, wrong, problems };
+    paintHistoryList('correct', correct, problems);
+  } catch (err) {
+    body.innerHTML = `<p class="history-empty">학습 기록을 불러오지 못했습니다. (${escapeHtml(err.message || '오류')})</p>`;
+  }
+}
+
+if (historyModal) {
+  historyModal.querySelectorAll('.history-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const which = tab.dataset.tab;
+      historyModal.querySelectorAll('.history-tab').forEach((t) =>
+        t.classList.toggle('is-active', t === tab),
+      );
+      const d = historyModal.__data;
+      if (!d) return;
+      paintHistoryList(which, which === 'correct' ? d.correct : d.wrong, d.problems);
+    });
+  });
+}
+
+async function openSubscriptionModal() {
+  if (!subscriptionModal) return;
+  subscriptionModal.hidden = false;
+  const card = document.getElementById('sub-card');
+  card.innerHTML = '<div class="sub-card__plan">불러오는 중…</div>';
+  try {
+    const me = await fetch(`${API_BASE}/api/me`, { credentials: 'include' });
+    if (!me.ok) {
+      card.innerHTML = '<div class="sub-card__plan">로그인 후 구독 정보를 확인할 수 있어요.</div>';
+      return;
+    }
+    // No subscription backend yet — render the honest free-plan state. When
+    // billing is wired up, swap this block for a fetch to /api/me/subscription.
+    card.innerHTML = `
+      <div class="sub-card__badge">현재 플랜</div>
+      <div class="sub-card__plan">무료 플랜</div>
+      <div class="sub-card__status">
+        <span class="sub-card__dot"></span>
+        구독 중인 결제 상품이 없습니다.
+      </div>
+      <ul class="sub-card__list">
+        <li>결제 진행 중인 상품 <strong>없음</strong></li>
+        <li>다음 결제일 <strong>—</strong></li>
+        <li>잔여 이용 기간 <strong>—</strong></li>
+      </ul>
+      <p class="sub-card__note">유료 플랜을 시작하면 이 화면에서 결제 상태와 잔여 일수가 자동으로 표시됩니다.</p>
+    `;
+  } catch (_) {
+    card.innerHTML = '<div class="sub-card__plan">구독 정보를 불러오지 못했습니다.</div>';
+  }
+}
+
+// My-menu item delegation. Match by data-i18n key — those keys are stable and
+// already on every menu button. Resolved locally because the module-scoped
+// `myMenu` const is declared further down in this file.
+{
+  const _myMenu = document.getElementById('my-menu');
+  if (_myMenu) {
+    _myMenu.addEventListener('click', (e) => {
+      const item = e.target.closest('.my-menu__item');
+      if (!item || item.id === 'logout-btn') return;
+      const key = item.dataset.i18n;
+      _myMenu.hidden = true;
+      if (key === 'my.history') openHistoryModal();
+      else if (key === 'my.subscription') openSubscriptionModal();
+      else if (key === 'my.invite') showInvite();
+      else if (key === 'my.settings') alert('설정은 곧 추가됩니다.');
+    });
+  }
+}
 
 // Copy invite link function
 function copyInviteLink() {
@@ -937,7 +1108,7 @@ function setMode(nextMode) {
     : nextMode === "find-password" ? "비밀번호 찾기"
     : "로그인";
   const submitKo =
-    nextMode === "signup-email" ? "인증코드 받기"
+    nextMode === "signup-email" ? "회원가입"
     : nextMode === "signup-verify" ? "회원가입"
     : nextMode === "login" ? "로그인"
     : "전송";
@@ -956,8 +1127,8 @@ function setMode(nextMode) {
   const showCode = nextMode === "signup-verify";
   const showRecovery = nextMode === "login";
   const showRecoveryAlt = nextMode === "find-id" || nextMode === "find-password";
-  const showUsername = nextMode === "login" || nextMode === "signup-verify" || nextMode === "signup-email";
-  const showPassword = nextMode === "login" || nextMode === "signup-verify" || nextMode === "signup-email";
+  const showUsername = nextMode === "login" || nextMode === "signup-email" || nextMode === "signup-verify";
+  const showPassword = nextMode === "login" || nextMode === "signup-email" || nextMode === "signup-verify";
 
   usernameLabel.hidden = !showUsername;
   passwordLabel.hidden = !showPassword;
@@ -994,7 +1165,7 @@ function setMode(nextMode) {
   // (which can synthesize stray click events that look like backdrop clicks).
   const pwInput = form.querySelector("input[name=password]");
   if (pwInput) {
-    pwInput.autocomplete = nextMode === "signup-verify" ? "new-password" : "current-password";
+    pwInput.autocomplete = (nextMode === "signup-verify" || nextMode === "signup-email") ? "new-password" : "current-password";
   }
 
   // Reset error region (also strips any demo-fallback button if present).
@@ -1150,18 +1321,26 @@ form.addEventListener("submit", async (e) => {
           return;
         }
 
-        // Success: move to signup-verify mode
-        infoEl.textContent = "인증코드를 이메일로 전송했습니다. 3분 이내에 입력해주세요.";
-        infoEl.hidden = false;
-        
-        if (body.devCode) {
-          alert(`[개발 모드 안내]\n현재 SMTP 서버가 설정되지 않아 실제 이메일이 발송되지 않습니다.\n\n인증코드: ${body.devCode}`);
-        }
-
+        // Capture the username/password the user already typed in step 1 so the
+        // form.reset() inside setMode("signup-verify") doesn't wipe them out.
+        const usernameInput = form.querySelector("input[name=username]");
+        const passwordInput = form.querySelector("input[name=password]");
+        const carryUsername = usernameInput ? usernameInput.value : "";
+        const carryPassword = passwordInput ? passwordInput.value : "";
         // Store email for next step
         sessionStorage.setItem("signup-email", data.email);
         // Switch to verify mode
         setMode("signup-verify");
+        if (usernameInput) usernameInput.value = carryUsername;
+        if (passwordInput) passwordInput.value = carryPassword;
+        // Show the info banner AFTER setMode so its reset doesn't hide it.
+        infoEl.textContent = "인증코드를 이메일로 전송했습니다. 3분 이내에 입력해주세요.";
+        infoEl.hidden = false;
+        // Dev convenience: if backend SMTP isn't configured it returns the
+        // verification code in the response body so we can surface it inline.
+        if (body.devCode) {
+          alert(`[개발 모드 안내]\n현재 SMTP 서버가 설정되지 않아 실제 이메일이 발송되지 않습니다.\n\n인증코드: ${body.devCode}`);
+        }
       } catch (netErr) {
         if (isNetworkError(netErr)) {
           errorEl.textContent = t("auth.serverError") || "서버에 연결할 수 없습니다.";
@@ -1418,7 +1597,7 @@ const DEFAULT_NOTIFICATIONS = [
     body: "초대 보상으로 7일 프리미엄이 적립됐습니다.",
     createdAt: Date.now() - 1000 * 60 * 60 * 3, read: false },
   { id: "n3", title: "학습 리포트가 준비됐어요",
-    body: "지난 주 진척도를 마이페이지에서 확인해 보세요.",
+    body: "지난 주 진척도를 학습 기록에서 확인해 보세요.",
     createdAt: Date.now() - 1000 * 60 * 60 * 26, read: true },
 ];
 

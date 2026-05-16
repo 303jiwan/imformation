@@ -23,9 +23,8 @@
       <div class="nav-collapse" id="nav-collapse">
         <nav class="menu" id="menu">
           <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
+          <a href="lectures.html" data-i18n="nav.lectures">강의</a>
           <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
-          <a href="index.html" data-action="reviews" data-i18n="nav.reviews">후기</a>
-          <a href="index.html" data-action="invite" data-i18n="nav.invite">친구 초대</a>
           <a href="#" data-action="avatar" data-i18n="nav.avatar">아바타</a>
         </nav>
         <div class="actions">
@@ -58,7 +57,6 @@
                 </div>
               </div>
               <ul class="my-menu__list">
-                <li><button type="button" class="my-menu__item" data-i18n="my.mypage">마이페이지</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.invite">친구 초대</button></li>
@@ -213,19 +211,75 @@
 
         <div class="survey-actions">
           <a class="survey-back" href="index.html">← 돌아가기</a>
-          <button type="submit" class="survey-submit">결과 보기 →</button>
+          <button type="submit" class="survey-submit">다음 →</button>
         </div>
       </form>
     </section>
 
     <script type="module" src="/src/main.js"></script>
     <script type="module">
+      const API_BASE = 'http://localhost:3000';
       const form = document.getElementById('survey-form');
       const fade = document.getElementById('page-fade');
-      form.addEventListener('submit', (e) => {
+
+      // Three-step gate on load:
+      //   1. Require login. If /api/me says 401, send them to index.html
+      //      (which hosts the login modal). Network errors fall through so the
+      //      page still works in demo/offline mode.
+      //   2. If the logged-in user already has a saved survey, mirror it into
+      //      sessionStorage (test-problems.js reads it for difficulty) and skip
+      //      to results.html.
+      //   3. Otherwise, reveal the form.
+      async function gateOnLoad() {
+        let loggedIn = null; // null = unknown (backend unreachable)
+        try {
+          const me = await fetch(`${API_BASE}/api/me`, { credentials: 'include' });
+          loggedIn = me.ok;
+        } catch (_) { /* offline — leave loggedIn null */ }
+
+        if (loggedIn === false) {
+          alert('로그인 후 이용해주세요.');
+          window.location.replace('index.html');
+          return;
+        }
+
+        if (loggedIn === true) {
+          try {
+            const res = await fetch(`${API_BASE}/api/survey`, { credentials: 'include' });
+            if (res.ok) {
+              const data = await res.json();
+              if (data?.survey) {
+                try {
+                  sessionStorage.setItem('survey', JSON.stringify({
+                    interest: data.survey.interest,
+                    level: data.survey.level,
+                    time: data.survey.time,
+                  }));
+                } catch (_) {}
+                window.location.replace('results.html');
+                return;
+              }
+            }
+          } catch (_) { /* fall through to showing the form */ }
+        }
+
+        if (fade) fade.classList.add('is-hidden');
+      }
+
+      gateOnLoad();
+
+      form.addEventListener('submit', async (e) => {
         e.preventDefault();
         const data = Object.fromEntries(new FormData(form));
         try { sessionStorage.setItem('survey', JSON.stringify(data)); } catch (_) {}
+        try {
+          await fetch(`${API_BASE}/api/survey`, {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+          });
+        } catch (_) { /* offline — sessionStorage covers the same-session case */ }
         if (fade) fade.classList.remove('is-hidden');
         setTimeout(() => { window.location.href = 'results.html'; }, 180);
       });

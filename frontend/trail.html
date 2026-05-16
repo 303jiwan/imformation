@@ -23,9 +23,8 @@
       <div class="nav-collapse" id="nav-collapse">
         <nav class="menu" id="menu">
           <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
+          <a href="lectures.html" data-i18n="nav.lectures">강의</a>
           <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
-          <a href="index.html" data-action="reviews" data-i18n="nav.reviews">후기</a>
-          <a href="index.html" data-action="invite" data-i18n="nav.invite">친구 초대</a>
           <a href="#" data-action="avatar" data-i18n="nav.avatar">아바타</a>
         </nav>
         <div class="actions">
@@ -58,7 +57,6 @@
                 </div>
               </div>
               <ul class="my-menu__list">
-                <li><button type="button" class="my-menu__item" data-i18n="my.mypage">마이페이지</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.invite">친구 초대</button></li>
@@ -125,11 +123,14 @@
 
     <main class="trail-page" id="trail-page" data-color="green">
       <header class="trail-page__topbar">
-        <button type="button" class="trail-page__name" id="trail-name-btn" aria-haspopup="true" aria-expanded="false">
-          <span class="trail-page__name-eyebrow" id="trail-eyebrow">Trail 0. Codetree 101</span>
-          <span class="trail-page__name-title" id="trail-title">프로그래밍 시작</span>
-          <span class="trail-page__name-caret" aria-hidden="true">▾</span>
-        </button>
+        <div class="trail-page__name-wrap">
+          <button type="button" class="trail-page__name" id="trail-name-btn" aria-haspopup="true" aria-expanded="false" aria-controls="trail-name-menu">
+            <span class="trail-page__name-eyebrow" id="trail-eyebrow">Trail 0. Codetree 101</span>
+            <span class="trail-page__name-title" id="trail-title">프로그래밍 시작</span>
+            <span class="trail-page__name-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="trail-page__name-menu" id="trail-name-menu" role="menu" hidden></div>
+        </div>
         <div class="trail-page__stats">
           <div class="trail-stat trail-stat--streak">
             <span class="trail-stat__icon" aria-hidden="true">▬</span>

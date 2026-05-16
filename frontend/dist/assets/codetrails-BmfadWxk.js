@@ -1,1 +1,0 @@
-import"./main-B2IttiPe.js";const e=document.getElementById("page-fade");document.querySelectorAll(".trail-primary[data-trail]").forEach(t=>{t.addEventListener("click",()=>{const i=t.getAttribute("data-trail");e&&e.classList.remove("is-hidden"),setTimeout(()=>{window.location.href=`trail.html?trail=${i}`},180)})});

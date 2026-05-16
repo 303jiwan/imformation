@@ -3,6 +3,8 @@
 // 각 트레일의 챕터/노드 이름은 codetrails.html 카드에 노출된 태그 + 첨부 시안에
 // 보이는 챕터 라벨을 합쳐 만든 정적 데이터. 실제 학습 콘텐츠는 후속 작업.
 
+import { getLesson as getLessonDisplay } from "./lesson-data.js";
+
 const COLORS = {
   green:  { hex: "#22c55e", deep: "#16a34a", soft: "#ecfdf5", chip: "#dcfce7" },
   yellow: { hex: "#eab308", deep: "#ca8a04", soft: "#fefce8", chip: "#fef9c3" },
@@ -33,7 +35,7 @@ const TRAILS = [
     id: 1, color: "yellow", eyebrow: "Trail 1. Novice Low", title: "프로그래밍 기초",
     chapters: [
       { name: "Ch 1. 출력",   nodes: ["기본 출력", "변수와 자료형", "출력 형식", "소수점 맞춰 출력", "변수 값 변경", "다른 변수로부터 값 변경", "두 변수 값을 교환", "변수값 동시에 복사"] },
-      { name: "Ch 2. 입출력", nodes: ["정수 입력", "실수 입력"] },
+      { name: "Ch 2. 입출력", nodes: ["정수 입력", "실수 입력", "공백을 사이에 두고 입력", "2개씩 줄에 실수 입력", "문자, 문자열 입력", "특정 문자를 사이에 두고 입력"] },
     ],
     lesson: {
       title: "기본 출력",
@@ -198,6 +200,56 @@ function renderTopbar(trail) {
   document.title = `Codenergy — ${trail.title}`;
 }
 
+function renderTrailMenu(currentTrail) {
+  const btn  = document.getElementById("trail-name-btn");
+  const menu = document.getElementById("trail-name-menu");
+  if (!btn || !menu) return;
+
+  menu.innerHTML = "";
+  TRAILS.forEach((t) => {
+    const a = document.createElement("a");
+    a.className = "trail-page__name-menu__item";
+    a.href = `trail.html?trail=${t.id}`;
+    a.setAttribute("role", "menuitem");
+    if (t.id === currentTrail.id) {
+      a.classList.add("is-active");
+      a.setAttribute("aria-current", "page");
+    }
+    a.innerHTML = `
+      <span class="trail-page__name-menu__item-eyebrow"></span>
+      <span class="trail-page__name-menu__item-title"></span>
+    `;
+    a.querySelector(".trail-page__name-menu__item-eyebrow").textContent = t.eyebrow;
+    a.querySelector(".trail-page__name-menu__item-title").textContent   = t.title;
+    menu.appendChild(a);
+  });
+
+  const close = () => {
+    menu.hidden = true;
+    btn.setAttribute("aria-expanded", "false");
+  };
+  const open = () => {
+    menu.hidden = false;
+    btn.setAttribute("aria-expanded", "true");
+  };
+
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    if (menu.hidden) open(); else close();
+  });
+  document.addEventListener("click", (e) => {
+    if (menu.hidden) return;
+    if (btn.contains(e.target) || menu.contains(e.target)) return;
+    close();
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && !menu.hidden) {
+      close();
+      btn.focus();
+    }
+  });
+}
+
 function renderChapters(trail) {
   const host = document.getElementById("trail-chapters");
   if (!host) return;
@@ -214,24 +266,81 @@ function renderChapters(trail) {
     list.className = "chapter-list";
 
     chapter.nodes.forEach((node, ni) => {
-      const isFirst = ci === 0 && ni === 0;
       const item = document.createElement("li");
-      item.className = `chapter-node${isFirst ? " is-active" : " is-locked"}`;
+      item.className = "chapter-node is-locked";
       const offset = ni % 2 === 0 ? "left" : "right";
       item.dataset.offset = offset;
+      const lessonId = `t${trail.id}-ch${ci + 1}-${ni + 1}`;
+      item.dataset.lessonId = lessonId;
       item.innerHTML = `
+        <span class="chapter-node__ring" aria-hidden="true"></span>
         <span class="hex" aria-hidden="true">
-          ${isFirst
-            ? `<span class="hex-num">${ni + 1}</span>`
-            : `<span class="hex-lock">🔒</span>`}
+          <span class="hex-num">${ni + 1}</span>
         </span>
         <span class="chapter-node__label">${node}</span>
       `;
+      item.addEventListener("click", () => {
+        const wasSelected = item.classList.contains("is-selected");
+        document.querySelectorAll(".chapter-node.is-selected").forEach((n) => {
+          n.classList.remove("is-selected");
+        });
+        if (!wasSelected) {
+          item.classList.add("is-selected");
+          renderLessonForNode(trail, lessonId, node);
+        }
+      });
       list.appendChild(item);
     });
 
     host.appendChild(list);
   });
+}
+
+/**
+ * Update the right-side lesson panel to reflect the clicked hex node.
+ * Falls back to whatever the trail's static lesson rows define when the
+ * lesson isn't yet wired in lesson-data.js.
+ */
+function renderLessonForNode(trail, lessonId, nodeTitle) {
+  const display = getLessonDisplay(lessonId);
+  const titleEl = document.getElementById("lesson-title");
+  if (titleEl) titleEl.textContent = display?.title || nodeTitle || trail.lesson.title;
+
+  const tbody = document.getElementById("lesson-rows");
+  if (tbody) {
+    tbody.innerHTML = "";
+    if (display?.problems) {
+      const all = [
+        ...(display.problems.basic    || []).map((p) => ({ ...p, step: "기본 문제" })),
+        ...(display.problems.practice || []).map((p) => ({ ...p, step: "연습 문제" })),
+      ];
+      let prevStep = "";
+      all.forEach((row) => {
+        const tr = document.createElement("tr");
+        const stepCell = row.step === prevStep ? "" : row.step;
+        prevStep = row.step;
+        tr.innerHTML = `
+          <td class="col-step">${stepCell}</td>
+          <td class="col-prob"><span class="bean" aria-hidden="true">●</span> ${row.title || row.id}</td>
+          <td class="col-time">${row.time || "—"}</td>
+          <td class="col-xp">${row.xp ?? 10}</td>
+          <td class="col-diff"><span class="${diffClass(row.diff || "Easy")}">${row.diff || "Easy"}</span></td>
+        `;
+        tbody.appendChild(tr);
+      });
+    } else {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `<td colspan="5" style="text-align:center;color:#888;padding:18px">아직 준비 중인 레슨이에요.</td>`;
+      tbody.appendChild(tr);
+    }
+  }
+
+  const cta = document.getElementById("lesson-cta");
+  if (cta) {
+    cta.textContent = display ? "레슨 시작하기 →" : "준비 중";
+    cta.disabled = !display;
+    cta.onclick = display ? () => { location.href = `lessons.html?lesson=${encodeURIComponent(lessonId)}`; } : null;
+  }
 }
 
 function renderLesson(trail) {
@@ -267,13 +376,20 @@ function renderLesson(trail) {
   });
 
   const cta = document.getElementById("lesson-cta");
-  if (cta) cta.textContent = trail.ctaText || "레슨 시작하기 →";
+  if (cta) {
+    cta.textContent = trail.ctaText || "레슨 시작하기 →";
+    const firstLessonId = `t${trail.id}-ch1-1`;
+    const display = getLessonDisplay(firstLessonId);
+    cta.disabled = !display;
+    cta.onclick = display ? () => { location.href = `lessons.html?lesson=${encodeURIComponent(firstLessonId)}`; } : null;
+  }
 }
 
 function init() {
   const trail = pickTrail();
   setColor(trail);
   renderTopbar(trail);
+  renderTrailMenu(trail);
   renderChapters(trail);
   renderLesson(trail);
 }

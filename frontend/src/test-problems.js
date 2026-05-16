@@ -4157,6 +4157,8000 @@ int main(void) {
 }
 `,
   },
+  /* --- cond medium (9 more, to total 10 for cond) --- */
+  {
+    id: 108,
+    difficulty: "medium",
+    tag: "중급 · 조건문",
+    title: "세 과목 평균 등급",
+    description:
+      "세 과목 점수 <code>A</code>, <code>B</code>, <code>C</code>가 주어집니다. " +
+      "세 점수의 평균(정수 나눗셈)에 따라 등급을 출력하세요.<br>" +
+      "- 평균이 90 이상이면 <code>A</code><br>" +
+      "- 80 이상이면 <code>B</code><br>" +
+      "- 70 이상이면 <code>C</code><br>" +
+      "- 그 외에는 <code>F</code>",
+    inputDesc:
+      "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>, 그다음 줄에 <code>C</code>가 주어집니다.",
+    outputDesc: "등급 한 글자를 출력합니다.",
+    constraints: ["0 ≤ A, B, C ≤ 100"],
+    examples: [
+      { input: "95\n90\n92", output: "A" },
+      { input: "70\n80\n60", output: "C" },
+      { input: "50\n40\n30", output: "F" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 100, desc: "1번 과목 점수" },
+      { name: "B", min: 0, max: 100, desc: "2번 과목 점수" },
+      { name: "C", min: 0, max: 100, desc: "3번 과목 점수" },
+    ],
+    testCases: [
+      { input: "95\n90\n92", expected: "A" },
+      { input: "70\n80\n60", expected: "C" },
+      { input: "50\n40\n30", expected: "F" },
+    ],
+    concepts: ["cond", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+
+    // TODO: 평균을 구해 A/B/C/F 등급 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+    int avg = (A + B + C) / 3;
+    if (avg >= 90)      printf("A\\n");
+    else if (avg >= 80) printf("B\\n");
+    else if (avg >= 70) printf("C\\n");
+    else                printf("F\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B, C }) => {
+      const avg = Math.floor((A + B + C) / 3);
+      if (avg >= 90) return "A";
+      if (avg >= 80) return "B";
+      if (avg >= 70) return "C";
+      return "F";
+    },
+  },
+  {
+    id: 109,
+    difficulty: "medium",
+    tag: "중급 · 조건문",
+    title: "자판기 거스름돈",
+    description:
+      "물건의 가격 <code>P</code>와 손님이 낸 금액 <code>M</code>이 주어집니다. " +
+      "<code>M</code>이 <code>P</code> 이상이면 거스름돈 <code>M - P</code>를 출력하고, " +
+      "그렇지 않으면 <code>need more</code>를 출력하세요.",
+    inputDesc:
+      "첫 줄에 가격 <code>P</code>, 그다음 줄에 지불 금액 <code>M</code>이 주어집니다.",
+    outputDesc: "거스름돈 또는 <code>need more</code>를 출력합니다.",
+    constraints: ["1 ≤ P, M ≤ 100000"],
+    examples: [
+      { input: "1500\n2000", output: "500" },
+      { input: "3000\n1000", output: "need more" },
+    ],
+    inputs: [
+      { name: "P", min: 1, max: 100000, desc: "물건 가격" },
+      { name: "M", min: 1, max: 100000, desc: "낸 금액" },
+    ],
+    testCases: [
+      { input: "1500\n2000", expected: "500" },
+      { input: "3000\n1000", expected: "need more" },
+      { input: "500\n500", expected: "0" },
+    ],
+    concepts: ["cond", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int P, M;
+    scanf("%d", &P);
+    scanf("%d", &M);
+
+    // TODO: M >= P 이면 거스름돈, 아니면 need more
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int P, M;
+    scanf("%d", &P);
+    scanf("%d", &M);
+    if (M >= P) printf("%d\\n", M - P);
+    else        printf("need more\\n");
+    return 0;
+}
+`,
+    expected: ({ P, M }) => (M >= P ? String(M - P) : "need more"),
+  },
+  {
+    id: 110,
+    difficulty: "medium",
+    tag: "중급 · 조건문",
+    title: "윤년 판정",
+    description:
+      "양의 정수 <code>Y</code>(연도)가 주어집니다. <code>Y</code>가 윤년이면 <code>leap</code>, " +
+      "그렇지 않으면 <code>common</code>을 출력하세요.<br>" +
+      "윤년 규칙: 4의 배수이고 100의 배수가 아니거나, 400의 배수이면 윤년입니다.",
+    inputDesc: "첫 줄에 연도 <code>Y</code>가 주어집니다.",
+    outputDesc: "<code>leap</code> 또는 <code>common</code>을 출력합니다.",
+    constraints: ["1900 ≤ Y ≤ 2100"],
+    examples: [
+      { input: "2024", output: "leap" },
+      { input: "2023", output: "common" },
+      { input: "2000", output: "leap" },
+      { input: "1900", output: "common" },
+    ],
+    inputs: [
+      { name: "Y", min: 1900, max: 2100, desc: "연도" },
+    ],
+    testCases: [
+      { input: "2024", expected: "leap" },
+      { input: "2023", expected: "common" },
+      { input: "2000", expected: "leap" },
+    ],
+    concepts: ["cond", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int Y;
+    scanf("%d", &Y);
+
+    // TODO: 윤년 판정
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int Y;
+    scanf("%d", &Y);
+    int leap = (Y % 4 == 0 && Y % 100 != 0) || (Y % 400 == 0);
+    if (leap) printf("leap\\n");
+    else      printf("common\\n");
+    return 0;
+}
+`,
+    expected: ({ Y }) =>
+      (Y % 4 === 0 && Y % 100 !== 0) || Y % 400 === 0 ? "leap" : "common",
+  },
+  {
+    id: 111,
+    difficulty: "medium",
+    tag: "중급 · 조건문",
+    title: "삼각형 종류 판별",
+    description:
+      "삼각형의 세 변 길이 <code>A</code>, <code>B</code>, <code>C</code>가 주어집니다. " +
+      "세 변이 모두 같으면 <code>equilateral</code>, 두 변만 같으면 <code>isosceles</code>, " +
+      "모두 다르면 <code>scalene</code>을 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>, 그다음 줄에 <code>C</code>가 주어집니다.",
+    outputDesc: "삼각형 종류를 출력합니다.",
+    constraints: ["1 ≤ A, B, C ≤ 100"],
+    examples: [
+      { input: "3\n3\n3", output: "equilateral" },
+      { input: "5\n5\n7", output: "isosceles" },
+      { input: "3\n4\n5", output: "scalene" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 100, desc: "변 A" },
+      { name: "B", min: 1, max: 100, desc: "변 B" },
+      { name: "C", min: 1, max: 100, desc: "변 C" },
+    ],
+    testCases: [
+      { input: "3\n3\n3", expected: "equilateral" },
+      { input: "5\n5\n7", expected: "isosceles" },
+      { input: "3\n4\n5", expected: "scalene" },
+    ],
+    concepts: ["cond", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+
+    // TODO: 세 변 비교로 삼각형 종류 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+    if (A == B && B == C)       printf("equilateral\\n");
+    else if (A == B || B == C || A == C) printf("isosceles\\n");
+    else                        printf("scalene\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B, C }) => {
+      if (A === B && B === C) return "equilateral";
+      if (A === B || B === C || A === C) return "isosceles";
+      return "scalene";
+    },
+  },
+  {
+    id: 112,
+    difficulty: "medium",
+    tag: "중급 · 조건문",
+    title: "시간 차이를 분으로",
+    description:
+      "시작 시각 <code>h1</code>시 <code>m1</code>분과 종료 시각 <code>h2</code>시 <code>m2</code>분이 주어집니다. " +
+      "두 시각 사이의 시간 차이를 분 단위로 출력하세요. (24시간 시계, 같은 날 기준)",
+    inputDesc:
+      "첫 줄에 <code>h1</code>, 그다음 줄에 <code>m1</code>, 그다음 줄에 <code>h2</code>, 그다음 줄에 <code>m2</code>가 주어집니다.",
+    outputDesc: "<code>(h2*60 + m2) - (h1*60 + m1)</code>의 값을 출력합니다.",
+    constraints: ["0 ≤ h1, h2 ≤ 23", "0 ≤ m1, m2 ≤ 59"],
+    examples: [
+      { input: "9\n30\n10\n45", output: "75" },
+      { input: "10\n0\n9\n0", output: "-60" },
+    ],
+    inputs: [
+      { name: "h1", min: 0, max: 23, desc: "시작 시" },
+      { name: "m1", min: 0, max: 59, desc: "시작 분" },
+      { name: "h2", min: 0, max: 23, desc: "종료 시" },
+      { name: "m2", min: 0, max: 59, desc: "종료 분" },
+    ],
+    testCases: [
+      { input: "9\n30\n10\n45", expected: "75" },
+      { input: "10\n0\n9\n0", expected: "-60" },
+      { input: "0\n0\n23\n59", expected: "1439" },
+    ],
+    concepts: ["cond", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int h1, m1, h2, m2;
+    scanf("%d", &h1);
+    scanf("%d", &m1);
+    scanf("%d", &h2);
+    scanf("%d", &m2);
+
+    // TODO: 분 단위 차이 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int h1, m1, h2, m2;
+    scanf("%d", &h1);
+    scanf("%d", &m1);
+    scanf("%d", &h2);
+    scanf("%d", &m2);
+    printf("%d\\n", (h2 * 60 + m2) - (h1 * 60 + m1));
+    return 0;
+}
+`,
+    expected: ({ h1, m1, h2, m2 }) =>
+      String((h2 * 60 + m2) - (h1 * 60 + m1)),
+  },
+  {
+    id: 113,
+    difficulty: "medium",
+    tag: "중급 · 조건문",
+    title: "좌표 사분면",
+    description:
+      "정수 좌표 <code>(x, y)</code>가 주어집니다. <code>x</code> 또는 <code>y</code>가 0이면 <code>axis</code>를, " +
+      "아니면 점이 위치한 사분면 번호(<code>1</code>~<code>4</code>)를 출력하세요.",
+    inputDesc: "첫 줄에 <code>x</code>, 그다음 줄에 <code>y</code>가 주어집니다.",
+    outputDesc: "사분면 번호 또는 <code>axis</code>를 출력합니다.",
+    constraints: ["-1000 ≤ x, y ≤ 1000"],
+    examples: [
+      { input: "3\n4", output: "1" },
+      { input: "-2\n5", output: "2" },
+      { input: "-3\n-1", output: "3" },
+      { input: "0\n5", output: "axis" },
+    ],
+    inputs: [
+      { name: "x", min: -1000, max: 1000, desc: "x 좌표" },
+      { name: "y", min: -1000, max: 1000, desc: "y 좌표" },
+    ],
+    testCases: [
+      { input: "3\n4", expected: "1" },
+      { input: "-2\n5", expected: "2" },
+      { input: "0\n5", expected: "axis" },
+    ],
+    concepts: ["cond", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int x, y;
+    scanf("%d", &x);
+    scanf("%d", &y);
+
+    // TODO: 사분면 번호 또는 axis 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int x, y;
+    scanf("%d", &x);
+    scanf("%d", &y);
+    if (x == 0 || y == 0)      printf("axis\\n");
+    else if (x > 0 && y > 0)   printf("1\\n");
+    else if (x < 0 && y > 0)   printf("2\\n");
+    else if (x < 0 && y < 0)   printf("3\\n");
+    else                       printf("4\\n");
+    return 0;
+}
+`,
+    expected: ({ x, y }) => {
+      if (x === 0 || y === 0) return "axis";
+      if (x > 0 && y > 0) return "1";
+      if (x < 0 && y > 0) return "2";
+      if (x < 0 && y < 0) return "3";
+      return "4";
+    },
+  },
+  {
+    id: 114,
+    difficulty: "medium",
+    tag: "중급 · 조건문",
+    title: "가위바위보",
+    description:
+      "두 사람이 가위바위보를 합니다. 각 사람의 손은 <code>1=rock</code>, <code>2=scissors</code>, " +
+      "<code>3=paper</code>로 입력됩니다. 첫 번째 사람의 손이 <code>A</code>, 두 번째 사람의 손이 <code>B</code>입니다. " +
+      "<code>A</code>가 이기면 <code>first</code>, <code>B</code>가 이기면 <code>second</code>, 비기면 <code>draw</code>를 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>first</code>, <code>second</code>, <code>draw</code> 중 하나를 출력합니다.",
+    constraints: ["A, B ∈ {1, 2, 3}"],
+    examples: [
+      { input: "1\n2", output: "first" },
+      { input: "3\n1", output: "first" },
+      { input: "2\n2", output: "draw" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 3, desc: "첫 번째 사람의 손" },
+      { name: "B", min: 1, max: 3, desc: "두 번째 사람의 손" },
+    ],
+    testCases: [
+      { input: "1\n2", expected: "first" },
+      { input: "2\n1", expected: "second" },
+      { input: "3\n3", expected: "draw" },
+    ],
+    concepts: ["cond", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: 가위바위보 결과 출력 (1=rock, 2=scissors, 3=paper)
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    if (A == B) printf("draw\\n");
+    else if ((A == 1 && B == 2) || (A == 2 && B == 3) || (A == 3 && B == 1))
+        printf("first\\n");
+    else
+        printf("second\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      if (A === B) return "draw";
+      if ((A === 1 && B === 2) || (A === 2 && B === 3) || (A === 3 && B === 1))
+        return "first";
+      return "second";
+    },
+  },
+  {
+    id: 115,
+    difficulty: "medium",
+    tag: "중급 · 조건문",
+    title: "직각삼각형 판정",
+    description:
+      "세 변 <code>A</code>, <code>B</code>, <code>C</code>가 주어집니다. 세 변으로 직각삼각형을 만들 수 있으면 " +
+      "<code>yes</code>, 아니면 <code>no</code>를 출력하세요. (<code>a² + b² = c²</code>이 어떤 순서로든 성립하면 yes)",
+    inputDesc:
+      "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>, 그다음 줄에 <code>C</code>가 주어집니다.",
+    outputDesc: "<code>yes</code> 또는 <code>no</code>를 출력합니다.",
+    constraints: ["1 ≤ A, B, C ≤ 100"],
+    examples: [
+      { input: "3\n4\n5", output: "yes" },
+      { input: "5\n12\n13", output: "yes" },
+      { input: "2\n3\n4", output: "no" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 100, desc: "변 A" },
+      { name: "B", min: 1, max: 100, desc: "변 B" },
+      { name: "C", min: 1, max: 100, desc: "변 C" },
+    ],
+    testCases: [
+      { input: "3\n4\n5", expected: "yes" },
+      { input: "5\n12\n13", expected: "yes" },
+      { input: "2\n3\n4", expected: "no" },
+    ],
+    concepts: ["cond", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+
+    // TODO: 직각삼각형 판정 후 yes/no 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+    int a2 = A * A, b2 = B * B, c2 = C * C;
+    if (a2 + b2 == c2 || a2 + c2 == b2 || b2 + c2 == a2)
+        printf("yes\\n");
+    else
+        printf("no\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B, C }) => {
+      const a2 = A * A, b2 = B * B, c2 = C * C;
+      if (a2 + b2 === c2 || a2 + c2 === b2 || b2 + c2 === a2) return "yes";
+      return "no";
+    },
+  },
+  {
+    id: 116,
+    difficulty: "medium",
+    tag: "중급 · 조건문",
+    title: "회원 등급",
+    description:
+      "누적 구매액 <code>S</code>(원)와 누적 포인트 <code>P</code>가 주어집니다. 다음 규칙으로 등급을 출력하세요.<br>" +
+      "- <code>S ≥ 1000000</code> 그리고 <code>P ≥ 10000</code>: <code>VIP</code><br>" +
+      "- <code>S ≥ 500000</code> 또는 <code>P ≥ 5000</code>: <code>GOLD</code><br>" +
+      "- <code>S ≥ 100000</code> 또는 <code>P ≥ 1000</code>: <code>SILVER</code><br>" +
+      "- 그 외: <code>BRONZE</code><br>" +
+      "(위에서 먼저 만족하는 등급으로 결정합니다.)",
+    inputDesc:
+      "첫 줄에 <code>S</code>, 그다음 줄에 <code>P</code>가 주어집니다.",
+    outputDesc: "<code>VIP</code>/<code>GOLD</code>/<code>SILVER</code>/<code>BRONZE</code> 중 하나를 출력합니다.",
+    constraints: ["0 ≤ S ≤ 10000000", "0 ≤ P ≤ 100000"],
+    examples: [
+      { input: "2000000\n15000", output: "VIP" },
+      { input: "600000\n2000", output: "GOLD" },
+      { input: "150000\n500", output: "SILVER" },
+      { input: "50000\n100", output: "BRONZE" },
+    ],
+    inputs: [
+      { name: "S", min: 0, max: 10000000, desc: "누적 구매액(원)" },
+      { name: "P", min: 0, max: 100000, desc: "누적 포인트" },
+    ],
+    testCases: [
+      { input: "2000000\n15000", expected: "VIP" },
+      { input: "150000\n500", expected: "SILVER" },
+      { input: "0\n0", expected: "BRONZE" },
+    ],
+    concepts: ["cond", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int S, P;
+    scanf("%d", &S);
+    scanf("%d", &P);
+
+    // TODO: 위에서 먼저 만족하는 등급 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int S, P;
+    scanf("%d", &S);
+    scanf("%d", &P);
+    if (S >= 1000000 && P >= 10000)        printf("VIP\\n");
+    else if (S >= 500000 || P >= 5000)     printf("GOLD\\n");
+    else if (S >= 100000 || P >= 1000)     printf("SILVER\\n");
+    else                                   printf("BRONZE\\n");
+    return 0;
+}
+`,
+    expected: ({ S, P }) => {
+      if (S >= 1000000 && P >= 10000) return "VIP";
+      if (S >= 500000 || P >= 5000) return "GOLD";
+      if (S >= 100000 || P >= 1000) return "SILVER";
+      return "BRONZE";
+    },
+  },
+  /* --- operators medium (10) --- */
+  {
+    id: 117,
+    difficulty: "medium",
+    tag: "중급 · 연산자",
+    title: "두 수의 평균",
+    description:
+      "두 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>(A + B) / 2.0</code>을 소수점 한 자리까지 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "평균을 소수점 한 자리로 출력합니다.",
+    constraints: ["0 ≤ A, B ≤ 100"],
+    examples: [
+      { input: "3\n5", output: "4.0" },
+      { input: "1\n2", output: "1.5" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 100, desc: "정수 A" },
+      { name: "B", min: 0, max: 100, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "4.0" },
+      { input: "1\n2", expected: "1.5" },
+      { input: "100\n0", expected: "50.0" },
+    ],
+    concepts: ["operators", "vars", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: (A + B) / 2.0을 %.1f로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%.1f\\n", (A + B) / 2.0);
+    return 0;
+}
+`,
+    expected: ({ A, B }) => ((A + B) / 2).toFixed(1),
+  },
+  {
+    id: 118,
+    difficulty: "medium",
+    tag: "중급 · 연산자",
+    title: "최대공약수 (유클리드)",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. 유클리드 호제법으로 두 수의 최대공약수를 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>gcd(A, B)</code>를 출력합니다.",
+    constraints: ["1 ≤ A, B ≤ 100000"],
+    examples: [
+      { input: "12\n18", output: "6" },
+      { input: "7\n13", output: "1" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 100000, desc: "정수 A" },
+      { name: "B", min: 1, max: 100000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "12\n18", expected: "6" },
+      { input: "100\n75", expected: "25" },
+      { input: "7\n13", expected: "1" },
+    ],
+    concepts: ["operators", "loops", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: 유클리드 호제법으로 gcd 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    int a = A, b = B;
+    while (b != 0) {
+        int t = a % b;
+        a = b;
+        b = t;
+    }
+    printf("%d\\n", a);
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      let a = A, b = B;
+      while (b !== 0) {
+        const t = a % b;
+        a = b;
+        b = t;
+      }
+      return String(a);
+    },
+  },
+  {
+    id: 119,
+    difficulty: "medium",
+    tag: "중급 · 연산자",
+    title: "최소공배수",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>lcm(A, B) = A × B / gcd(A, B)</code>로 " +
+      "최소공배수를 구해 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>lcm(A, B)</code>를 출력합니다.",
+    constraints: ["1 ≤ A, B ≤ 1000"],
+    examples: [
+      { input: "4\n6", output: "12" },
+      { input: "7\n5", output: "35" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 1000, desc: "정수 A" },
+      { name: "B", min: 1, max: 1000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "4\n6", expected: "12" },
+      { input: "10\n15", expected: "30" },
+      { input: "7\n5", expected: "35" },
+    ],
+    concepts: ["operators", "loops", "functions"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: lcm(A, B) 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int gcd(int a, int b) {
+    while (b != 0) { int t = a % b; a = b; b = t; }
+    return a;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d\\n", (A * B) / gcd(A, B));
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      const g = (a, b) => (b === 0 ? a : g(b, a % b));
+      return String((A * B) / g(A, B));
+    },
+  },
+  {
+    id: 120,
+    difficulty: "medium",
+    tag: "중급 · 연산자",
+    title: "두 점 사이 거리의 제곱",
+    description:
+      "두 점 <code>(x1, y1)</code>과 <code>(x2, y2)</code>가 주어집니다. 두 점 사이 거리의 제곱 " +
+      "<code>(x1 - x2)² + (y1 - y2)²</code>을 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>x1</code>, 그다음 줄에 <code>y1</code>, 그다음 줄에 <code>x2</code>, 그다음 줄에 <code>y2</code>가 주어집니다.",
+    outputDesc: "거리의 제곱을 출력합니다.",
+    constraints: ["-100 ≤ x1, y1, x2, y2 ≤ 100"],
+    examples: [
+      { input: "0\n0\n3\n4", output: "25" },
+      { input: "1\n1\n4\n5", output: "25" },
+    ],
+    inputs: [
+      { name: "x1", min: -100, max: 100, desc: "첫 점 x" },
+      { name: "y1", min: -100, max: 100, desc: "첫 점 y" },
+      { name: "x2", min: -100, max: 100, desc: "두 번째 점 x" },
+      { name: "y2", min: -100, max: 100, desc: "두 번째 점 y" },
+    ],
+    testCases: [
+      { input: "0\n0\n3\n4", expected: "25" },
+      { input: "1\n1\n4\n5", expected: "25" },
+      { input: "-1\n-1\n2\n3", expected: "25" },
+    ],
+    concepts: ["operators", "vars", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int x1, y1, x2, y2;
+    scanf("%d", &x1);
+    scanf("%d", &y1);
+    scanf("%d", &x2);
+    scanf("%d", &y2);
+
+    // TODO: 거리의 제곱 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int x1, y1, x2, y2;
+    scanf("%d", &x1);
+    scanf("%d", &y1);
+    scanf("%d", &x2);
+    scanf("%d", &y2);
+    int dx = x1 - x2, dy = y1 - y2;
+    printf("%d\\n", dx * dx + dy * dy);
+    return 0;
+}
+`,
+    expected: ({ x1, y1, x2, y2 }) => {
+      const dx = x1 - x2, dy = y1 - y2;
+      return String(dx * dx + dy * dy);
+    },
+  },
+  {
+    id: 121,
+    difficulty: "medium",
+    tag: "중급 · 연산자",
+    title: "비트 연산 종합",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. " +
+      "<code>A &amp; B</code>, <code>A | B</code>, <code>A ^ B</code>의 값을 각각 한 줄씩 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "세 줄에 걸쳐 AND / OR / XOR 결과를 출력합니다.",
+    constraints: ["0 ≤ A, B ≤ 255"],
+    examples: [
+      { input: "5\n3", output: "1\n7\n6" },
+      { input: "12\n10", output: "8\n14\n6" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 255, desc: "정수 A" },
+      { name: "B", min: 0, max: 255, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "5\n3", expected: "1\n7\n6" },
+      { input: "12\n10", expected: "8\n14\n6" },
+      { input: "255\n0", expected: "0\n255\n255" },
+    ],
+    concepts: ["operators", "vars", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: AND, OR, XOR을 각각 한 줄씩 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d\\n", A & B);
+    printf("%d\\n", A | B);
+    printf("%d\\n", A ^ B);
+    return 0;
+}
+`,
+    expected: ({ A, B }) => `${A & B}\n${A | B}\n${A ^ B}`,
+  },
+  {
+    id: 122,
+    difficulty: "medium",
+    tag: "중급 · 연산자",
+    title: "자릿수 합이 더 큰 쪽",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. 각 수의 자릿수 합을 비교해, " +
+      "더 큰 쪽의 자릿수 합을 출력하세요. 같으면 <code>tie</code>를 출력합니다.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "더 큰 자릿수 합 또는 <code>tie</code>를 출력합니다.",
+    constraints: ["1 ≤ A, B ≤ 99999"],
+    examples: [
+      { input: "99\n123", output: "18" },
+      { input: "123\n321", output: "tie" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 99999, desc: "정수 A" },
+      { name: "B", min: 1, max: 99999, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "99\n123", expected: "18" },
+      { input: "12\n345", expected: "12" },
+      { input: "321\n123", expected: "tie" },
+    ],
+    concepts: ["operators", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: 두 수의 자릿수 합을 비교해 큰 쪽 또는 tie 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int digitSum(int n) {
+    int s = 0;
+    while (n > 0) { s += n % 10; n /= 10; }
+    return s;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    int sa = digitSum(A);
+    int sb = digitSum(B);
+    if (sa > sb)      printf("%d\\n", sa);
+    else if (sb > sa) printf("%d\\n", sb);
+    else              printf("tie\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      const ds = (n) => String(n).split("").reduce((s, d) => s + Number(d), 0);
+      const sa = ds(A), sb = ds(B);
+      if (sa > sb) return String(sa);
+      if (sb > sa) return String(sb);
+      return "tie";
+    },
+  },
+  {
+    id: 123,
+    difficulty: "medium",
+    tag: "중급 · 연산자",
+    title: "초를 시·분·초로 환산",
+    description:
+      "양의 정수 <code>S</code>(초)가 주어집니다. <code>S</code>를 <code>시:분:초</code> 형식으로 출력하세요. " +
+      "예) <code>S = 3661</code> → <code>1:1:1</code>",
+    inputDesc: "첫 줄에 정수 <code>S</code>가 주어집니다.",
+    outputDesc: "<code>시:분:초</code> 형식으로 출력합니다.",
+    constraints: ["1 ≤ S ≤ 86400"],
+    examples: [
+      { input: "3661", output: "1:1:1" },
+      { input: "60", output: "0:1:0" },
+    ],
+    inputs: [
+      { name: "S", min: 1, max: 86400, desc: "총 초" },
+    ],
+    testCases: [
+      { input: "3661", expected: "1:1:1" },
+      { input: "60", expected: "0:1:0" },
+      { input: "86399", expected: "23:59:59" },
+    ],
+    concepts: ["operators", "vars", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int S;
+    scanf("%d", &S);
+
+    // TODO: 시:분:초 형식으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int S;
+    scanf("%d", &S);
+    int h = S / 3600;
+    int m = (S % 3600) / 60;
+    int s = S % 60;
+    printf("%d:%d:%d\\n", h, m, s);
+    return 0;
+}
+`,
+    expected: ({ S }) =>
+      `${Math.floor(S / 3600)}:${Math.floor((S % 3600) / 60)}:${S % 60}`,
+  },
+  {
+    id: 124,
+    difficulty: "medium",
+    tag: "중급 · 연산자",
+    title: "n진수 변환",
+    description:
+      "양의 정수 <code>N</code>과 진법 <code>B</code>(2 ≤ B ≤ 16)가 주어집니다. <code>N</code>을 " +
+      "<code>B</code>진수로 변환한 결과를 출력하세요. 10 이상의 자리는 소문자 <code>a</code>~<code>f</code>로 표기합니다.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>N</code>을 <code>B</code>진수로 표현한 문자열을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 100000", "2 ≤ B ≤ 16"],
+    examples: [
+      { input: "10\n2", output: "1010" },
+      { input: "255\n16", output: "ff" },
+      { input: "15\n8", output: "17" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 100000, desc: "변환할 수" },
+      { name: "B", min: 2, max: 16, desc: "진법" },
+    ],
+    testCases: [
+      { input: "10\n2", expected: "1010" },
+      { input: "255\n16", expected: "ff" },
+      { input: "15\n8", expected: "17" },
+    ],
+    concepts: ["operators", "loops", "strings"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N, B;
+    scanf("%d", &N);
+    scanf("%d", &B);
+
+    // TODO: N을 B진수로 변환해 출력 (10~15는 소문자)
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N, B;
+    scanf("%d", &N);
+    scanf("%d", &B);
+    char buf[40];
+    int len = 0;
+    while (N > 0) {
+        int d = N % B;
+        buf[len++] = d < 10 ? ('0' + d) : ('a' + d - 10);
+        N /= B;
+    }
+    for (int i = len - 1; i >= 0; i--) printf("%c", buf[i]);
+    printf("\\n");
+    return 0;
+}
+`,
+    expected: ({ N, B }) => N.toString(B),
+  },
+  {
+    id: 125,
+    difficulty: "medium",
+    tag: "중급 · 연산자",
+    title: "거듭제곱 (mod)",
+    description:
+      "양의 정수 <code>A</code>, <code>B</code>, <code>M</code>이 주어집니다. " +
+      "<code>A^B mod M</code>의 값을 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>, 그다음 줄에 <code>M</code>이 주어집니다.",
+    outputDesc: "<code>A^B</code>를 <code>M</code>으로 나눈 나머지를 출력합니다.",
+    constraints: ["1 ≤ A ≤ 100", "0 ≤ B ≤ 20", "2 ≤ M ≤ 1000"],
+    examples: [
+      { input: "2\n10\n1000", output: "24" },
+      { input: "3\n5\n7", output: "5" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 100, desc: "밑" },
+      { name: "B", min: 0, max: 20, desc: "지수" },
+      { name: "M", min: 2, max: 1000, desc: "나누는 수" },
+    ],
+    testCases: [
+      { input: "2\n10\n1000", expected: "24" },
+      { input: "3\n5\n7", expected: "5" },
+      { input: "5\n0\n100", expected: "1" },
+    ],
+    concepts: ["operators", "loops", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, M;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &M);
+
+    // TODO: A^B mod M 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, M;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &M);
+    long long r = 1 % M;
+    long long base = A % M;
+    for (int i = 0; i < B; i++) {
+        r = (r * base) % M;
+    }
+    printf("%lld\\n", r);
+    return 0;
+}
+`,
+    expected: ({ A, B, M }) => {
+      let r = 1n % BigInt(M);
+      const base = BigInt(A) % BigInt(M);
+      const m = BigInt(M);
+      for (let i = 0; i < B; i++) r = (r * base) % m;
+      return String(r);
+    },
+  },
+  {
+    id: 126,
+    difficulty: "medium",
+    tag: "중급 · 연산자",
+    title: "두 수의 절댓값 차이",
+    description:
+      "두 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>|A - B|</code>를 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>|A - B|</code>의 값을 출력합니다.",
+    constraints: ["-1000 ≤ A, B ≤ 1000"],
+    examples: [
+      { input: "3\n8", output: "5" },
+      { input: "10\n-3", output: "13" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "정수 A" },
+      { name: "B", min: -1000, max: 1000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "3\n8", expected: "5" },
+      { input: "10\n-3", expected: "13" },
+      { input: "5\n5", expected: "0" },
+    ],
+    concepts: ["operators", "cond", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: |A - B| 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    int d = A - B;
+    if (d < 0) d = -d;
+    printf("%d\\n", d);
+    return 0;
+}
+`,
+    expected: ({ A, B }) => String(Math.abs(A - B)),
+  },
+  /* --- operators killer --- */
+  {
+    id: 127,
+    difficulty: "killer",
+    tag: "킬러 · 시뮬레이션",
+    title: "주식 매매 최대 이익",
+    description:
+      "어느 주식의 <code>N</code>일치 종가가 차례대로 주어집니다. 단 한 번 사고 한 번 판다고 할 때 (사기 전에 팔 수는 없습니다) " +
+      "얻을 수 있는 최대 이익을 출력하세요. 이익이 없으면 <code>0</code>을 출력합니다.",
+    inputDesc:
+      "첫 줄에 정수 <code>N</code>이 주어집니다.<br>" +
+      "둘째 줄에 <code>N</code>개의 종가가 공백으로 구분되어 주어집니다.",
+    outputDesc: "단일 매매로 얻을 수 있는 최대 이익을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 100000", "1 ≤ 종가 ≤ 100000"],
+    examples: [
+      { input: "6\n7 1 5 3 6 4", output: "5" },
+      { input: "5\n7 6 4 3 1", output: "0" },
+      { input: "1\n10", output: "0" },
+    ],
+    testCases: [
+      { input: "6\n7 1 5 3 6 4", expected: "5" },
+      { input: "5\n7 6 4 3 1", expected: "0" },
+      { input: "7\n2 4 1 7 3 6 8", expected: "7" },
+    ],
+    concepts: ["loops", "cond", "operators", "vars"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    int prices[100000];
+    for (int i = 0; i < N; i++) scanf("%d", &prices[i]);
+
+    // TODO: 한 번 사고 한 번 팔아 얻을 수 있는 최대 이익 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    int prices[100000];
+    for (int i = 0; i < N; i++) scanf("%d", &prices[i]);
+    if (N <= 1) { printf("0\\n"); return 0; }
+    int minPrice = prices[0];
+    int best = 0;
+    for (int i = 1; i < N; i++) {
+        int profit = prices[i] - minPrice;
+        if (profit > best) best = profit;
+        if (prices[i] < minPrice) minPrice = prices[i];
+    }
+    printf("%d\\n", best);
+    return 0;
+}
+`,
+  },
+  /* --- vars medium (10) --- */
+  {
+    id: 128,
+    difficulty: "medium",
+    tag: "중급 · 자료형",
+    title: "두 변수 교환",
+    description:
+      "두 정수 <code>A</code>, <code>B</code>가 주어집니다. 임시 변수를 사용해 두 값을 교환한 뒤 " +
+      "<code>B A</code> 순서로 공백 구분으로 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "교환 후 첫 변수와 두 번째 변수의 값을 출력합니다.",
+    constraints: ["-1000 ≤ A, B ≤ 1000"],
+    examples: [
+      { input: "3\n7", output: "7 3" },
+      { input: "0\n9", output: "9 0" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "정수 A" },
+      { name: "B", min: -1000, max: 1000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "3\n7", expected: "7 3" },
+      { input: "0\n9", expected: "9 0" },
+      { input: "-5\n5", expected: "5 -5" },
+    ],
+    concepts: ["vars", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: 임시 변수로 A와 B 교환 후 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    int t = A;
+    A = B;
+    B = t;
+    printf("%d %d\\n", A, B);
+    return 0;
+}
+`,
+    expected: ({ A, B }) => `${B} ${A}`,
+  },
+  {
+    id: 129,
+    difficulty: "medium",
+    tag: "중급 · 자료형",
+    title: "평균 절대 편차",
+    description:
+      "세 정수 <code>A</code>, <code>B</code>, <code>C</code>가 주어집니다. 세 수의 평균(정수 나눗셈)에 대한 " +
+      "각 값의 절대 편차 합 <code>|A-avg| + |B-avg| + |C-avg|</code>를 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>, 그다음 줄에 <code>C</code>가 주어집니다.",
+    outputDesc: "절대 편차들의 합을 출력합니다.",
+    constraints: ["0 ≤ A, B, C ≤ 100"],
+    examples: [
+      { input: "1\n2\n3", output: "2" },
+      { input: "5\n5\n5", output: "0" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 100, desc: "정수 A" },
+      { name: "B", min: 0, max: 100, desc: "정수 B" },
+      { name: "C", min: 0, max: 100, desc: "정수 C" },
+    ],
+    testCases: [
+      { input: "1\n2\n3", expected: "2" },
+      { input: "10\n4\n7", expected: "6" },
+      { input: "5\n5\n5", expected: "0" },
+    ],
+    concepts: ["vars", "operators", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+
+    // TODO: 평균에 대한 절대 편차 합 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int absVal(int x) { return x < 0 ? -x : x; }
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+    int avg = (A + B + C) / 3;
+    printf("%d\\n", absVal(A - avg) + absVal(B - avg) + absVal(C - avg));
+    return 0;
+}
+`,
+    expected: ({ A, B, C }) => {
+      const avg = Math.floor((A + B + C) / 3);
+      return String(
+        Math.abs(A - avg) + Math.abs(B - avg) + Math.abs(C - avg)
+      );
+    },
+  },
+  {
+    id: 130,
+    difficulty: "medium",
+    tag: "중급 · 자료형",
+    title: "정수 나눗셈 vs 실수 나눗셈",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. 첫 줄에 <code>A / B</code>의 정수 나눗셈 결과를, " +
+      "둘째 줄에 <code>(double)A / B</code>를 소수점 둘째 자리까지 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "두 줄에 걸쳐 정수 나눗셈과 실수 나눗셈 결과를 출력합니다.",
+    constraints: ["1 ≤ A ≤ 10000", "1 ≤ B ≤ 100"],
+    examples: [
+      { input: "10\n3", output: "3\n3.33" },
+      { input: "7\n2", output: "3\n3.50" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 10000, desc: "분자" },
+      { name: "B", min: 1, max: 100, desc: "분모" },
+    ],
+    testCases: [
+      { input: "10\n3", expected: "3\n3.33" },
+      { input: "7\n2", expected: "3\n3.50" },
+      { input: "100\n4", expected: "25\n25.00" },
+    ],
+    concepts: ["vars", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: A/B (정수) 줄1, (double)A/B 줄2 (%.2f)
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d\\n", A / B);
+    printf("%.2f\\n", (double)A / B);
+    return 0;
+}
+`,
+    expected: ({ A, B }) =>
+      `${Math.floor(A / B)}\n${(A / B).toFixed(2)}`,
+  },
+  {
+    id: 131,
+    difficulty: "medium",
+    tag: "중급 · 자료형",
+    title: "대소문자 한 줄에 출력",
+    description:
+      "양의 정수 <code>N</code>(1~26)이 주어집니다. <code>'A'</code>에서 <code>N - 1</code> 만큼 떨어진 대문자와 " +
+      "<code>'a'</code>에서 <code>N - 1</code> 만큼 떨어진 소문자를 한 줄에 공백으로 구분해 출력하세요.",
+    inputDesc: "첫 줄에 정수 <code>N</code>이 주어집니다.",
+    outputDesc: "대문자와 소문자를 공백 구분으로 출력합니다.",
+    constraints: ["1 ≤ N ≤ 26"],
+    examples: [
+      { input: "1", output: "A a" },
+      { input: "5", output: "E e" },
+      { input: "26", output: "Z z" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 26, desc: "알파벳 순서" },
+    ],
+    testCases: [
+      { input: "1", expected: "A a" },
+      { input: "5", expected: "E e" },
+      { input: "26", expected: "Z z" },
+    ],
+    concepts: ["vars", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+
+    // TODO: 'A'+(N-1)과 'a'+(N-1)을 공백 구분으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    char up = 'A' + (N - 1);
+    char lo = 'a' + (N - 1);
+    printf("%c %c\\n", up, lo);
+    return 0;
+}
+`,
+    expected: ({ N }) =>
+      `${String.fromCharCode(64 + N)} ${String.fromCharCode(96 + N)}`,
+  },
+  {
+    id: 132,
+    difficulty: "medium",
+    tag: "중급 · 자료형",
+    title: "비트 1의 개수 (popcount)",
+    description:
+      "양의 정수 <code>A</code>와 양의 정수 <code>B</code>가 주어집니다. 각 수의 이진 표현에서 <code>1</code>의 개수를 " +
+      "한 줄에 공백으로 구분해 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>popcount(A) popcount(B)</code> 형식으로 출력합니다.",
+    constraints: ["0 ≤ A, B ≤ 65535"],
+    examples: [
+      { input: "5\n7", output: "2 3" },
+      { input: "0\n15", output: "0 4" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 65535, desc: "정수 A" },
+      { name: "B", min: 0, max: 65535, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "5\n7", expected: "2 3" },
+      { input: "0\n15", expected: "0 4" },
+      { input: "255\n256", expected: "8 1" },
+    ],
+    concepts: ["vars", "operators", "loops"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: 각 수의 이진 표현에서 1의 개수를 공백 구분으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int popcount(int n) {
+    int c = 0;
+    while (n > 0) { c += n & 1; n >>= 1; }
+    return c;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d %d\\n", popcount(A), popcount(B));
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      const pc = (n) => {
+        let c = 0; while (n > 0) { c += n & 1; n >>>= 1; } return c;
+      };
+      return `${pc(A)} ${pc(B)}`;
+    },
+  },
+  {
+    id: 133,
+    difficulty: "medium",
+    tag: "중급 · 자료형",
+    title: "가장 큰 자릿수",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. 각 수의 자릿수 중 가장 큰 숫자를 찾아 " +
+      "한 줄에 공백으로 구분해 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>maxDigit(A) maxDigit(B)</code> 형식으로 출력합니다.",
+    constraints: ["1 ≤ A, B ≤ 99999"],
+    examples: [
+      { input: "1234\n9876", output: "4 9" },
+      { input: "111\n222", output: "1 2" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 99999, desc: "정수 A" },
+      { name: "B", min: 1, max: 99999, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "1234\n9876", expected: "4 9" },
+      { input: "5\n50", expected: "5 5" },
+      { input: "111\n222", expected: "1 2" },
+    ],
+    concepts: ["vars", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: 각 수의 최대 자릿수를 공백 구분으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int maxDigit(int n) {
+    int m = 0;
+    while (n > 0) { int d = n % 10; if (d > m) m = d; n /= 10; }
+    return m;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d %d\\n", maxDigit(A), maxDigit(B));
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      const md = (n) => Math.max(...String(n).split("").map(Number));
+      return `${md(A)} ${md(B)}`;
+    },
+  },
+  {
+    id: 134,
+    difficulty: "medium",
+    tag: "중급 · 자료형",
+    title: "자릿수 분리해 줄마다 출력",
+    description:
+      "양의 정수 <code>A</code>가 주어집니다. <code>A</code>의 각 자릿수를 최상위부터 한 줄씩 출력하세요. " +
+      "예) <code>A = 123</code> → <code>1</code> / <code>2</code> / <code>3</code> (세 줄)",
+    inputDesc: "첫 줄에 정수 <code>A</code>가 주어집니다.",
+    outputDesc: "각 자릿수를 한 줄씩 출력합니다.",
+    constraints: ["1 ≤ A ≤ 99999"],
+    examples: [
+      { input: "123", output: "1\n2\n3" },
+      { input: "7", output: "7" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 99999, desc: "정수 A" },
+    ],
+    testCases: [
+      { input: "123", expected: "1\n2\n3" },
+      { input: "7", expected: "7" },
+      { input: "10000", expected: "1\n0\n0\n0\n0" },
+    ],
+    concepts: ["vars", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A;
+    scanf("%d", &A);
+
+    // TODO: A의 자릿수를 최상위부터 한 줄씩 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A;
+    scanf("%d", &A);
+    int buf[10];
+    int len = 0;
+    if (A == 0) { printf("0\\n"); return 0; }
+    while (A > 0) { buf[len++] = A % 10; A /= 10; }
+    for (int i = len - 1; i >= 0; i--) printf("%d\\n", buf[i]);
+    return 0;
+}
+`,
+    expected: ({ A }) => String(A).split("").join("\n"),
+  },
+  {
+    id: 135,
+    difficulty: "medium",
+    tag: "중급 · 자료형",
+    title: "더한 요일 번호",
+    description:
+      "오늘이 요일 번호 <code>D</code>(0=월, 1=화, ..., 6=일)일 때, <code>K</code>일 뒤의 요일 번호를 출력하세요.",
+    inputDesc: "첫 줄에 <code>D</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "K일 뒤의 요일 번호(<code>0</code>~<code>6</code>)를 출력합니다.",
+    constraints: ["0 ≤ D ≤ 6", "0 ≤ K ≤ 10000"],
+    examples: [
+      { input: "0\n7", output: "0" },
+      { input: "3\n10", output: "6" },
+    ],
+    inputs: [
+      { name: "D", min: 0, max: 6, desc: "오늘 요일 번호" },
+      { name: "K", min: 0, max: 10000, desc: "더할 일수" },
+    ],
+    testCases: [
+      { input: "0\n7", expected: "0" },
+      { input: "3\n10", expected: "6" },
+      { input: "6\n1", expected: "0" },
+    ],
+    concepts: ["vars", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int D, K;
+    scanf("%d", &D);
+    scanf("%d", &K);
+
+    // TODO: (D + K) % 7 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int D, K;
+    scanf("%d", &D);
+    scanf("%d", &K);
+    printf("%d\\n", (D + K) % 7);
+    return 0;
+}
+`,
+    expected: ({ D, K }) => String((D + K) % 7),
+  },
+  {
+    id: 136,
+    difficulty: "medium",
+    tag: "중급 · 자료형",
+    title: "unsigned char 캐스팅",
+    description:
+      "양의 정수 <code>A</code>가 주어집니다. <code>A</code>를 <code>unsigned char</code>로 형변환했을 때의 값을 " +
+      "출력하세요. (실질적으로 <code>A % 256</code>)",
+    inputDesc: "첫 줄에 정수 <code>A</code>가 주어집니다.",
+    outputDesc: "<code>(unsigned char)A</code>의 값을 출력합니다.",
+    constraints: ["0 ≤ A ≤ 100000"],
+    examples: [
+      { input: "300", output: "44" },
+      { input: "255", output: "255" },
+      { input: "1000", output: "232" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 100000, desc: "정수 A" },
+    ],
+    testCases: [
+      { input: "300", expected: "44" },
+      { input: "255", expected: "255" },
+      { input: "1000", expected: "232" },
+    ],
+    concepts: ["vars", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A;
+    scanf("%d", &A);
+
+    // TODO: (unsigned char)A의 값 출력 (= A % 256)
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A;
+    scanf("%d", &A);
+    unsigned char c = (unsigned char)A;
+    printf("%u\\n", (unsigned)c);
+    return 0;
+}
+`,
+    expected: ({ A }) => String(A % 256),
+  },
+  {
+    id: 137,
+    difficulty: "medium",
+    tag: "중급 · 자료형",
+    title: "짝수와 홀수 개수",
+    description:
+      "두 정수 <code>A</code>, <code>B</code>가 주어집니다 (<code>A ≤ B</code>). 구간 <code>[A, B]</code>에 포함된 " +
+      "짝수와 홀수의 개수를 한 줄에 공백으로 구분해 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>짝수 개수 홀수 개수</code>를 출력합니다.",
+    constraints: ["0 ≤ A ≤ B ≤ 100000"],
+    examples: [
+      { input: "1\n10", output: "5 5" },
+      { input: "0\n0", output: "1 0" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 100000, desc: "구간 시작" },
+      { name: "B", min: 0, max: 100000, desc: "구간 끝" },
+    ],
+    testCases: [
+      { input: "1\n10", expected: "5 5" },
+      { input: "0\n0", expected: "1 0" },
+      { input: "3\n7", expected: "2 3" },
+    ],
+    concepts: ["vars", "operators", "loops"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: [A, B] 내 짝수/홀수 개수를 공백 구분으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    int evens = 0, odds = 0;
+    for (int i = A; i <= B; i++) {
+        if (i % 2 == 0) evens++;
+        else            odds++;
+    }
+    printf("%d %d\\n", evens, odds);
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      let e = 0, o = 0;
+      for (let i = A; i <= B; i++) {
+        if (i % 2 === 0) e++;
+        else o++;
+      }
+      return `${e} ${o}`;
+    },
+  },
+  /* --- loops medium (10) --- */
+  {
+    id: 138,
+    difficulty: "medium",
+    tag: "중급 · 반복문",
+    title: "1부터 N까지의 합과 곱",
+    description:
+      "양의 정수 <code>N</code>이 주어집니다. <code>1</code>부터 <code>N</code>까지의 합을 첫 줄에, " +
+      "<code>N!</code>(<code>1 × 2 × ... × N</code>)을 둘째 줄에 출력하세요.",
+    inputDesc: "첫 줄에 정수 <code>N</code>이 주어집니다.",
+    outputDesc: "두 줄에 걸쳐 합과 곱을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 12"],
+    examples: [
+      { input: "3", output: "6\n6" },
+      { input: "5", output: "15\n120" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 12, desc: "정수 N" },
+    ],
+    testCases: [
+      { input: "3", expected: "6\n6" },
+      { input: "5", expected: "15\n120" },
+      { input: "1", expected: "1\n1" },
+    ],
+    concepts: ["loops", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+
+    // TODO: 1부터 N까지의 합과 곱을 두 줄에 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    long long sum = 0, prod = 1;
+    for (int i = 1; i <= N; i++) { sum += i; prod *= i; }
+    printf("%lld\\n", sum);
+    printf("%lld\\n", prod);
+    return 0;
+}
+`,
+    expected: ({ N }) => {
+      let s = 0, p = 1;
+      for (let i = 1; i <= N; i++) { s += i; p *= i; }
+      return `${s}\n${p}`;
+    },
+  },
+  {
+    id: 139,
+    difficulty: "medium",
+    tag: "중급 · 반복문",
+    title: "다섯 수의 합과 평균",
+    description:
+      "다섯 개의 정수 <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code>가 " +
+      "각각 한 줄씩 주어집니다. 합을 첫 줄에, 정수 평균을 둘째 줄에 출력하세요.",
+    inputDesc:
+      "총 다섯 줄에 걸쳐 <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code>가 주어집니다.",
+    outputDesc: "두 줄에 걸쳐 합과 평균(정수)을 출력합니다.",
+    constraints: ["0 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "1\n2\n3\n4\n5", output: "15\n3" },
+      { input: "10\n20\n30\n40\n50", output: "150\n30" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 1000, desc: "정수 A" },
+      { name: "B", min: 0, max: 1000, desc: "정수 B" },
+      { name: "C", min: 0, max: 1000, desc: "정수 C" },
+      { name: "D", min: 0, max: 1000, desc: "정수 D" },
+      { name: "E", min: 0, max: 1000, desc: "정수 E" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n4\n5", expected: "15\n3" },
+      { input: "10\n20\n30\n40\n50", expected: "150\n30" },
+      { input: "0\n0\n0\n0\n0", expected: "0\n0" },
+    ],
+    concepts: ["loops", "arrays", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+
+    // TODO: 합과 평균(정수)을 각 줄에 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    int sum = 0;
+    for (int i = 0; i < 5; i++) sum += arr[i];
+    printf("%d\\n", sum);
+    printf("%d\\n", sum / 5);
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) => {
+      const sum = A + B + C + D + E;
+      return `${sum}\n${Math.floor(sum / 5)}`;
+    },
+  },
+  {
+    id: 140,
+    difficulty: "medium",
+    tag: "중급 · 반복문",
+    title: "네 수의 최댓값과 최솟값",
+    description:
+      "네 정수 <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>가 주어집니다. 최댓값과 최솟값을 " +
+      "한 줄에 공백으로 구분해 출력하세요.",
+    inputDesc:
+      "총 네 줄에 걸쳐 <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>가 주어집니다.",
+    outputDesc: "<code>최댓값 최솟값</code> 형식으로 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C, D ≤ 1000"],
+    examples: [
+      { input: "1\n5\n3\n2", output: "5 1" },
+      { input: "-1\n0\n7\n-3", output: "7 -3" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "정수 A" },
+      { name: "B", min: -1000, max: 1000, desc: "정수 B" },
+      { name: "C", min: -1000, max: 1000, desc: "정수 C" },
+      { name: "D", min: -1000, max: 1000, desc: "정수 D" },
+    ],
+    testCases: [
+      { input: "1\n5\n3\n2", expected: "5 1" },
+      { input: "-1\n0\n7\n-3", expected: "7 -3" },
+      { input: "4\n4\n4\n4", expected: "4 4" },
+    ],
+    concepts: ["loops", "arrays", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[4];
+    for (int i = 0; i < 4; i++) scanf("%d", &arr[i]);
+
+    // TODO: 최댓값과 최솟값을 공백 구분으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[4];
+    for (int i = 0; i < 4; i++) scanf("%d", &arr[i]);
+    int mx = arr[0], mn = arr[0];
+    for (int i = 1; i < 4; i++) {
+        if (arr[i] > mx) mx = arr[i];
+        if (arr[i] < mn) mn = arr[i];
+    }
+    printf("%d %d\\n", mx, mn);
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D }) => {
+      const a = [A, B, C, D];
+      return `${Math.max(...a)} ${Math.min(...a)}`;
+    },
+  },
+  {
+    id: 141,
+    difficulty: "medium",
+    tag: "중급 · 반복문",
+    title: "세 수의 중앙값",
+    description:
+      "세 정수 <code>A</code>, <code>B</code>, <code>C</code>가 주어집니다. 세 수의 중앙값을 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>, 그다음 줄에 <code>C</code>가 주어집니다.",
+    outputDesc: "중앙값을 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C ≤ 1000"],
+    examples: [
+      { input: "1\n2\n3", output: "2" },
+      { input: "10\n2\n7", output: "7" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "정수 A" },
+      { name: "B", min: -1000, max: 1000, desc: "정수 B" },
+      { name: "C", min: -1000, max: 1000, desc: "정수 C" },
+    ],
+    testCases: [
+      { input: "1\n2\n3", expected: "2" },
+      { input: "10\n2\n7", expected: "7" },
+      { input: "5\n5\n5", expected: "5" },
+    ],
+    concepts: ["loops", "cond", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+
+    // TODO: 세 수의 중앙값 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+    int arr[3] = { A, B, C };
+    for (int i = 0; i < 2; i++)
+        for (int j = 0; j < 2 - i; j++)
+            if (arr[j] > arr[j + 1]) {
+                int t = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = t;
+            }
+    printf("%d\\n", arr[1]);
+    return 0;
+}
+`,
+    expected: ({ A, B, C }) => {
+      const a = [A, B, C].sort((x, y) => x - y);
+      return String(a[1]);
+    },
+  },
+  {
+    id: 142,
+    difficulty: "medium",
+    tag: "중급 · 반복문",
+    title: "N x M 곱셈표",
+    description:
+      "양의 정수 <code>N</code>, <code>M</code>이 주어집니다. <code>N</code>행 <code>M</code>열의 곱셈표를 " +
+      "출력하세요. 각 칸은 행 번호와 열 번호(1부터 시작)의 곱이며, 같은 행의 값들은 공백으로 구분합니다.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>M</code>이 주어집니다.",
+    outputDesc: "<code>N</code>개의 줄에 걸쳐 각 행을 출력합니다.",
+    constraints: ["1 ≤ N, M ≤ 10"],
+    examples: [
+      { input: "2\n3", output: "1 2 3\n2 4 6" },
+      { input: "3\n3", output: "1 2 3\n2 4 6\n3 6 9" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 10, desc: "행 수" },
+      { name: "M", min: 1, max: 10, desc: "열 수" },
+    ],
+    testCases: [
+      { input: "2\n3", expected: "1 2 3\n2 4 6" },
+      { input: "3\n3", expected: "1 2 3\n2 4 6\n3 6 9" },
+      { input: "1\n5", expected: "1 2 3 4 5" },
+    ],
+    concepts: ["loops", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+
+    // TODO: N행 M열 곱셈표 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+    for (int i = 1; i <= N; i++) {
+        for (int j = 1; j <= M; j++) {
+            if (j > 1) printf(" ");
+            printf("%d", i * j);
+        }
+        printf("\\n");
+    }
+    return 0;
+}
+`,
+    expected: ({ N, M }) => {
+      const rows = [];
+      for (let i = 1; i <= N; i++) {
+        const row = [];
+        for (let j = 1; j <= M; j++) row.push(i * j);
+        rows.push(row.join(" "));
+      }
+      return rows.join("\n");
+    },
+  },
+  {
+    id: 143,
+    difficulty: "medium",
+    tag: "중급 · 반복문",
+    title: "K의 배수 개수",
+    description:
+      "양의 정수 <code>N</code>, <code>K</code>가 주어집니다. <code>1</code>부터 <code>N</code>까지의 정수 중 " +
+      "<code>K</code>의 배수의 개수를 출력하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "<code>K</code>의 배수 개수(<code>⌊N / K⌋</code>)를 출력합니다.",
+    constraints: ["1 ≤ N ≤ 100000", "1 ≤ K ≤ 100"],
+    examples: [
+      { input: "20\n3", output: "6" },
+      { input: "10\n2", output: "5" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 100000, desc: "상한" },
+      { name: "K", min: 1, max: 100, desc: "배수의 기준" },
+    ],
+    testCases: [
+      { input: "20\n3", expected: "6" },
+      { input: "10\n2", expected: "5" },
+      { input: "100\n7", expected: "14" },
+    ],
+    concepts: ["loops", "cond", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+
+    // TODO: 1~N 중 K의 배수 개수 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    int count = 0;
+    for (int i = 1; i <= N; i++) {
+        if (i % K == 0) count++;
+    }
+    printf("%d\\n", count);
+    return 0;
+}
+`,
+    expected: ({ N, K }) => String(Math.floor(N / K)),
+  },
+  {
+    id: 144,
+    difficulty: "medium",
+    tag: "중급 · 반복문",
+    title: "별 피라미드",
+    description:
+      "양의 정수 <code>N</code>이 주어집니다. 높이 <code>N</code>인 별 피라미드를 가운데 정렬로 출력하세요. " +
+      "<code>i</code>번째 줄(1부터 시작)에는 앞쪽에 공백 <code>N - i</code>개, 그 뒤에 별 <code>2i - 1</code>개를 출력합니다.",
+    inputDesc: "첫 줄에 정수 <code>N</code>이 주어집니다.",
+    outputDesc: "<code>N</code>개의 줄에 걸쳐 피라미드를 출력합니다.",
+    constraints: ["1 ≤ N ≤ 20"],
+    examples: [
+      { input: "3", output: "  *\n ***\n*****" },
+      { input: "1", output: "*" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 20, desc: "피라미드 높이" },
+    ],
+    testCases: [
+      { input: "3", expected: "  *\n ***\n*****" },
+      { input: "1", expected: "*" },
+      { input: "5", expected: "    *\n   ***\n  *****\n *******\n*********" },
+    ],
+    concepts: ["loops", "strings", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+
+    // TODO: 높이 N인 별 피라미드 (가운데 정렬) 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    for (int i = 1; i <= N; i++) {
+        for (int j = 0; j < N - i; j++) printf(" ");
+        for (int j = 0; j < 2 * i - 1; j++) printf("*");
+        printf("\\n");
+    }
+    return 0;
+}
+`,
+    expected: ({ N }) => {
+      const lines = [];
+      for (let i = 1; i <= N; i++) {
+        lines.push(" ".repeat(N - i) + "*".repeat(2 * i - 1));
+      }
+      return lines.join("\n");
+    },
+  },
+  {
+    id: 145,
+    difficulty: "medium",
+    tag: "중급 · 반복문",
+    title: "별 직사각형",
+    description:
+      "양의 정수 <code>N</code>, <code>M</code>이 주어집니다. <code>N</code>행 <code>M</code>열의 직사각형을 " +
+      "<code>'*'</code>로 채워 출력하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>M</code>이 주어집니다.",
+    outputDesc: "<code>N</code>개의 줄에 걸쳐 <code>'*'</code>를 출력합니다.",
+    constraints: ["1 ≤ N, M ≤ 20"],
+    examples: [
+      { input: "2\n3", output: "***\n***" },
+      { input: "3\n1", output: "*\n*\n*" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 20, desc: "행 수" },
+      { name: "M", min: 1, max: 20, desc: "열 수" },
+    ],
+    testCases: [
+      { input: "2\n3", expected: "***\n***" },
+      { input: "3\n1", expected: "*\n*\n*" },
+      { input: "1\n5", expected: "*****" },
+    ],
+    concepts: ["loops", "strings", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+
+    // TODO: N행 M열 별 직사각형 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+    for (int i = 0; i < N; i++) {
+        for (int j = 0; j < M; j++) printf("*");
+        printf("\\n");
+    }
+    return 0;
+}
+`,
+    expected: ({ N, M }) =>
+      Array.from({ length: N }, () => "*".repeat(M)).join("\n"),
+  },
+  {
+    id: 146,
+    difficulty: "medium",
+    tag: "중급 · 반복문",
+    title: "범위를 방향에 맞춰 출력",
+    description:
+      "두 정수 <code>N</code>, <code>M</code>이 주어집니다. <code>N ≤ M</code>이면 오름차순으로, 아니면 내림차순으로 " +
+      "두 수를 포함한 모든 정수를 공백 구분으로 출력하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>M</code>이 주어집니다.",
+    outputDesc: "방향에 따라 모든 정수를 공백으로 구분해 출력합니다.",
+    constraints: ["-100 ≤ N, M ≤ 100"],
+    examples: [
+      { input: "3\n7", output: "3 4 5 6 7" },
+      { input: "7\n3", output: "7 6 5 4 3" },
+      { input: "5\n5", output: "5" },
+    ],
+    inputs: [
+      { name: "N", min: -100, max: 100, desc: "시작" },
+      { name: "M", min: -100, max: 100, desc: "끝" },
+    ],
+    testCases: [
+      { input: "3\n7", expected: "3 4 5 6 7" },
+      { input: "7\n3", expected: "7 6 5 4 3" },
+      { input: "5\n5", expected: "5" },
+    ],
+    concepts: ["loops", "cond", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+
+    // TODO: 방향에 맞춰 N부터 M까지 공백 구분 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+    int step = (N <= M) ? 1 : -1;
+    int i = N;
+    int first = 1;
+    while (1) {
+        if (!first) printf(" ");
+        printf("%d", i);
+        first = 0;
+        if (i == M) break;
+        i += step;
+    }
+    printf("\\n");
+    return 0;
+}
+`,
+    expected: ({ N, M }) => {
+      const arr = [];
+      if (N <= M) for (let i = N; i <= M; i++) arr.push(i);
+      else for (let i = N; i >= M; i--) arr.push(i);
+      return arr.join(" ");
+    },
+  },
+  {
+    id: 147,
+    difficulty: "medium",
+    tag: "중급 · 반복문",
+    title: "Collatz 단계 수",
+    description:
+      "양의 정수 <code>N</code>이 주어집니다. <code>N</code>이 짝수면 <code>N = N / 2</code>, 홀수면 " +
+      "<code>N = 3N + 1</code>을 반복해 <code>N</code>이 <code>1</code>이 될 때까지 걸리는 횟수를 출력하세요.",
+    inputDesc: "첫 줄에 정수 <code>N</code>이 주어집니다.",
+    outputDesc: "<code>1</code>이 될 때까지 걸리는 단계 수를 출력합니다.",
+    constraints: ["1 ≤ N ≤ 100000"],
+    examples: [
+      { input: "1", output: "0" },
+      { input: "6", output: "8" },
+      { input: "27", output: "111" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 100000, desc: "시작 수" },
+    ],
+    testCases: [
+      { input: "1", expected: "0" },
+      { input: "6", expected: "8" },
+      { input: "27", expected: "111" },
+    ],
+    concepts: ["loops", "cond", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+
+    // TODO: Collatz 단계 수 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    long long N;
+    scanf("%lld", &N);
+    int steps = 0;
+    while (N > 1) {
+        if (N % 2 == 0) N /= 2;
+        else            N = 3 * N + 1;
+        steps++;
+    }
+    printf("%d\\n", steps);
+    return 0;
+}
+`,
+    expected: ({ N }) => {
+      let n = BigInt(N);
+      let s = 0;
+      while (n > 1n) {
+        if (n % 2n === 0n) n /= 2n;
+        else n = 3n * n + 1n;
+        s++;
+      }
+      return String(s);
+    },
+  },
+  /* --- loops/vars killer --- */
+  {
+    id: 148,
+    difficulty: "killer",
+    tag: "킬러 · 시뮬레이션",
+    title: "에라토스테네스의 체",
+    description:
+      "양의 정수 <code>N</code>이 주어집니다. <code>2</code>부터 <code>N</code>까지의 모든 소수를 " +
+      "에라토스테네스의 체로 구해 공백 구분으로 한 줄에 출력하세요. <code>N &lt; 2</code>이면 빈 줄을 출력합니다.",
+    inputDesc: "첫 줄에 정수 <code>N</code>이 주어집니다.",
+    outputDesc: "<code>2</code> 이상 <code>N</code> 이하 모든 소수를 공백 구분으로 출력합니다.",
+    constraints: ["1 ≤ N ≤ 10000"],
+    examples: [
+      { input: "10", output: "2 3 5 7" },
+      { input: "2", output: "2" },
+      { input: "1", output: "" },
+    ],
+    testCases: [
+      { input: "10", expected: "2 3 5 7" },
+      { input: "30", expected: "2 3 5 7 11 13 17 19 23 29" },
+      { input: "2", expected: "2" },
+    ],
+    concepts: ["loops", "arrays", "cond", "vars"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+
+    // TODO: 에라토스테네스의 체로 2~N 사이 소수를 공백 구분으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    if (N < 2) { printf("\\n"); return 0; }
+    char isComposite[10001] = {0};
+    for (int i = 2; (long long)i * i <= N; i++) {
+        if (!isComposite[i]) {
+            for (int j = i * i; j <= N; j += i) isComposite[j] = 1;
+        }
+    }
+    int first = 1;
+    for (int i = 2; i <= N; i++) {
+        if (!isComposite[i]) {
+            if (!first) printf(" ");
+            printf("%d", i);
+            first = 0;
+        }
+    }
+    printf("\\n");
+    return 0;
+}
+`,
+  },
+  /* --- arrays medium (10) --- */
+  {
+    id: 149,
+    difficulty: "medium",
+    tag: "중급 · 배열",
+    title: "다섯 수 오름차순 정렬",
+    description:
+      "다섯 개의 정수 <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code>가 한 줄씩 주어집니다. " +
+      "오름차순으로 정렬해 한 줄에 공백으로 구분해 출력하세요.",
+    inputDesc: "총 다섯 줄에 걸쳐 정수가 주어집니다.",
+    outputDesc: "오름차순 정렬한 결과를 공백으로 구분해 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "3\n1\n4\n1\n5", output: "1 1 3 4 5" },
+      { input: "5\n4\n3\n2\n1", output: "1 2 3 4 5" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "정수 A" },
+      { name: "B", min: -1000, max: 1000, desc: "정수 B" },
+      { name: "C", min: -1000, max: 1000, desc: "정수 C" },
+      { name: "D", min: -1000, max: 1000, desc: "정수 D" },
+      { name: "E", min: -1000, max: 1000, desc: "정수 E" },
+    ],
+    testCases: [
+      { input: "3\n1\n4\n1\n5", expected: "1 1 3 4 5" },
+      { input: "5\n4\n3\n2\n1", expected: "1 2 3 4 5" },
+      { input: "0\n0\n0\n0\n0", expected: "0 0 0 0 0" },
+    ],
+    concepts: ["arrays", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+
+    // TODO: 오름차순 정렬 후 공백 구분 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    for (int i = 0; i < 4; i++) {
+        for (int j = 0; j < 4 - i; j++) {
+            if (arr[j] > arr[j + 1]) {
+                int t = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = t;
+            }
+        }
+    }
+    for (int i = 0; i < 5; i++) {
+        if (i > 0) printf(" ");
+        printf("%d", arr[i]);
+    }
+    printf("\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) =>
+      [A, B, C, D, E].sort((x, y) => x - y).join(" "),
+  },
+  {
+    id: 150,
+    difficulty: "medium",
+    tag: "중급 · 배열",
+    title: "최댓값과 그 위치",
+    description:
+      "다섯 개의 정수 <code>A</code>~<code>E</code>가 차례로 주어집니다. 최댓값과 그 인덱스(1부터 시작, " +
+      "동률이면 가장 앞쪽)를 한 줄에 공백 구분으로 출력하세요.",
+    inputDesc: "총 다섯 줄에 걸쳐 정수가 주어집니다.",
+    outputDesc: "<code>최댓값 인덱스</code> 형식으로 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "1\n5\n3\n2\n4", output: "5 2" },
+      { input: "7\n3\n7\n1\n0", output: "7 1" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "1번째 값" },
+      { name: "B", min: -1000, max: 1000, desc: "2번째 값" },
+      { name: "C", min: -1000, max: 1000, desc: "3번째 값" },
+      { name: "D", min: -1000, max: 1000, desc: "4번째 값" },
+      { name: "E", min: -1000, max: 1000, desc: "5번째 값" },
+    ],
+    testCases: [
+      { input: "1\n5\n3\n2\n4", expected: "5 2" },
+      { input: "7\n3\n7\n1\n0", expected: "7 1" },
+      { input: "9\n9\n9\n9\n9", expected: "9 1" },
+    ],
+    concepts: ["arrays", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+
+    // TODO: 최댓값과 그 1-indexed 위치 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    int mxIdx = 0;
+    for (int i = 1; i < 5; i++) {
+        if (arr[i] > arr[mxIdx]) mxIdx = i;
+    }
+    printf("%d %d\\n", arr[mxIdx], mxIdx + 1);
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) => {
+      const arr = [A, B, C, D, E];
+      let idx = 0;
+      for (let i = 1; i < 5; i++) if (arr[i] > arr[idx]) idx = i;
+      return `${arr[idx]} ${idx + 1}`;
+    },
+  },
+  {
+    id: 151,
+    difficulty: "medium",
+    tag: "중급 · 배열",
+    title: "누적합 (prefix sum)",
+    description:
+      "다섯 개의 정수 <code>A</code>~<code>E</code>가 차례로 주어집니다. 각 위치까지의 누적합을 한 줄씩 출력하세요. " +
+      "예) <code>1, 2, 3, 4, 5</code> → <code>1</code> / <code>3</code> / <code>6</code> / <code>10</code> / <code>15</code>",
+    inputDesc: "총 다섯 줄에 걸쳐 정수가 주어집니다.",
+    outputDesc: "다섯 줄에 걸쳐 누적합을 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "1\n2\n3\n4\n5", output: "1\n3\n6\n10\n15" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "1번째 값" },
+      { name: "B", min: -1000, max: 1000, desc: "2번째 값" },
+      { name: "C", min: -1000, max: 1000, desc: "3번째 값" },
+      { name: "D", min: -1000, max: 1000, desc: "4번째 값" },
+      { name: "E", min: -1000, max: 1000, desc: "5번째 값" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n4\n5", expected: "1\n3\n6\n10\n15" },
+      { input: "10\n-5\n10\n-5\n10", expected: "10\n5\n15\n10\n20" },
+      { input: "0\n0\n0\n0\n0", expected: "0\n0\n0\n0\n0" },
+    ],
+    concepts: ["arrays", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+
+    // TODO: 각 위치까지의 누적합을 한 줄씩 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    int s = 0;
+    for (int i = 0; i < 5; i++) {
+        s += arr[i];
+        printf("%d\\n", s);
+    }
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) => {
+      const arr = [A, B, C, D, E];
+      const out = [];
+      let s = 0;
+      for (const v of arr) { s += v; out.push(s); }
+      return out.join("\n");
+    },
+  },
+  {
+    id: 152,
+    difficulty: "medium",
+    tag: "중급 · 배열",
+    title: "K번째로 작은 값",
+    description:
+      "다섯 개의 정수 <code>A</code>~<code>E</code>와 인덱스 <code>K</code>(1~5)가 주어집니다. " +
+      "정렬한 결과의 <code>K</code>번째 원소(1부터)를 출력하세요.",
+    inputDesc:
+      "다섯 줄에 걸쳐 <code>A</code>~<code>E</code>, 여섯 번째 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "<code>K</code>번째로 작은 값을 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C, D, E ≤ 1000", "1 ≤ K ≤ 5"],
+    examples: [
+      { input: "3\n1\n4\n1\n5\n3", output: "3" },
+      { input: "10\n9\n8\n7\n6\n1", output: "6" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "1번째 값" },
+      { name: "B", min: -1000, max: 1000, desc: "2번째 값" },
+      { name: "C", min: -1000, max: 1000, desc: "3번째 값" },
+      { name: "D", min: -1000, max: 1000, desc: "4번째 값" },
+      { name: "E", min: -1000, max: 1000, desc: "5번째 값" },
+      { name: "K", min: 1, max: 5, desc: "순서" },
+    ],
+    testCases: [
+      { input: "3\n1\n4\n1\n5\n3", expected: "3" },
+      { input: "10\n9\n8\n7\n6\n1", expected: "6" },
+      { input: "5\n5\n5\n5\n5\n5", expected: "5" },
+    ],
+    concepts: ["arrays", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5], K;
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    scanf("%d", &K);
+
+    // TODO: 정렬 후 K번째 원소 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5], K;
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    scanf("%d", &K);
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4 - i; j++)
+            if (arr[j] > arr[j + 1]) {
+                int t = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = t;
+            }
+    printf("%d\\n", arr[K - 1]);
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E, K }) => {
+      const arr = [A, B, C, D, E].sort((x, y) => x - y);
+      return String(arr[K - 1]);
+    },
+  },
+  {
+    id: 153,
+    difficulty: "medium",
+    tag: "중급 · 배열",
+    title: "두 번째로 큰 값",
+    description:
+      "다섯 개의 정수가 차례로 주어집니다. 두 번째로 큰 값을 출력하세요. (서로 다른 값이 아닐 수 있고, " +
+      "정렬 후 4번 인덱스를 사용합니다.)",
+    inputDesc: "총 다섯 줄에 걸쳐 정수가 주어집니다.",
+    outputDesc: "정렬 후 네 번째 원소(두 번째로 큰 값)를 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "1\n2\n3\n4\n5", output: "4" },
+      { input: "9\n9\n7\n5\n3", output: "9" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "1번째 값" },
+      { name: "B", min: -1000, max: 1000, desc: "2번째 값" },
+      { name: "C", min: -1000, max: 1000, desc: "3번째 값" },
+      { name: "D", min: -1000, max: 1000, desc: "4번째 값" },
+      { name: "E", min: -1000, max: 1000, desc: "5번째 값" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n4\n5", expected: "4" },
+      { input: "9\n9\n7\n5\n3", expected: "9" },
+      { input: "1\n1\n1\n1\n1", expected: "1" },
+    ],
+    concepts: ["arrays", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+
+    // TODO: 정렬 후 4번 인덱스(두 번째로 큰 값) 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    for (int i = 0; i < 4; i++)
+        for (int j = 0; j < 4 - i; j++)
+            if (arr[j] > arr[j + 1]) {
+                int t = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = t;
+            }
+    printf("%d\\n", arr[3]);
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) => {
+      const arr = [A, B, C, D, E].sort((x, y) => x - y);
+      return String(arr[3]);
+    },
+  },
+  {
+    id: 154,
+    difficulty: "medium",
+    tag: "중급 · 배열",
+    title: "짝수만 골라 출력",
+    description:
+      "다섯 개의 정수가 차례로 주어집니다. 짝수만 입력 순서대로 한 줄에 공백 구분으로 출력하세요. " +
+      "짝수가 하나도 없으면 <code>none</code>을 출력합니다.",
+    inputDesc: "총 다섯 줄에 걸쳐 정수가 주어집니다.",
+    outputDesc: "짝수들을 공백 구분으로 출력하거나, 없으면 <code>none</code>.",
+    constraints: ["-1000 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "1\n2\n3\n4\n5", output: "2 4" },
+      { input: "1\n3\n5\n7\n9", output: "none" },
+      { input: "2\n4\n6\n8\n10", output: "2 4 6 8 10" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "1번째 값" },
+      { name: "B", min: -1000, max: 1000, desc: "2번째 값" },
+      { name: "C", min: -1000, max: 1000, desc: "3번째 값" },
+      { name: "D", min: -1000, max: 1000, desc: "4번째 값" },
+      { name: "E", min: -1000, max: 1000, desc: "5번째 값" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n4\n5", expected: "2 4" },
+      { input: "1\n3\n5\n7\n9", expected: "none" },
+      { input: "2\n4\n6\n8\n10", expected: "2 4 6 8 10" },
+    ],
+    concepts: ["arrays", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+
+    // TODO: 짝수만 공백 구분으로 출력 (없으면 none)
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    int count = 0;
+    for (int i = 0; i < 5; i++) {
+        if (arr[i] % 2 == 0) {
+            if (count > 0) printf(" ");
+            printf("%d", arr[i]);
+            count++;
+        }
+    }
+    if (count == 0) printf("none");
+    printf("\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) => {
+      const evens = [A, B, C, D, E].filter((v) => v % 2 === 0);
+      return evens.length === 0 ? "none" : evens.join(" ");
+    },
+  },
+  {
+    id: 155,
+    difficulty: "medium",
+    tag: "중급 · 배열",
+    title: "평균보다 큰 값의 합",
+    description:
+      "다섯 개의 정수가 차례로 주어집니다. 다섯 수의 평균(실수 평균)을 계산하고, 평균보다 큰 값들의 합을 출력하세요.",
+    inputDesc: "총 다섯 줄에 걸쳐 정수가 주어집니다.",
+    outputDesc: "평균을 초과하는 값들의 합을 출력합니다.",
+    constraints: ["0 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "1\n2\n3\n4\n5", output: "9" },
+      { input: "10\n10\n10\n10\n10", output: "0" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 1000, desc: "1번째 값" },
+      { name: "B", min: 0, max: 1000, desc: "2번째 값" },
+      { name: "C", min: 0, max: 1000, desc: "3번째 값" },
+      { name: "D", min: 0, max: 1000, desc: "4번째 값" },
+      { name: "E", min: 0, max: 1000, desc: "5번째 값" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n4\n5", expected: "9" },
+      { input: "10\n10\n10\n10\n10", expected: "0" },
+      { input: "100\n0\n0\n0\n0", expected: "100" },
+    ],
+    concepts: ["arrays", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+
+    // TODO: 실수 평균 계산 후 평균 초과 값들의 합 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    int sum = 0;
+    for (int i = 0; i < 5; i++) sum += arr[i];
+    double avg = sum / 5.0;
+    int total = 0;
+    for (int i = 0; i < 5; i++) {
+        if (arr[i] > avg) total += arr[i];
+    }
+    printf("%d\\n", total);
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) => {
+      const arr = [A, B, C, D, E];
+      const avg = arr.reduce((a, b) => a + b, 0) / 5;
+      return String(arr.filter((v) => v > avg).reduce((a, b) => a + b, 0));
+    },
+  },
+  {
+    id: 156,
+    difficulty: "medium",
+    tag: "중급 · 배열",
+    title: "인접 차이 절댓값 합",
+    description:
+      "다섯 개의 정수가 차례로 주어집니다. 인접한 두 원소의 차의 절댓값들을 모두 더한 값을 출력하세요. " +
+      "(<code>|A-B| + |B-C| + |C-D| + |D-E|</code>)",
+    inputDesc: "총 다섯 줄에 걸쳐 정수가 주어집니다.",
+    outputDesc: "인접 차이 절댓값들의 합을 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "1\n3\n2\n5\n0", output: "11" },
+      { input: "0\n0\n0\n0\n0", output: "0" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "1번째 값" },
+      { name: "B", min: -1000, max: 1000, desc: "2번째 값" },
+      { name: "C", min: -1000, max: 1000, desc: "3번째 값" },
+      { name: "D", min: -1000, max: 1000, desc: "4번째 값" },
+      { name: "E", min: -1000, max: 1000, desc: "5번째 값" },
+    ],
+    testCases: [
+      { input: "1\n3\n2\n5\n0", expected: "11" },
+      { input: "0\n0\n0\n0\n0", expected: "0" },
+      { input: "1\n2\n3\n4\n5", expected: "4" },
+    ],
+    concepts: ["arrays", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+
+    // TODO: 인접 차이의 절댓값 합 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    int total = 0;
+    for (int i = 1; i < 5; i++) {
+        int d = arr[i] - arr[i - 1];
+        if (d < 0) d = -d;
+        total += d;
+    }
+    printf("%d\\n", total);
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) => {
+      const arr = [A, B, C, D, E];
+      let total = 0;
+      for (let i = 1; i < 5; i++) total += Math.abs(arr[i] - arr[i - 1]);
+      return String(total);
+    },
+  },
+  {
+    id: 157,
+    difficulty: "medium",
+    tag: "중급 · 배열",
+    title: "두 배열 합쳐 정렬",
+    description:
+      "길이 3 배열 두 개가 주어집니다(<code>A B C</code>와 <code>D E F</code>). 두 배열을 합쳐 6개를 오름차순으로 " +
+      "정렬한 결과를 공백 구분으로 출력하세요.",
+    inputDesc:
+      "여섯 줄에 걸쳐 <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code>, <code>F</code>가 주어집니다.",
+    outputDesc: "정렬된 여섯 개를 공백으로 구분해 출력합니다.",
+    constraints: ["-1000 ≤ 모든 값 ≤ 1000"],
+    examples: [
+      { input: "3\n1\n2\n6\n5\n4", output: "1 2 3 4 5 6" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "첫 배열 1" },
+      { name: "B", min: -1000, max: 1000, desc: "첫 배열 2" },
+      { name: "C", min: -1000, max: 1000, desc: "첫 배열 3" },
+      { name: "D", min: -1000, max: 1000, desc: "두 번째 배열 1" },
+      { name: "E", min: -1000, max: 1000, desc: "두 번째 배열 2" },
+      { name: "F", min: -1000, max: 1000, desc: "두 번째 배열 3" },
+    ],
+    testCases: [
+      { input: "3\n1\n2\n6\n5\n4", expected: "1 2 3 4 5 6" },
+      { input: "10\n20\n30\n5\n15\n25", expected: "5 10 15 20 25 30" },
+      { input: "0\n0\n0\n0\n0\n0", expected: "0 0 0 0 0 0" },
+    ],
+    concepts: ["arrays", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[6];
+    for (int i = 0; i < 6; i++) scanf("%d", &arr[i]);
+
+    // TODO: 6개를 정렬해 공백 구분으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[6];
+    for (int i = 0; i < 6; i++) scanf("%d", &arr[i]);
+    for (int i = 0; i < 5; i++)
+        for (int j = 0; j < 5 - i; j++)
+            if (arr[j] > arr[j + 1]) {
+                int t = arr[j]; arr[j] = arr[j + 1]; arr[j + 1] = t;
+            }
+    for (int i = 0; i < 6; i++) {
+        if (i > 0) printf(" ");
+        printf("%d", arr[i]);
+    }
+    printf("\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E, F }) =>
+      [A, B, C, D, E, F].sort((x, y) => x - y).join(" "),
+  },
+  {
+    id: 158,
+    difficulty: "medium",
+    tag: "중급 · 배열",
+    title: "배열 왼쪽 회전",
+    description:
+      "다섯 개의 정수 <code>A</code>~<code>E</code>와 회전 횟수 <code>K</code>가 주어집니다. 배열을 왼쪽으로 " +
+      "<code>K</code>번 회전한 결과를 공백 구분으로 출력하세요.",
+    inputDesc:
+      "다섯 줄에 정수, 여섯 번째 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "왼쪽으로 <code>K</code>번 회전한 배열을 공백 구분으로 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C, D, E ≤ 1000", "0 ≤ K ≤ 100"],
+    examples: [
+      { input: "1\n2\n3\n4\n5\n2", output: "3 4 5 1 2" },
+      { input: "10\n20\n30\n40\n50\n0", output: "10 20 30 40 50" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "1번째 값" },
+      { name: "B", min: -1000, max: 1000, desc: "2번째 값" },
+      { name: "C", min: -1000, max: 1000, desc: "3번째 값" },
+      { name: "D", min: -1000, max: 1000, desc: "4번째 값" },
+      { name: "E", min: -1000, max: 1000, desc: "5번째 값" },
+      { name: "K", min: 0, max: 100, desc: "왼쪽 회전 횟수" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n4\n5\n2", expected: "3 4 5 1 2" },
+      { input: "1\n2\n3\n4\n5\n0", expected: "1 2 3 4 5" },
+      { input: "1\n2\n3\n4\n5\n7", expected: "3 4 5 1 2" },
+    ],
+    concepts: ["arrays", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5], K;
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    scanf("%d", &K);
+
+    // TODO: 왼쪽으로 K번 회전 후 공백 구분 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int arr[5], K;
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    scanf("%d", &K);
+    K %= 5;
+    for (int i = 0; i < 5; i++) {
+        if (i > 0) printf(" ");
+        printf("%d", arr[(i + K) % 5]);
+    }
+    printf("\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E, K }) => {
+      const arr = [A, B, C, D, E];
+      const k = K % 5;
+      return Array.from({ length: 5 }, (_, i) => arr[(i + k) % 5]).join(" ");
+    },
+  },
+  /* --- strings medium (10) --- */
+  {
+    id: 159,
+    difficulty: "medium",
+    tag: "중급 · 문자열",
+    title: "시저 암호 (한 글자)",
+    description:
+      "알파벳 위치 <code>N</code> (<code>1=A</code>, ..., <code>26=Z</code>)과 시프트 <code>K</code> (0~25)가 주어집니다. " +
+      "<code>N</code>에 <code>K</code>만큼 더한 위치의 대문자를 출력합니다. 위치가 26을 넘으면 다시 <code>A</code>로 돌아갑니다.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "변환된 대문자 한 글자를 출력합니다.",
+    constraints: ["1 ≤ N ≤ 26", "0 ≤ K ≤ 25"],
+    examples: [
+      { input: "1\n3", output: "D" },
+      { input: "26\n1", output: "A" },
+      { input: "13\n0", output: "M" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 26, desc: "알파벳 위치" },
+      { name: "K", min: 0, max: 25, desc: "시프트" },
+    ],
+    testCases: [
+      { input: "1\n3", expected: "D" },
+      { input: "26\n1", expected: "A" },
+      { input: "13\n0", expected: "M" },
+    ],
+    concepts: ["strings", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+
+    // TODO: 시저 암호로 변환된 대문자 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    int idx = (N - 1 + K) % 26;
+    printf("%c\\n", 'A' + idx);
+    return 0;
+}
+`,
+    expected: ({ N, K }) =>
+      String.fromCharCode("A".charCodeAt(0) + ((N - 1 + K) % 26)),
+  },
+  {
+    id: 160,
+    difficulty: "medium",
+    tag: "중급 · 문자열",
+    title: "A와 B 이어 출력",
+    description:
+      "두 양의 정수 <code>N</code>, <code>M</code>이 주어집니다. <code>'A'</code>를 <code>N</code>번 출력한 뒤 " +
+      "<code>'B'</code>를 <code>M</code>번 이어 출력하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>M</code>이 주어집니다.",
+    outputDesc: "<code>A...AB...B</code> 형식 한 줄을 출력합니다.",
+    constraints: ["1 ≤ N, M ≤ 30"],
+    examples: [
+      { input: "3\n2", output: "AAABB" },
+      { input: "1\n5", output: "ABBBBB" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 30, desc: "A 개수" },
+      { name: "M", min: 1, max: 30, desc: "B 개수" },
+    ],
+    testCases: [
+      { input: "3\n2", expected: "AAABB" },
+      { input: "1\n5", expected: "ABBBBB" },
+      { input: "5\n5", expected: "AAAAABBBBB" },
+    ],
+    concepts: ["strings", "loops", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+
+    // TODO: A를 N번, B를 M번 이어 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+    for (int i = 0; i < N; i++) printf("A");
+    for (int i = 0; i < M; i++) printf("B");
+    printf("\\n");
+    return 0;
+}
+`,
+    expected: ({ N, M }) => "A".repeat(N) + "B".repeat(M),
+  },
+  {
+    id: 161,
+    difficulty: "medium",
+    tag: "중급 · 문자열",
+    title: "abc 패턴 K자리",
+    description:
+      "양의 정수 <code>K</code>가 주어집니다. 문자열 <code>\"abc\"</code>를 무한히 반복했을 때 앞쪽 " +
+      "<code>K</code>개의 문자를 출력하세요.",
+    inputDesc: "첫 줄에 정수 <code>K</code>가 주어집니다.",
+    outputDesc: "<code>K</code>개의 문자를 출력합니다.",
+    constraints: ["1 ≤ K ≤ 30"],
+    examples: [
+      { input: "6", output: "abcabc" },
+      { input: "4", output: "abca" },
+      { input: "1", output: "a" },
+    ],
+    inputs: [
+      { name: "K", min: 1, max: 30, desc: "출력 길이" },
+    ],
+    testCases: [
+      { input: "6", expected: "abcabc" },
+      { input: "4", expected: "abca" },
+      { input: "10", expected: "abcabcabca" },
+    ],
+    concepts: ["strings", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int K;
+    scanf("%d", &K);
+
+    // TODO: "abc"를 반복해 K글자 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int K;
+    scanf("%d", &K);
+    const char *pat = "abc";
+    for (int i = 0; i < K; i++) printf("%c", pat[i % 3]);
+    printf("\\n");
+    return 0;
+}
+`,
+    expected: ({ K }) => {
+      const pat = "abc";
+      let out = "";
+      for (let i = 0; i < K; i++) out += pat[i % 3];
+      return out;
+    },
+  },
+  {
+    id: 162,
+    difficulty: "medium",
+    tag: "중급 · 문자열",
+    title: "알파벳 구간 출력",
+    description:
+      "두 양의 정수 <code>N1</code>, <code>N2</code>가 주어집니다 (<code>N1 ≤ N2</code>). 알파벳 " +
+      "<code>'A'</code>를 1번이라 할 때 <code>N1</code>번째부터 <code>N2</code>번째까지의 대문자를 이어 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>N1</code>, 그다음 줄에 <code>N2</code>가 주어집니다.",
+    outputDesc: "구간의 대문자들을 이어붙여 출력합니다.",
+    constraints: ["1 ≤ N1 ≤ N2 ≤ 26"],
+    examples: [
+      { input: "2\n5", output: "BCDE" },
+      { input: "1\n26", output: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" },
+      { input: "10\n10", output: "J" },
+    ],
+    inputs: [
+      { name: "N1", min: 1, max: 26, desc: "시작 위치" },
+      { name: "N2", min: 1, max: 26, desc: "끝 위치" },
+    ],
+    testCases: [
+      { input: "2\n5", expected: "BCDE" },
+      { input: "1\n26", expected: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" },
+      { input: "10\n10", expected: "J" },
+    ],
+    concepts: ["strings", "loops", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N1, N2;
+    scanf("%d", &N1);
+    scanf("%d", &N2);
+
+    // TODO: 'A' + (N1 - 1)부터 'A' + (N2 - 1)까지의 대문자를 이어 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N1, N2;
+    scanf("%d", &N1);
+    scanf("%d", &N2);
+    for (int i = N1 - 1; i < N2; i++) printf("%c", 'A' + i);
+    printf("\\n");
+    return 0;
+}
+`,
+    expected: ({ N1, N2 }) =>
+      "ABCDEFGHIJKLMNOPQRSTUVWXYZ".slice(N1 - 1, N2),
+  },
+  {
+    id: 163,
+    difficulty: "medium",
+    tag: "중급 · 문자열",
+    title: "한 글자를 K번 반복",
+    description:
+      "알파벳 순서 <code>N</code>(1~26, 소문자)과 반복 횟수 <code>K</code>가 주어집니다. " +
+      "<code>'a' + (N - 1)</code> 문자를 <code>K</code>번 이어 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>N</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "한 글자를 <code>K</code>번 반복한 문자열을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 26", "1 ≤ K ≤ 30"],
+    examples: [
+      { input: "1\n3", output: "aaa" },
+      { input: "26\n5", output: "zzzzz" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 26, desc: "알파벳 순서" },
+      { name: "K", min: 1, max: 30, desc: "반복 횟수" },
+    ],
+    testCases: [
+      { input: "1\n3", expected: "aaa" },
+      { input: "26\n5", expected: "zzzzz" },
+      { input: "5\n1", expected: "e" },
+    ],
+    concepts: ["strings", "loops", "io"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+
+    // TODO: 'a' + (N - 1) 글자를 K번 이어 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    char c = 'a' + (N - 1);
+    for (int i = 0; i < K; i++) printf("%c", c);
+    printf("\\n");
+    return 0;
+}
+`,
+    expected: ({ N, K }) =>
+      String.fromCharCode("a".charCodeAt(0) + (N - 1)).repeat(K),
+  },
+  {
+    id: 164,
+    difficulty: "medium",
+    tag: "중급 · 문자열",
+    title: "진법별 회문 판정",
+    description:
+      "양의 정수 <code>A</code>와 진법 <code>B</code>(2~16)가 주어집니다. <code>A</code>를 <code>B</code>진수로 " +
+      "표현했을 때 회문이면 <code>yes</code>, 아니면 <code>no</code>를 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>yes</code> 또는 <code>no</code>를 출력합니다.",
+    constraints: ["1 ≤ A ≤ 99999", "2 ≤ B ≤ 16"],
+    examples: [
+      { input: "121\n10", output: "yes" },
+      { input: "9\n2", output: "yes" },
+      { input: "12\n10", output: "no" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 99999, desc: "정수" },
+      { name: "B", min: 2, max: 16, desc: "진법" },
+    ],
+    testCases: [
+      { input: "121\n10", expected: "yes" },
+      { input: "9\n2", expected: "yes" },
+      { input: "12\n10", expected: "no" },
+    ],
+    concepts: ["strings", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: A를 B진수로 변환 후 회문인지 yes/no 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    char buf[40];
+    int len = 0;
+    while (A > 0) {
+        int d = A % B;
+        buf[len++] = d < 10 ? '0' + d : 'a' + d - 10;
+        A /= B;
+    }
+    int pal = 1;
+    for (int i = 0; i < len / 2; i++) {
+        if (buf[i] != buf[len - 1 - i]) { pal = 0; break; }
+    }
+    printf("%s\\n", pal ? "yes" : "no");
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      const s = A.toString(B);
+      return s === s.split("").reverse().join("") ? "yes" : "no";
+    },
+  },
+  {
+    id: 165,
+    difficulty: "medium",
+    tag: "중급 · 문자열",
+    title: "두 수 자릿수 합 일치",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. 두 수의 자릿수 합이 같으면 <code>yes</code>, " +
+      "다르면 <code>no</code>를 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>yes</code> 또는 <code>no</code>를 출력합니다.",
+    constraints: ["1 ≤ A, B ≤ 99999"],
+    examples: [
+      { input: "123\n321", output: "yes" },
+      { input: "99\n100", output: "no" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 99999, desc: "정수 A" },
+      { name: "B", min: 1, max: 99999, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "123\n321", expected: "yes" },
+      { input: "99\n100", expected: "no" },
+      { input: "11\n2", expected: "yes" },
+    ],
+    concepts: ["strings", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: 두 수의 자릿수 합이 같은지 yes/no 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int digitSum(int n) {
+    int s = 0;
+    while (n > 0) { s += n % 10; n /= 10; }
+    return s;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    if (digitSum(A) == digitSum(B)) printf("yes\\n");
+    else                            printf("no\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      const ds = (n) => String(n).split("").reduce((s, d) => s + Number(d), 0);
+      return ds(A) === ds(B) ? "yes" : "no";
+    },
+  },
+  {
+    id: 166,
+    difficulty: "medium",
+    tag: "중급 · 문자열",
+    title: "자릿수의 곱 (K 제외)",
+    description:
+      "양의 정수 <code>A</code>와 한 자리 정수 <code>K</code>(0~9)가 주어집니다. <code>A</code>의 자릿수 중 " +
+      "<code>K</code>와 같은 자릿수를 제외한 나머지의 곱을 출력하세요. (제외 후 자릿수가 없으면 <code>1</code> 출력)",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "남은 자릿수들의 곱을 출력합니다.",
+    constraints: ["1 ≤ A ≤ 99999", "0 ≤ K ≤ 9"],
+    examples: [
+      { input: "123\n2", output: "3" },
+      { input: "120\n0", output: "2" },
+      { input: "999\n9", output: "1" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 99999, desc: "정수" },
+      { name: "K", min: 0, max: 9, desc: "제외할 자릿수" },
+    ],
+    testCases: [
+      { input: "123\n2", expected: "3" },
+      { input: "120\n0", expected: "2" },
+      { input: "999\n9", expected: "1" },
+    ],
+    concepts: ["strings", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, K;
+    scanf("%d", &A);
+    scanf("%d", &K);
+
+    // TODO: A의 자릿수 중 K가 아닌 것들의 곱 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, K;
+    scanf("%d", &A);
+    scanf("%d", &K);
+    long long prod = 1;
+    while (A > 0) {
+        int d = A % 10;
+        if (d != K) prod *= d;
+        A /= 10;
+    }
+    printf("%lld\\n", prod);
+    return 0;
+}
+`,
+    expected: ({ A, K }) => {
+      const digs = String(A)
+        .split("")
+        .map(Number)
+        .filter((d) => d !== K);
+      return String(digs.reduce((p, d) => p * d, 1));
+    },
+  },
+  {
+    id: 167,
+    difficulty: "medium",
+    tag: "중급 · 문자열",
+    title: "첫 자릿수와 마지막 자릿수",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. 각 수의 첫 자릿수와 마지막 자릿수를 모두 한 줄에 " +
+      "공백 구분으로 출력합니다. 순서: <code>A의 첫자리 A의 끝자리 B의 첫자리 B의 끝자리</code>.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "네 개의 숫자를 공백으로 구분해 한 줄로 출력합니다.",
+    constraints: ["1 ≤ A, B ≤ 99999"],
+    examples: [
+      { input: "12345\n7", output: "1 5 7 7" },
+      { input: "100\n98765", output: "1 0 9 5" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 99999, desc: "정수 A" },
+      { name: "B", min: 1, max: 99999, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "12345\n7", expected: "1 5 7 7" },
+      { input: "100\n98765", expected: "1 0 9 5" },
+      { input: "9\n9", expected: "9 9 9 9" },
+    ],
+    concepts: ["strings", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: 각 수의 첫 자릿수와 마지막 자릿수를 공백 구분으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int firstDigit(int n) {
+    while (n >= 10) n /= 10;
+    return n;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d %d %d %d\\n",
+        firstDigit(A), A % 10,
+        firstDigit(B), B % 10);
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      const first = (n) => Number(String(n)[0]);
+      return `${first(A)} ${A % 10} ${first(B)} ${B % 10}`;
+    },
+  },
+  {
+    id: 168,
+    difficulty: "medium",
+    tag: "중급 · 문자열",
+    title: "자릿수에 K가 있는지",
+    description:
+      "양의 정수 <code>A</code>와 한 자리 정수 <code>K</code>(0~9)가 주어집니다. <code>A</code>의 자릿수 중 " +
+      "<code>K</code>가 포함되어 있으면 <code>yes</code>, 아니면 <code>no</code>를 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "<code>yes</code> 또는 <code>no</code>를 출력합니다.",
+    constraints: ["1 ≤ A ≤ 99999", "0 ≤ K ≤ 9"],
+    examples: [
+      { input: "12345\n3", output: "yes" },
+      { input: "12345\n9", output: "no" },
+      { input: "10\n0", output: "yes" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 99999, desc: "정수" },
+      { name: "K", min: 0, max: 9, desc: "찾을 자릿수" },
+    ],
+    testCases: [
+      { input: "12345\n3", expected: "yes" },
+      { input: "12345\n9", expected: "no" },
+      { input: "10\n0", expected: "yes" },
+    ],
+    concepts: ["strings", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, K;
+    scanf("%d", &A);
+    scanf("%d", &K);
+
+    // TODO: A의 자릿수 중 K가 있는지 yes/no 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, K;
+    scanf("%d", &A);
+    scanf("%d", &K);
+    int found = 0;
+    while (A > 0) {
+        if (A % 10 == K) { found = 1; break; }
+        A /= 10;
+    }
+    printf("%s\\n", found ? "yes" : "no");
+    return 0;
+}
+`,
+    expected: ({ A, K }) => (String(A).includes(String(K)) ? "yes" : "no"),
+  },
+  /* --- arrays killer --- */
+  {
+    id: 169,
+    difficulty: "killer",
+    tag: "킬러 · 시뮬레이션",
+    title: "슬라이딩 윈도우 최대 합",
+    description:
+      "정수 <code>N</code>과 윈도우 길이 <code>K</code>(<code>K ≤ N</code>), 그리고 <code>N</code>개의 정수가 주어집니다. " +
+      "연속한 <code>K</code>개 원소의 합 중 가장 큰 값을 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>N</code>, 둘째 줄에 <code>K</code>, 셋째 줄에 <code>N</code>개의 정수가 공백으로 구분되어 주어집니다.",
+    outputDesc: "길이 <code>K</code> 윈도우의 최대 합을 출력합니다.",
+    constraints: ["1 ≤ K ≤ N ≤ 100000", "-10000 ≤ 각 원소 ≤ 10000"],
+    examples: [
+      { input: "6\n3\n1 2 3 4 5 6", output: "15" },
+      { input: "5\n2\n2 1 5 1 3", output: "6" },
+      { input: "3\n1\n7 4 9", output: "9" },
+    ],
+    testCases: [
+      { input: "6\n3\n1 2 3 4 5 6", expected: "15" },
+      { input: "5\n2\n2 1 5 1 3", expected: "6" },
+      { input: "7\n4\n-1 -2 -3 -4 -5 -6 -7", expected: "-10" },
+    ],
+    concepts: ["arrays", "loops", "operators", "vars"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    int arr[100000];
+    for (int i = 0; i < N; i++) scanf("%d", &arr[i]);
+
+    // TODO: 길이 K 윈도우의 최대 합 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    int arr[100000];
+    for (int i = 0; i < N; i++) scanf("%d", &arr[i]);
+    long long curr = 0;
+    for (int i = 0; i < K; i++) curr += arr[i];
+    long long best = curr;
+    for (int i = K; i < N; i++) {
+        curr += arr[i] - arr[i - K];
+        if (curr > best) best = curr;
+    }
+    printf("%lld\\n", best);
+    return 0;
+}
+`,
+  },
+  /* --- functions medium (10) --- */
+  {
+    id: 170,
+    difficulty: "medium",
+    tag: "중급 · 함수",
+    title: "두 수 더하는 함수",
+    description:
+      "두 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>int add(int x, int y)</code> 함수를 정의해 " +
+      "<code>add(A, B)</code>의 결과를 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>A + B</code>를 출력합니다.",
+    constraints: ["-1000 ≤ A, B ≤ 1000"],
+    examples: [
+      { input: "3\n5", output: "8" },
+      { input: "-2\n10", output: "8" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "정수 A" },
+      { name: "B", min: -1000, max: 1000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "8" },
+      { input: "-2\n10", expected: "8" },
+      { input: "0\n0", expected: "0" },
+    ],
+    concepts: ["functions", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int add(int x, int y) {
+    // TODO
+    return 0;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d\\n", add(A, B));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int add(int x, int y) {
+    return x + y;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d\\n", add(A, B));
+    return 0;
+}
+`,
+    expected: ({ A, B }) => String(A + B),
+  },
+  {
+    id: 171,
+    difficulty: "medium",
+    tag: "중급 · 함수",
+    title: "세 수의 최댓값 함수",
+    description:
+      "세 정수 <code>A</code>, <code>B</code>, <code>C</code>가 주어집니다. <code>int maxOfThree(int x, int y, int z)</code> 함수를 정의해 " +
+      "최댓값을 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>, 그다음 줄에 <code>C</code>가 주어집니다.",
+    outputDesc: "세 수 중 최댓값을 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C ≤ 1000"],
+    examples: [
+      { input: "3\n7\n2", output: "7" },
+      { input: "10\n10\n5", output: "10" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "정수 A" },
+      { name: "B", min: -1000, max: 1000, desc: "정수 B" },
+      { name: "C", min: -1000, max: 1000, desc: "정수 C" },
+    ],
+    testCases: [
+      { input: "3\n7\n2", expected: "7" },
+      { input: "10\n10\n5", expected: "10" },
+      { input: "-5\n-3\n-7", expected: "-3" },
+    ],
+    concepts: ["functions", "cond", "io"],
+    starter:
+`#include <stdio.h>
+
+int maxOfThree(int x, int y, int z) {
+    // TODO
+    return 0;
+}
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+    printf("%d\\n", maxOfThree(A, B, C));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int maxOfThree(int x, int y, int z) {
+    int m = x;
+    if (y > m) m = y;
+    if (z > m) m = z;
+    return m;
+}
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+    printf("%d\\n", maxOfThree(A, B, C));
+    return 0;
+}
+`,
+    expected: ({ A, B, C }) => String(Math.max(A, B, C)),
+  },
+  {
+    id: 172,
+    difficulty: "medium",
+    tag: "중급 · 함수",
+    title: "거듭제곱 함수",
+    description:
+      "양의 정수 <code>A</code>, <code>K</code>가 주어집니다. <code>long long power(int base, int exp)</code> 함수를 " +
+      "반복문으로 정의하고 <code>power(A, K)</code>의 결과를 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "<code>A^K</code>의 값을 출력합니다.",
+    constraints: ["1 ≤ A ≤ 20", "0 ≤ K ≤ 15"],
+    examples: [
+      { input: "2\n10", output: "1024" },
+      { input: "5\n3", output: "125" },
+      { input: "9\n0", output: "1" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 20, desc: "밑" },
+      { name: "K", min: 0, max: 15, desc: "지수" },
+    ],
+    testCases: [
+      { input: "2\n10", expected: "1024" },
+      { input: "5\n3", expected: "125" },
+      { input: "9\n0", expected: "1" },
+    ],
+    concepts: ["functions", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+
+long long power(int base, int exp) {
+    // TODO
+    return 0;
+}
+
+int main(void) {
+    int A, K;
+    scanf("%d", &A);
+    scanf("%d", &K);
+    printf("%lld\\n", power(A, K));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+long long power(int base, int exp) {
+    long long r = 1;
+    for (int i = 0; i < exp; i++) r *= base;
+    return r;
+}
+
+int main(void) {
+    int A, K;
+    scanf("%d", &A);
+    scanf("%d", &K);
+    printf("%lld\\n", power(A, K));
+    return 0;
+}
+`,
+    expected: ({ A, K }) => String(A ** K),
+  },
+  {
+    id: 173,
+    difficulty: "medium",
+    tag: "중급 · 함수",
+    title: "약수 개수 함수",
+    description:
+      "양의 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>int countDivisors(int n)</code> 함수를 정의해 " +
+      "<code>A</code>와 <code>B</code> 각각의 약수 개수를 한 줄에 공백 구분으로 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>약수개수(A) 약수개수(B)</code> 형식으로 출력합니다.",
+    constraints: ["1 ≤ A, B ≤ 10000"],
+    examples: [
+      { input: "12\n7", output: "6 2" },
+      { input: "1\n100", output: "1 9" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 10000, desc: "정수 A" },
+      { name: "B", min: 1, max: 10000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "12\n7", expected: "6 2" },
+      { input: "1\n100", expected: "1 9" },
+      { input: "36\n36", expected: "9 9" },
+    ],
+    concepts: ["functions", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int countDivisors(int n) {
+    // TODO
+    return 0;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d %d\\n", countDivisors(A), countDivisors(B));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int countDivisors(int n) {
+    int c = 0;
+    for (int i = 1; i <= n; i++) if (n % i == 0) c++;
+    return c;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d %d\\n", countDivisors(A), countDivisors(B));
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      const cd = (n) => {
+        let c = 0;
+        for (let i = 1; i <= n; i++) if (n % i === 0) c++;
+        return c;
+      };
+      return `${cd(A)} ${cd(B)}`;
+    },
+  },
+  {
+    id: 174,
+    difficulty: "medium",
+    tag: "중급 · 함수",
+    title: "소수 판정 함수",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>int isPrime(int n)</code> 함수를 정의해 " +
+      "각 수가 소수면 <code>yes</code>, 아니면 <code>no</code>를 한 줄에 공백 구분으로 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>isPrime(A) isPrime(B)</code>의 결과를 출력합니다.",
+    constraints: ["1 ≤ A, B ≤ 10000"],
+    examples: [
+      { input: "7\n12", output: "yes no" },
+      { input: "2\n3", output: "yes yes" },
+      { input: "1\n4", output: "no no" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 10000, desc: "정수 A" },
+      { name: "B", min: 1, max: 10000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "7\n12", expected: "yes no" },
+      { input: "2\n3", expected: "yes yes" },
+      { input: "1\n4", expected: "no no" },
+    ],
+    concepts: ["functions", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int isPrime(int n) {
+    // TODO
+    return 0;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%s %s\\n",
+        isPrime(A) ? "yes" : "no",
+        isPrime(B) ? "yes" : "no");
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int isPrime(int n) {
+    if (n < 2) return 0;
+    for (int i = 2; i * i <= n; i++) if (n % i == 0) return 0;
+    return 1;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%s %s\\n",
+        isPrime(A) ? "yes" : "no",
+        isPrime(B) ? "yes" : "no");
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      const ip = (n) => {
+        if (n < 2) return false;
+        for (let i = 2; i * i <= n; i++) if (n % i === 0) return false;
+        return true;
+      };
+      return `${ip(A) ? "yes" : "no"} ${ip(B) ? "yes" : "no"}`;
+    },
+  },
+  {
+    id: 175,
+    difficulty: "medium",
+    tag: "중급 · 함수",
+    title: "함수의 함수: f(g(x))",
+    description:
+      "정수 <code>A</code>가 주어집니다. <code>int g(int x) = 2x + 1</code>, <code>int f(int x) = x * x</code>로 정의된 " +
+      "두 함수를 사용해 <code>f(g(A))</code>의 값을 출력하세요.",
+    inputDesc: "첫 줄에 정수 <code>A</code>와 둘째 줄에 <code>B</code>가 주어집니다(미사용 더미). 함수 합성만 평가합니다.",
+    outputDesc: "<code>f(g(A))</code>를 출력합니다.",
+    constraints: ["-100 ≤ A ≤ 100", "0 ≤ B ≤ 100"],
+    examples: [
+      { input: "3\n0", output: "49" },
+      { input: "0\n0", output: "1" },
+      { input: "-2\n0", output: "9" },
+    ],
+    inputs: [
+      { name: "A", min: -100, max: 100, desc: "정수 A" },
+      { name: "B", min: 0, max: 100, desc: "더미(미사용)" },
+    ],
+    testCases: [
+      { input: "3\n0", expected: "49" },
+      { input: "0\n0", expected: "1" },
+      { input: "-2\n0", expected: "9" },
+    ],
+    concepts: ["functions", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int g(int x) { return 2 * x + 1; }
+int f(int x) { return x * x; }
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    (void)B;
+    // TODO: f(g(A)) 출력
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int g(int x) { return 2 * x + 1; }
+int f(int x) { return x * x; }
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    (void)B;
+    printf("%d\\n", f(g(A)));
+    return 0;
+}
+`,
+    expected: ({ A }) => String((2 * A + 1) * (2 * A + 1)),
+  },
+  {
+    id: 176,
+    difficulty: "medium",
+    tag: "중급 · 함수",
+    title: "조합 nCk 함수",
+    description:
+      "양의 정수 <code>N</code>, <code>K</code>가 주어집니다 (<code>K ≤ N</code>). <code>nCk = N! / (K! × (N-K)!)</code>를 " +
+      "함수로 정의해 출력하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "<code>nCk</code>의 값을 출력합니다.",
+    constraints: ["0 ≤ K ≤ N ≤ 15"],
+    examples: [
+      { input: "5\n2", output: "10" },
+      { input: "10\n3", output: "120" },
+      { input: "0\n0", output: "1" },
+    ],
+    inputs: [
+      { name: "N", min: 0, max: 15, desc: "전체 수" },
+      { name: "K", min: 0, max: 15, desc: "선택 수" },
+    ],
+    testCases: [
+      { input: "5\n2", expected: "10" },
+      { input: "10\n3", expected: "120" },
+      { input: "0\n0", expected: "1" },
+    ],
+    concepts: ["functions", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+
+long long factorial(int n) {
+    // TODO
+    return 1;
+}
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    printf("%lld\\n", factorial(N) / (factorial(K) * factorial(N - K)));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+long long factorial(int n) {
+    long long r = 1;
+    for (int i = 2; i <= n; i++) r *= i;
+    return r;
+}
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    printf("%lld\\n", factorial(N) / (factorial(K) * factorial(N - K)));
+    return 0;
+}
+`,
+    expected: ({ N, K }) => {
+      const fact = (n) => {
+        let r = 1n;
+        for (let i = 2; i <= n; i++) r *= BigInt(i);
+        return r;
+      };
+      return String(fact(N) / (fact(K) * fact(N - K)));
+    },
+  },
+  {
+    id: 177,
+    difficulty: "medium",
+    tag: "중급 · 함수",
+    title: "양수만 거른 합",
+    description:
+      "다섯 개의 정수 <code>A</code>~<code>E</code>가 주어집니다. <code>int isPositive(int x)</code> 함수를 정의해 " +
+      "양수인 값들의 합만 출력하세요. (0은 양수가 아닙니다.)",
+    inputDesc: "다섯 줄에 걸쳐 정수가 주어집니다.",
+    outputDesc: "양수들의 합을 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "-1\n2\n-3\n4\n5", output: "11" },
+      { input: "-5\n-10\n0\n0\n-1", output: "0" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "1번째 값" },
+      { name: "B", min: -1000, max: 1000, desc: "2번째 값" },
+      { name: "C", min: -1000, max: 1000, desc: "3번째 값" },
+      { name: "D", min: -1000, max: 1000, desc: "4번째 값" },
+      { name: "E", min: -1000, max: 1000, desc: "5번째 값" },
+    ],
+    testCases: [
+      { input: "-1\n2\n-3\n4\n5", expected: "11" },
+      { input: "-5\n-10\n0\n0\n-1", expected: "0" },
+      { input: "1\n1\n1\n1\n1", expected: "5" },
+    ],
+    concepts: ["functions", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+
+int isPositive(int x) {
+    // TODO
+    return 0;
+}
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    int sum = 0;
+    for (int i = 0; i < 5; i++) if (isPositive(arr[i])) sum += arr[i];
+    printf("%d\\n", sum);
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int isPositive(int x) { return x > 0; }
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    int sum = 0;
+    for (int i = 0; i < 5; i++) if (isPositive(arr[i])) sum += arr[i];
+    printf("%d\\n", sum);
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) =>
+      String([A, B, C, D, E].filter((v) => v > 0).reduce((a, b) => a + b, 0)),
+  },
+  {
+    id: 178,
+    difficulty: "medium",
+    tag: "중급 · 함수",
+    title: "보조 함수: 두 번 호출",
+    description:
+      "정수 <code>A</code>와 <code>K</code>가 주어집니다. <code>int step(int x) = x + 3</code> 함수를 정의해 " +
+      "<code>A</code>에 <code>step</code>을 <code>K</code>번 반복 적용한 값을 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "<code>A + 3 × K</code>의 값을 출력합니다.",
+    constraints: ["-1000 ≤ A ≤ 1000", "0 ≤ K ≤ 1000"],
+    examples: [
+      { input: "0\n3", output: "9" },
+      { input: "5\n0", output: "5" },
+      { input: "-1\n10", output: "29" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "시작 값" },
+      { name: "K", min: 0, max: 1000, desc: "반복 횟수" },
+    ],
+    testCases: [
+      { input: "0\n3", expected: "9" },
+      { input: "5\n0", expected: "5" },
+      { input: "-1\n10", expected: "29" },
+    ],
+    concepts: ["functions", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+
+int step(int x) { return x + 3; }
+
+int main(void) {
+    int A, K;
+    scanf("%d", &A);
+    scanf("%d", &K);
+
+    // TODO: step을 K번 호출한 결과 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int step(int x) { return x + 3; }
+
+int main(void) {
+    int A, K;
+    scanf("%d", &A);
+    scanf("%d", &K);
+    int v = A;
+    for (int i = 0; i < K; i++) v = step(v);
+    printf("%d\\n", v);
+    return 0;
+}
+`,
+    expected: ({ A, K }) => String(A + 3 * K),
+  },
+  {
+    id: 179,
+    difficulty: "medium",
+    tag: "중급 · 함수",
+    title: "두 함수의 합",
+    description:
+      "두 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>int doubleIt(int x) = 2x</code>, " +
+      "<code>int addTen(int x) = x + 10</code>으로 정의된 두 함수를 사용해 " +
+      "<code>doubleIt(A) + addTen(B)</code>의 값을 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>2A + (B + 10)</code>을 출력합니다.",
+    constraints: ["-100 ≤ A, B ≤ 100"],
+    examples: [
+      { input: "3\n5", output: "21" },
+      { input: "0\n0", output: "10" },
+    ],
+    inputs: [
+      { name: "A", min: -100, max: 100, desc: "정수 A" },
+      { name: "B", min: -100, max: 100, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "21" },
+      { input: "0\n0", expected: "10" },
+      { input: "-5\n-10", expected: "-10" },
+    ],
+    concepts: ["functions", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+int doubleIt(int x) { return 2 * x; }
+int addTen(int x) { return x + 10; }
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: doubleIt(A) + addTen(B) 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int doubleIt(int x) { return 2 * x; }
+int addTen(int x) { return x + 10; }
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d\\n", doubleIt(A) + addTen(B));
+    return 0;
+}
+`,
+    expected: ({ A, B }) => String(2 * A + B + 10),
+  },
+  /* --- pointers medium (10) --- */
+  {
+    id: 180,
+    difficulty: "medium",
+    tag: "중급 · 포인터",
+    title: "포인터로 두 변수 교환",
+    description:
+      "두 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>void swap(int *x, int *y)</code> 함수를 정의해 " +
+      "두 변수의 값을 교환한 뒤, 교환 후 <code>A B</code> 순서로 공백 구분 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "교환 후의 두 값을 공백 구분으로 출력합니다.",
+    constraints: ["-1000 ≤ A, B ≤ 1000"],
+    examples: [
+      { input: "3\n7", output: "7 3" },
+      { input: "0\n5", output: "5 0" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "정수 A" },
+      { name: "B", min: -1000, max: 1000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "3\n7", expected: "7 3" },
+      { input: "0\n5", expected: "5 0" },
+      { input: "-3\n3", expected: "3 -3" },
+    ],
+    concepts: ["pointers", "functions", "io"],
+    starter:
+`#include <stdio.h>
+
+void swap(int *x, int *y) {
+    // TODO
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    swap(&A, &B);
+    printf("%d %d\\n", A, B);
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+void swap(int *x, int *y) {
+    int t = *x;
+    *x = *y;
+    *y = t;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    swap(&A, &B);
+    printf("%d %d\\n", A, B);
+    return 0;
+}
+`,
+    expected: ({ A, B }) => `${B} ${A}`,
+  },
+  {
+    id: 181,
+    difficulty: "medium",
+    tag: "중급 · 포인터",
+    title: "포인터로 합과 평균",
+    description:
+      "두 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>void sumAvg(int *a, int *b, int *s, double *avg)</code> 함수를 " +
+      "정의해 합과 평균(실수)을 출력 변수에 담은 뒤, <code>합 평균</code>을 한 줄에 공백 구분으로 출력하세요 " +
+      "(평균은 소수점 한 자리).",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>합 평균</code> 형식으로 출력합니다.",
+    constraints: ["0 ≤ A, B ≤ 1000"],
+    examples: [
+      { input: "3\n5", output: "8 4.0" },
+      { input: "1\n2", output: "3 1.5" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 1000, desc: "정수 A" },
+      { name: "B", min: 0, max: 1000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "8 4.0" },
+      { input: "1\n2", expected: "3 1.5" },
+      { input: "100\n0", expected: "100 50.0" },
+    ],
+    concepts: ["pointers", "functions", "io"],
+    starter:
+`#include <stdio.h>
+
+void sumAvg(int *a, int *b, int *s, double *avg) {
+    // TODO
+}
+
+int main(void) {
+    int A, B, s;
+    double avg;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    sumAvg(&A, &B, &s, &avg);
+    printf("%d %.1f\\n", s, avg);
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+void sumAvg(int *a, int *b, int *s, double *avg) {
+    *s = *a + *b;
+    *avg = *s / 2.0;
+}
+
+int main(void) {
+    int A, B, s;
+    double avg;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    sumAvg(&A, &B, &s, &avg);
+    printf("%d %.1f\\n", s, avg);
+    return 0;
+}
+`,
+    expected: ({ A, B }) => `${A + B} ${((A + B) / 2).toFixed(1)}`,
+  },
+  {
+    id: 182,
+    difficulty: "medium",
+    tag: "중급 · 포인터",
+    title: "포인터로 배열 최댓값",
+    description:
+      "다섯 정수가 차례로 주어집니다. <code>int arrayMax(int *arr, int n)</code> 함수를 정의해 배열의 최댓값을 " +
+      "출력하세요. 함수 내부에서는 포인터 산술(<code>*(arr + i)</code>)을 사용하세요.",
+    inputDesc: "총 다섯 줄에 걸쳐 정수가 주어집니다.",
+    outputDesc: "최댓값을 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "1\n3\n5\n2\n4", output: "5" },
+      { input: "-1\n-2\n-3\n-4\n-5", output: "-1" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "1번째 값" },
+      { name: "B", min: -1000, max: 1000, desc: "2번째 값" },
+      { name: "C", min: -1000, max: 1000, desc: "3번째 값" },
+      { name: "D", min: -1000, max: 1000, desc: "4번째 값" },
+      { name: "E", min: -1000, max: 1000, desc: "5번째 값" },
+    ],
+    testCases: [
+      { input: "1\n3\n5\n2\n4", expected: "5" },
+      { input: "-1\n-2\n-3\n-4\n-5", expected: "-1" },
+      { input: "9\n9\n9\n9\n9", expected: "9" },
+    ],
+    concepts: ["pointers", "arrays", "functions"],
+    starter:
+`#include <stdio.h>
+
+int arrayMax(int *arr, int n) {
+    // TODO: 포인터 산술로 최댓값 찾기
+    return 0;
+}
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    printf("%d\\n", arrayMax(arr, 5));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int arrayMax(int *arr, int n) {
+    int m = *arr;
+    for (int i = 1; i < n; i++) {
+        if (*(arr + i) > m) m = *(arr + i);
+    }
+    return m;
+}
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    printf("%d\\n", arrayMax(arr, 5));
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) => String(Math.max(A, B, C, D, E)),
+  },
+  {
+    id: 183,
+    difficulty: "medium",
+    tag: "중급 · 포인터",
+    title: "포인터로 몫과 나머지",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>void divmod(int a, int b, int *q, int *r)</code> 함수를 " +
+      "정의해 몫과 나머지를 포인터로 반환한 뒤, <code>몫 나머지</code> 형식으로 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>A / B</code>의 몫과 나머지를 공백 구분으로 출력합니다.",
+    constraints: ["1 ≤ A ≤ 100000", "1 ≤ B ≤ 1000"],
+    examples: [
+      { input: "10\n3", output: "3 1" },
+      { input: "100\n4", output: "25 0" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 100000, desc: "분자" },
+      { name: "B", min: 1, max: 1000, desc: "분모" },
+    ],
+    testCases: [
+      { input: "10\n3", expected: "3 1" },
+      { input: "100\n4", expected: "25 0" },
+      { input: "7\n10", expected: "0 7" },
+    ],
+    concepts: ["pointers", "functions", "operators"],
+    starter:
+`#include <stdio.h>
+
+void divmod(int a, int b, int *q, int *r) {
+    // TODO
+}
+
+int main(void) {
+    int A, B, q, r;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    divmod(A, B, &q, &r);
+    printf("%d %d\\n", q, r);
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+void divmod(int a, int b, int *q, int *r) {
+    *q = a / b;
+    *r = a % b;
+}
+
+int main(void) {
+    int A, B, q, r;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    divmod(A, B, &q, &r);
+    printf("%d %d\\n", q, r);
+    return 0;
+}
+`,
+    expected: ({ A, B }) => `${Math.floor(A / B)} ${A % B}`,
+  },
+  {
+    id: 184,
+    difficulty: "medium",
+    tag: "중급 · 포인터",
+    title: "포인터로 배열 평균",
+    description:
+      "다섯 정수가 차례로 주어집니다. <code>double arrayAvg(int *arr, int n)</code> 함수를 포인터 산술로 정의해 " +
+      "배열의 평균을 소수점 둘째 자리까지 출력하세요.",
+    inputDesc: "총 다섯 줄에 걸쳐 정수가 주어집니다.",
+    outputDesc: "배열의 평균을 소수점 둘째 자리로 출력합니다.",
+    constraints: ["0 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "1\n2\n3\n4\n5", output: "3.00" },
+      { input: "10\n10\n10\n10\n10", output: "10.00" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 1000, desc: "1번째 값" },
+      { name: "B", min: 0, max: 1000, desc: "2번째 값" },
+      { name: "C", min: 0, max: 1000, desc: "3번째 값" },
+      { name: "D", min: 0, max: 1000, desc: "4번째 값" },
+      { name: "E", min: 0, max: 1000, desc: "5번째 값" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n4\n5", expected: "3.00" },
+      { input: "10\n10\n10\n10\n10", expected: "10.00" },
+      { input: "0\n0\n0\n0\n0", expected: "0.00" },
+    ],
+    concepts: ["pointers", "arrays", "functions"],
+    starter:
+`#include <stdio.h>
+
+double arrayAvg(int *arr, int n) {
+    // TODO
+    return 0.0;
+}
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    printf("%.2f\\n", arrayAvg(arr, 5));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+double arrayAvg(int *arr, int n) {
+    int s = 0;
+    for (int i = 0; i < n; i++) s += *(arr + i);
+    return (double)s / n;
+}
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    printf("%.2f\\n", arrayAvg(arr, 5));
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) =>
+      ((A + B + C + D + E) / 5).toFixed(2),
+  },
+  {
+    id: 185,
+    difficulty: "medium",
+    tag: "중급 · 포인터",
+    title: "포인터로 문자열 길이",
+    description:
+      "양의 정수 <code>N</code>이 주어집니다. <code>char buf[N + 1]</code>에 <code>'a'</code>를 <code>N</code>번 채우고 " +
+      "<code>'\\0'</code>을 두어 문자열을 만든 뒤, <code>int myStrlen(const char *s)</code> 함수를 " +
+      "포인터로 정의해 길이를 출력하세요. (NULL 종료를 만날 때까지 포인터를 증가시키며 카운트)",
+    inputDesc: "첫 줄에 정수 <code>N</code>이 주어집니다.",
+    outputDesc: "<code>myStrlen</code>의 결과(= <code>N</code>)를 출력합니다.",
+    constraints: ["1 ≤ N ≤ 50"],
+    examples: [
+      { input: "5", output: "5" },
+      { input: "1", output: "1" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 50, desc: "문자열 길이" },
+    ],
+    testCases: [
+      { input: "5", expected: "5" },
+      { input: "1", expected: "1" },
+      { input: "50", expected: "50" },
+    ],
+    concepts: ["pointers", "strings", "loops"],
+    starter:
+`#include <stdio.h>
+
+int myStrlen(const char *s) {
+    // TODO: 포인터를 증가시키며 '\\0'까지의 거리 반환
+    return 0;
+}
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    char buf[64];
+    for (int i = 0; i < N; i++) buf[i] = 'a';
+    buf[N] = '\\0';
+    printf("%d\\n", myStrlen(buf));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int myStrlen(const char *s) {
+    const char *p = s;
+    while (*p != '\\0') p++;
+    return (int)(p - s);
+}
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    char buf[64];
+    for (int i = 0; i < N; i++) buf[i] = 'a';
+    buf[N] = '\\0';
+    printf("%d\\n", myStrlen(buf));
+    return 0;
+}
+`,
+    expected: ({ N }) => String(N),
+  },
+  {
+    id: 186,
+    difficulty: "medium",
+    tag: "중급 · 포인터",
+    title: "두 배열 원소별 합",
+    description:
+      "두 길이 3 배열이 차례로 주어집니다(<code>A B C</code>와 <code>D E F</code>). " +
+      "<code>void elemAdd(int *a, int *b, int *out, int n)</code> 함수로 원소별 합을 구해 한 줄에 공백 구분으로 출력하세요.",
+    inputDesc:
+      "여섯 줄에 걸쳐 <code>A</code>, <code>B</code>, <code>C</code>, <code>D</code>, <code>E</code>, <code>F</code>가 주어집니다.",
+    outputDesc: "<code>A+D B+E C+F</code> 순서로 공백 구분 출력합니다.",
+    constraints: ["-1000 ≤ 모든 값 ≤ 1000"],
+    examples: [
+      { input: "1\n2\n3\n10\n20\n30", output: "11 22 33" },
+      { input: "0\n0\n0\n0\n0\n0", output: "0 0 0" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "첫 배열 1" },
+      { name: "B", min: -1000, max: 1000, desc: "첫 배열 2" },
+      { name: "C", min: -1000, max: 1000, desc: "첫 배열 3" },
+      { name: "D", min: -1000, max: 1000, desc: "두 번째 배열 1" },
+      { name: "E", min: -1000, max: 1000, desc: "두 번째 배열 2" },
+      { name: "F", min: -1000, max: 1000, desc: "두 번째 배열 3" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n10\n20\n30", expected: "11 22 33" },
+      { input: "0\n0\n0\n0\n0\n0", expected: "0 0 0" },
+      { input: "-1\n-2\n-3\n1\n2\n3", expected: "0 0 0" },
+    ],
+    concepts: ["pointers", "arrays", "functions"],
+    starter:
+`#include <stdio.h>
+
+void elemAdd(int *a, int *b, int *out, int n) {
+    // TODO
+}
+
+int main(void) {
+    int A[3], B[3], C[3];
+    for (int i = 0; i < 3; i++) scanf("%d", &A[i]);
+    for (int i = 0; i < 3; i++) scanf("%d", &B[i]);
+    elemAdd(A, B, C, 3);
+    for (int i = 0; i < 3; i++) {
+        if (i > 0) printf(" ");
+        printf("%d", C[i]);
+    }
+    printf("\\n");
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+void elemAdd(int *a, int *b, int *out, int n) {
+    for (int i = 0; i < n; i++) out[i] = a[i] + b[i];
+}
+
+int main(void) {
+    int A[3], B[3], C[3];
+    for (int i = 0; i < 3; i++) scanf("%d", &A[i]);
+    for (int i = 0; i < 3; i++) scanf("%d", &B[i]);
+    elemAdd(A, B, C, 3);
+    for (int i = 0; i < 3; i++) {
+        if (i > 0) printf(" ");
+        printf("%d", C[i]);
+    }
+    printf("\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E, F }) => `${A + D} ${B + E} ${C + F}`,
+  },
+  {
+    id: 187,
+    difficulty: "medium",
+    tag: "중급 · 포인터",
+    title: "포인터로 값 증가",
+    description:
+      "양의 정수 <code>A</code>와 <code>K</code>가 주어집니다. <code>void addAssign(int *p, int k)</code> 함수를 " +
+      "정의해 <code>*p</code>에 <code>k</code>를 더한 뒤, 변경된 <code>A</code>의 값을 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "<code>A + K</code>의 값을 출력합니다.",
+    constraints: ["1 ≤ A ≤ 1000", "0 ≤ K ≤ 1000"],
+    examples: [
+      { input: "3\n5", output: "8" },
+      { input: "100\n0", output: "100" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 1000, desc: "정수 A" },
+      { name: "K", min: 0, max: 1000, desc: "더할 값" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "8" },
+      { input: "100\n0", expected: "100" },
+      { input: "1\n999", expected: "1000" },
+    ],
+    concepts: ["pointers", "functions", "io"],
+    starter:
+`#include <stdio.h>
+
+void addAssign(int *p, int k) {
+    // TODO
+}
+
+int main(void) {
+    int A, K;
+    scanf("%d", &A);
+    scanf("%d", &K);
+    addAssign(&A, K);
+    printf("%d\\n", A);
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+void addAssign(int *p, int k) {
+    *p += k;
+}
+
+int main(void) {
+    int A, K;
+    scanf("%d", &A);
+    scanf("%d", &K);
+    addAssign(&A, K);
+    printf("%d\\n", A);
+    return 0;
+}
+`,
+    expected: ({ A, K }) => String(A + K),
+  },
+  {
+    id: 188,
+    difficulty: "medium",
+    tag: "중급 · 포인터",
+    title: "포인터로 자릿수 분리",
+    description:
+      "양의 정수 <code>A</code>가 주어집니다. <code>int splitDigits(int n, int *out)</code> 함수가 " +
+      "<code>n</code>의 자릿수를 <code>out</code> 배열에 (낮은 자리부터) 채우고 자릿수 개수를 반환하도록 정의한 뒤, " +
+      "최상위 자리부터 한 줄씩 출력하세요.",
+    inputDesc: "첫 줄에 정수 <code>A</code>가 주어집니다.",
+    outputDesc: "각 자릿수를 줄마다 출력합니다.",
+    constraints: ["1 ≤ A ≤ 99999"],
+    examples: [
+      { input: "1234", output: "1\n2\n3\n4" },
+      { input: "9", output: "9" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 99999, desc: "정수 A" },
+    ],
+    testCases: [
+      { input: "1234", expected: "1\n2\n3\n4" },
+      { input: "9", expected: "9" },
+      { input: "100", expected: "1\n0\n0" },
+    ],
+    concepts: ["pointers", "loops", "arrays"],
+    starter:
+`#include <stdio.h>
+
+int splitDigits(int n, int *out) {
+    // TODO: out[0]부터 낮은 자릿수 순서로 채우고 자릿수 개수 반환
+    return 0;
+}
+
+int main(void) {
+    int A;
+    scanf("%d", &A);
+    int buf[10];
+    int len = splitDigits(A, buf);
+    for (int i = len - 1; i >= 0; i--) printf("%d\\n", buf[i]);
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int splitDigits(int n, int *out) {
+    int len = 0;
+    if (n == 0) { out[len++] = 0; return len; }
+    while (n > 0) { out[len++] = n % 10; n /= 10; }
+    return len;
+}
+
+int main(void) {
+    int A;
+    scanf("%d", &A);
+    int buf[10];
+    int len = splitDigits(A, buf);
+    for (int i = len - 1; i >= 0; i--) printf("%d\\n", buf[i]);
+    return 0;
+}
+`,
+    expected: ({ A }) => String(A).split("").join("\n"),
+  },
+  {
+    id: 189,
+    difficulty: "medium",
+    tag: "중급 · 포인터",
+    title: "배열에서 값 카운트",
+    description:
+      "다섯 정수가 주어지고 마지막 줄에 정수 <code>K</code>가 주어집니다. " +
+      "<code>int countValue(int *arr, int n, int target)</code> 함수로 배열에서 <code>K</code>가 등장한 횟수를 출력하세요.",
+    inputDesc: "여섯 줄에 걸쳐 다섯 개의 정수와 <code>K</code>가 주어집니다.",
+    outputDesc: "<code>K</code>의 등장 횟수를 출력합니다.",
+    constraints: ["-100 ≤ 값 ≤ 100", "-100 ≤ K ≤ 100"],
+    examples: [
+      { input: "1\n2\n1\n3\n1\n1", output: "3" },
+      { input: "5\n5\n5\n5\n5\n5", output: "5" },
+      { input: "1\n2\n3\n4\n5\n9", output: "0" },
+    ],
+    inputs: [
+      { name: "A", min: -100, max: 100, desc: "1번째 값" },
+      { name: "B", min: -100, max: 100, desc: "2번째 값" },
+      { name: "C", min: -100, max: 100, desc: "3번째 값" },
+      { name: "D", min: -100, max: 100, desc: "4번째 값" },
+      { name: "E", min: -100, max: 100, desc: "5번째 값" },
+      { name: "K", min: -100, max: 100, desc: "찾을 값" },
+    ],
+    testCases: [
+      { input: "1\n2\n1\n3\n1\n1", expected: "3" },
+      { input: "5\n5\n5\n5\n5\n5", expected: "5" },
+      { input: "1\n2\n3\n4\n5\n9", expected: "0" },
+    ],
+    concepts: ["pointers", "arrays", "loops"],
+    starter:
+`#include <stdio.h>
+
+int countValue(int *arr, int n, int target) {
+    // TODO
+    return 0;
+}
+
+int main(void) {
+    int arr[5], K;
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    scanf("%d", &K);
+    printf("%d\\n", countValue(arr, 5, K));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int countValue(int *arr, int n, int target) {
+    int c = 0;
+    for (int i = 0; i < n; i++) if (*(arr + i) == target) c++;
+    return c;
+}
+
+int main(void) {
+    int arr[5], K;
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    scanf("%d", &K);
+    printf("%d\\n", countValue(arr, 5, K));
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E, K }) =>
+      String([A, B, C, D, E].filter((v) => v === K).length),
+  },
+  /* --- functions killer --- */
+  {
+    id: 190,
+    difficulty: "killer",
+    tag: "킬러 · 시뮬레이션",
+    title: "기차 플랫폼 최소 개수",
+    description:
+      "한 역에 <code>N</code>대의 기차가 들어오고 나갑니다. 각 기차의 도착 시각과 출발 시각이 주어졌을 때, " +
+      "어떤 순간에도 모든 기차를 수용하기 위해 필요한 최소 플랫폼 수를 출력하세요. " +
+      "(도착과 출발이 같은 시각에 발생하면 출발이 먼저 처리되어 같은 플랫폼을 재사용할 수 있습니다.)",
+    inputDesc:
+      "첫 줄에 <code>N</code>이 주어집니다. 이후 <code>N</code>개의 줄에 각 기차의 " +
+      "<code>도착시각 출발시각</code>이 주어집니다.",
+    outputDesc: "필요한 최소 플랫폼 수를 출력합니다.",
+    constraints: ["1 ≤ N ≤ 100000", "0 ≤ 도착, 출발 ≤ 1000000", "도착 ≤ 출발"],
+    examples: [
+      { input: "3\n0 10\n5 15\n10 20", output: "2" },
+      { input: "2\n0 10\n10 20", output: "1" },
+      { input: "1\n5 10", output: "1" },
+    ],
+    testCases: [
+      { input: "3\n0 10\n5 15\n10 20", expected: "2" },
+      { input: "2\n0 10\n10 20", expected: "1" },
+      { input: "5\n0 30\n5 10\n10 20\n12 18\n20 25", expected: "3" },
+    ],
+    concepts: ["functions", "arrays", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int time;
+    int delta;
+} Event;
+
+int cmp(const void *a, const void *b) {
+    const Event *ea = a;
+    const Event *eb = b;
+    if (ea->time != eb->time) return ea->time - eb->time;
+    return ea->delta - eb->delta;
+}
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    Event events[200000];
+
+    // TODO: N개의 도착/출발을 events에 채우고, 정렬한 뒤 동시 점유 최댓값을 구하세요.
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int time;
+    int delta;
+} Event;
+
+int cmp(const void *a, const void *b) {
+    const Event *ea = a;
+    const Event *eb = b;
+    if (ea->time != eb->time) return ea->time - eb->time;
+    return ea->delta - eb->delta;
+}
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    Event events[200000];
+    for (int i = 0; i < N; i++) {
+        int a, d;
+        scanf("%d %d", &a, &d);
+        events[2 * i].time = a;
+        events[2 * i].delta = 1;
+        events[2 * i + 1].time = d;
+        events[2 * i + 1].delta = -1;
+    }
+    int total = 2 * N;
+    qsort(events, total, sizeof(Event), cmp);
+    int curr = 0, best = 0;
+    for (int i = 0; i < total; i++) {
+        curr += events[i].delta;
+        if (curr > best) best = curr;
+    }
+    printf("%d\\n", best);
+    return 0;
+}
+`,
+  },
+  /* --- pointers killer --- */
+  {
+    id: 191,
+    difficulty: "killer",
+    tag: "킬러 · 시뮬레이션",
+    title: "함수 포인터 계산기",
+    description:
+      "정수 <code>N</code>과 시작값 <code>V</code>, 그리고 <code>N</code>개의 연산이 주어집니다. " +
+      "각 연산은 <code>op x</code> 형식이며 <code>op</code>는 <code>1=+</code>, <code>2=-</code>, " +
+      "<code>3=×</code>입니다. <strong>함수 포인터 배열</strong>로 연산을 디스패치해 누적값을 차례로 갱신하고, " +
+      "최종 값을 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>N</code>, 둘째 줄에 <code>V</code>, 이후 <code>N</code>개의 줄에 <code>op x</code>가 주어집니다.",
+    outputDesc: "<code>N</code>번의 연산을 모두 적용한 후의 누적값을 출력합니다.",
+    constraints: ["0 ≤ N ≤ 100000", "-1000 ≤ V ≤ 1000", "1 ≤ op ≤ 3", "-1000 ≤ x ≤ 1000"],
+    examples: [
+      { input: "3\n10\n1 5\n3 2\n2 3", output: "27" },
+      { input: "0\n100", output: "100" },
+      { input: "4\n1\n3 2\n3 3\n3 4\n3 5", output: "120" },
+    ],
+    testCases: [
+      { input: "3\n10\n1 5\n3 2\n2 3", expected: "27" },
+      { input: "0\n100", expected: "100" },
+      { input: "4\n1\n3 2\n3 3\n3 4\n3 5", expected: "120" },
+    ],
+    concepts: ["pointers", "functions", "loops"],
+    starter:
+`#include <stdio.h>
+
+long long addOp(long long a, long long b) { return a + b; }
+long long subOp(long long a, long long b) { return a - b; }
+long long mulOp(long long a, long long b) { return a * b; }
+
+int main(void) {
+    int N;
+    long long V;
+    scanf("%d", &N);
+    scanf("%lld", &V);
+
+    // TODO: 함수 포인터 배열을 만들어 N개의 연산을 V에 차례로 적용
+
+    printf("%lld\\n", V);
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+long long addOp(long long a, long long b) { return a + b; }
+long long subOp(long long a, long long b) { return a - b; }
+long long mulOp(long long a, long long b) { return a * b; }
+
+int main(void) {
+    int N;
+    long long V;
+    scanf("%d", &N);
+    scanf("%lld", &V);
+    long long (*ops[3])(long long, long long) = { addOp, subOp, mulOp };
+    for (int i = 0; i < N; i++) {
+        int op;
+        long long x;
+        scanf("%d %lld", &op, &x);
+        V = ops[op - 1](V, x);
+    }
+    printf("%lld\\n", V);
+    return 0;
+}
+`,
+  },
+  /* --- structs medium (10) --- */
+  {
+    id: 192,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "두 Point 사이 거리의 제곱",
+    description:
+      "두 점 <code>p1 = (x1, y1)</code>, <code>p2 = (x2, y2)</code>가 주어집니다. <code>Point</code> 구조체를 정의해 " +
+      "두 점 사이 거리의 제곱 <code>(x1 - x2)² + (y1 - y2)²</code>을 출력하세요.",
+    inputDesc:
+      "네 줄에 걸쳐 <code>x1</code>, <code>y1</code>, <code>x2</code>, <code>y2</code>가 주어집니다.",
+    outputDesc: "거리의 제곱을 출력합니다.",
+    constraints: ["-100 ≤ x1, y1, x2, y2 ≤ 100"],
+    examples: [
+      { input: "0\n0\n3\n4", output: "25" },
+      { input: "1\n1\n4\n5", output: "25" },
+    ],
+    inputs: [
+      { name: "x1", min: -100, max: 100, desc: "p1.x" },
+      { name: "y1", min: -100, max: 100, desc: "p1.y" },
+      { name: "x2", min: -100, max: 100, desc: "p2.x" },
+      { name: "y2", min: -100, max: 100, desc: "p2.y" },
+    ],
+    testCases: [
+      { input: "0\n0\n3\n4", expected: "25" },
+      { input: "1\n1\n4\n5", expected: "25" },
+      { input: "-1\n-1\n2\n3", expected: "25" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+int main(void) {
+    Point p1, p2;
+    scanf("%d", &p1.x);
+    scanf("%d", &p1.y);
+    scanf("%d", &p2.x);
+    scanf("%d", &p2.y);
+
+    // TODO: 두 점 사이 거리의 제곱 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+int main(void) {
+    Point p1, p2;
+    scanf("%d", &p1.x);
+    scanf("%d", &p1.y);
+    scanf("%d", &p2.x);
+    scanf("%d", &p2.y);
+    int dx = p1.x - p2.x;
+    int dy = p1.y - p2.y;
+    printf("%d\\n", dx * dx + dy * dy);
+    return 0;
+}
+`,
+    expected: ({ x1, y1, x2, y2 }) => {
+      const dx = x1 - x2, dy = y1 - y2;
+      return String(dx * dx + dy * dy);
+    },
+  },
+  {
+    id: 193,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "Rect 둘레",
+    description:
+      "직사각형의 너비 <code>W</code>와 높이 <code>H</code>가 주어집니다. <code>Rect</code> 구조체를 정의해 " +
+      "둘레 <code>2 × (W + H)</code>를 출력하세요.",
+    inputDesc: "첫 줄에 <code>W</code>, 그다음 줄에 <code>H</code>가 주어집니다.",
+    outputDesc: "직사각형 둘레를 출력합니다.",
+    constraints: ["1 ≤ W, H ≤ 1000"],
+    examples: [
+      { input: "3\n4", output: "14" },
+      { input: "5\n5", output: "20" },
+    ],
+    inputs: [
+      { name: "W", min: 1, max: 1000, desc: "너비" },
+      { name: "H", min: 1, max: 1000, desc: "높이" },
+    ],
+    testCases: [
+      { input: "3\n4", expected: "14" },
+      { input: "5\n5", expected: "20" },
+      { input: "10\n1", expected: "22" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int width;
+    int height;
+} Rect;
+
+int main(void) {
+    Rect r;
+    scanf("%d", &r.width);
+    scanf("%d", &r.height);
+
+    // TODO: 둘레 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int width;
+    int height;
+} Rect;
+
+int main(void) {
+    Rect r;
+    scanf("%d", &r.width);
+    scanf("%d", &r.height);
+    printf("%d\\n", 2 * (r.width + r.height));
+    return 0;
+}
+`,
+    expected: ({ W, H }) => String(2 * (W + H)),
+  },
+  {
+    id: 194,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "두 직사각형 면적 비교",
+    description:
+      "직사각형 두 개의 크기 <code>(W1, H1)</code>, <code>(W2, H2)</code>가 주어집니다. 두 구조체의 면적을 비교해 " +
+      "더 큰 면적을 출력하세요. 면적이 같으면 그 값을 출력합니다.",
+    inputDesc:
+      "네 줄에 걸쳐 <code>W1</code>, <code>H1</code>, <code>W2</code>, <code>H2</code>가 주어집니다.",
+    outputDesc: "더 큰 면적(또는 같은 경우 그 값)을 출력합니다.",
+    constraints: ["1 ≤ W1, H1, W2, H2 ≤ 1000"],
+    examples: [
+      { input: "3\n4\n5\n2", output: "12" },
+      { input: "2\n2\n2\n2", output: "4" },
+    ],
+    inputs: [
+      { name: "W1", min: 1, max: 1000, desc: "1번 너비" },
+      { name: "H1", min: 1, max: 1000, desc: "1번 높이" },
+      { name: "W2", min: 1, max: 1000, desc: "2번 너비" },
+      { name: "H2", min: 1, max: 1000, desc: "2번 높이" },
+    ],
+    testCases: [
+      { input: "3\n4\n5\n2", expected: "12" },
+      { input: "2\n2\n2\n2", expected: "4" },
+      { input: "10\n10\n1\n1", expected: "100" },
+    ],
+    concepts: ["structs", "cond", "operators"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int width;
+    int height;
+} Rect;
+
+int main(void) {
+    Rect r1, r2;
+    scanf("%d", &r1.width);
+    scanf("%d", &r1.height);
+    scanf("%d", &r2.width);
+    scanf("%d", &r2.height);
+
+    // TODO: 두 면적 비교 후 더 큰 값(같으면 그 값) 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int width;
+    int height;
+} Rect;
+
+int main(void) {
+    Rect r1, r2;
+    scanf("%d", &r1.width);
+    scanf("%d", &r1.height);
+    scanf("%d", &r2.width);
+    scanf("%d", &r2.height);
+    int a1 = r1.width * r1.height;
+    int a2 = r2.width * r2.height;
+    printf("%d\\n", a1 >= a2 ? a1 : a2);
+    return 0;
+}
+`,
+    expected: ({ W1, H1, W2, H2 }) =>
+      String(Math.max(W1 * H1, W2 * H2)),
+  },
+  {
+    id: 195,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "Time 더하기 (분 단위)",
+    description:
+      "두 시각 <code>(h1, m1)</code>, <code>(h2, m2)</code>가 주어집니다. <code>Time</code> 구조체를 정의해 " +
+      "두 시각의 합을 24시간 시계 기준 분 단위로 더한 결과를 <code>시 분</code> 형식으로 출력하세요. (24시간 모듈로)",
+    inputDesc:
+      "네 줄에 걸쳐 <code>h1</code>, <code>m1</code>, <code>h2</code>, <code>m2</code>가 주어집니다.",
+    outputDesc: "<code>시 분</code> 형식으로 출력합니다.",
+    constraints: ["0 ≤ h1, h2 ≤ 23", "0 ≤ m1, m2 ≤ 59"],
+    examples: [
+      { input: "1\n30\n2\n45", output: "4 15" },
+      { input: "23\n50\n0\n20", output: "0 10" },
+    ],
+    inputs: [
+      { name: "h1", min: 0, max: 23, desc: "시각1 시" },
+      { name: "m1", min: 0, max: 59, desc: "시각1 분" },
+      { name: "h2", min: 0, max: 23, desc: "시각2 시" },
+      { name: "m2", min: 0, max: 59, desc: "시각2 분" },
+    ],
+    testCases: [
+      { input: "1\n30\n2\n45", expected: "4 15" },
+      { input: "23\n50\n0\n20", expected: "0 10" },
+      { input: "0\n0\n0\n0", expected: "0 0" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int h;
+    int m;
+} Time;
+
+int main(void) {
+    Time t1, t2;
+    scanf("%d", &t1.h);
+    scanf("%d", &t1.m);
+    scanf("%d", &t2.h);
+    scanf("%d", &t2.m);
+
+    // TODO: 두 시각을 분 단위로 더하고 24시간 시계로 환산해 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int h;
+    int m;
+} Time;
+
+int main(void) {
+    Time t1, t2;
+    scanf("%d", &t1.h);
+    scanf("%d", &t1.m);
+    scanf("%d", &t2.h);
+    scanf("%d", &t2.m);
+    int total = (t1.h * 60 + t1.m + t2.h * 60 + t2.m) % (24 * 60);
+    printf("%d %d\\n", total / 60, total % 60);
+    return 0;
+}
+`,
+    expected: ({ h1, m1, h2, m2 }) => {
+      const total = (h1 * 60 + m1 + h2 * 60 + m2) % (24 * 60);
+      return `${Math.floor(total / 60)} ${total % 60}`;
+    },
+  },
+  {
+    id: 196,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "Student 점수 합과 평균",
+    description:
+      "한 학생의 세 과목 점수 <code>S1</code>, <code>S2</code>, <code>S3</code>가 주어집니다. " +
+      "<code>Student</code> 구조체에 담은 뒤 합과 평균(소수점 둘째 자리)을 두 줄에 출력하세요.",
+    inputDesc: "세 줄에 걸쳐 <code>S1</code>, <code>S2</code>, <code>S3</code>가 주어집니다.",
+    outputDesc: "첫 줄에 합, 둘째 줄에 평균(소수점 둘째 자리).",
+    constraints: ["0 ≤ S1, S2, S3 ≤ 100"],
+    examples: [
+      { input: "80\n90\n70", output: "240\n80.00" },
+      { input: "100\n100\n100", output: "300\n100.00" },
+    ],
+    inputs: [
+      { name: "S1", min: 0, max: 100, desc: "1번 과목" },
+      { name: "S2", min: 0, max: 100, desc: "2번 과목" },
+      { name: "S3", min: 0, max: 100, desc: "3번 과목" },
+    ],
+    testCases: [
+      { input: "80\n90\n70", expected: "240\n80.00" },
+      { input: "100\n100\n100", expected: "300\n100.00" },
+      { input: "50\n60\n70", expected: "180\n60.00" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int scores[3];
+} Student;
+
+int main(void) {
+    Student s;
+    for (int i = 0; i < 3; i++) scanf("%d", &s.scores[i]);
+
+    // TODO: 합과 평균을 두 줄에 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int scores[3];
+} Student;
+
+int main(void) {
+    Student s;
+    for (int i = 0; i < 3; i++) scanf("%d", &s.scores[i]);
+    int sum = s.scores[0] + s.scores[1] + s.scores[2];
+    printf("%d\\n", sum);
+    printf("%.2f\\n", sum / 3.0);
+    return 0;
+}
+`,
+    expected: ({ S1, S2, S3 }) => {
+      const sum = S1 + S2 + S3;
+      return `${sum}\n${(sum / 3).toFixed(2)}`;
+    },
+  },
+  {
+    id: 197,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "Vector 합의 크기 제곱",
+    description:
+      "두 2D 벡터 <code>a = (ax, ay)</code>, <code>b = (bx, by)</code>가 주어집니다. <code>Vec</code> 구조체로 " +
+      "두 벡터를 합한 결과의 크기 제곱 <code>(ax + bx)² + (ay + by)²</code>을 출력하세요.",
+    inputDesc:
+      "네 줄에 걸쳐 <code>ax</code>, <code>ay</code>, <code>bx</code>, <code>by</code>가 주어집니다.",
+    outputDesc: "합 벡터의 크기 제곱을 출력합니다.",
+    constraints: ["-100 ≤ ax, ay, bx, by ≤ 100"],
+    examples: [
+      { input: "1\n2\n3\n4", output: "52" },
+      { input: "0\n0\n0\n0", output: "0" },
+    ],
+    inputs: [
+      { name: "ax", min: -100, max: 100, desc: "벡터 a의 x" },
+      { name: "ay", min: -100, max: 100, desc: "벡터 a의 y" },
+      { name: "bx", min: -100, max: 100, desc: "벡터 b의 x" },
+      { name: "by", min: -100, max: 100, desc: "벡터 b의 y" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n4", expected: "52" },
+      { input: "0\n0\n0\n0", expected: "0" },
+      { input: "1\n0\n-1\n0", expected: "0" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Vec;
+
+int main(void) {
+    Vec a, b;
+    scanf("%d", &a.x);
+    scanf("%d", &a.y);
+    scanf("%d", &b.x);
+    scanf("%d", &b.y);
+
+    // TODO: 합 벡터의 크기 제곱 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Vec;
+
+int main(void) {
+    Vec a, b;
+    scanf("%d", &a.x);
+    scanf("%d", &a.y);
+    scanf("%d", &b.x);
+    scanf("%d", &b.y);
+    int sx = a.x + b.x;
+    int sy = a.y + b.y;
+    printf("%d\\n", sx * sx + sy * sy);
+    return 0;
+}
+`,
+    expected: ({ ax, ay, bx, by }) => {
+      const sx = ax + bx, sy = ay + by;
+      return String(sx * sx + sy * sy);
+    },
+  },
+  {
+    id: 198,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "Circle 면적 큰 쪽",
+    description:
+      "두 원의 반지름 <code>R1</code>, <code>R2</code>가 주어집니다. <code>Circle</code> 구조체로 두 원의 면적(원주율 사용 안 함, " +
+      "<code>r²</code> 비교)을 비교해 더 큰 면적의 반지름을 출력하세요. 같으면 <code>R1</code>의 반지름을 출력합니다.",
+    inputDesc: "첫 줄에 <code>R1</code>, 그다음 줄에 <code>R2</code>가 주어집니다.",
+    outputDesc: "면적이 더 큰 원의 반지름을 출력합니다.",
+    constraints: ["1 ≤ R1, R2 ≤ 1000"],
+    examples: [
+      { input: "3\n5", output: "5" },
+      { input: "7\n7", output: "7" },
+    ],
+    inputs: [
+      { name: "R1", min: 1, max: 1000, desc: "원 1 반지름" },
+      { name: "R2", min: 1, max: 1000, desc: "원 2 반지름" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "5" },
+      { input: "7\n7", expected: "7" },
+      { input: "10\n2", expected: "10" },
+    ],
+    concepts: ["structs", "cond", "operators"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int r;
+} Circle;
+
+int main(void) {
+    Circle c1, c2;
+    scanf("%d", &c1.r);
+    scanf("%d", &c2.r);
+
+    // TODO: r²이 더 큰 원의 반지름 출력 (같으면 R1)
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int r;
+} Circle;
+
+int main(void) {
+    Circle c1, c2;
+    scanf("%d", &c1.r);
+    scanf("%d", &c2.r);
+    if (c1.r * c1.r >= c2.r * c2.r) printf("%d\\n", c1.r);
+    else                            printf("%d\\n", c2.r);
+    return 0;
+}
+`,
+    expected: ({ R1, R2 }) => (R1 * R1 >= R2 * R2 ? String(R1) : String(R2)),
+  },
+  {
+    id: 199,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "Date 비교",
+    description:
+      "두 날짜 <code>(y1, m1, d1)</code>, <code>(y2, m2, d2)</code>가 주어집니다. <code>Date</code> 구조체를 정의하고 " +
+      "비교 결과를 출력하세요: <code>date1 &lt; date2</code>이면 <code>-1</code>, 같으면 <code>0</code>, " +
+      "<code>date1 &gt; date2</code>이면 <code>1</code>.",
+    inputDesc:
+      "여섯 줄에 걸쳐 <code>y1</code>, <code>m1</code>, <code>d1</code>, <code>y2</code>, <code>m2</code>, <code>d2</code>가 주어집니다.",
+    outputDesc: "<code>-1</code>, <code>0</code>, <code>1</code> 중 하나를 출력합니다.",
+    constraints: ["1900 ≤ y1, y2 ≤ 2100", "1 ≤ m1, m2 ≤ 12", "1 ≤ d1, d2 ≤ 31"],
+    examples: [
+      { input: "2024\n5\n15\n2025\n1\n1", output: "-1" },
+      { input: "2024\n5\n15\n2024\n5\n15", output: "0" },
+      { input: "2024\n5\n15\n2024\n4\n20", output: "1" },
+    ],
+    inputs: [
+      { name: "y1", min: 1900, max: 2100, desc: "1번 연" },
+      { name: "m1", min: 1, max: 12, desc: "1번 월" },
+      { name: "d1", min: 1, max: 31, desc: "1번 일" },
+      { name: "y2", min: 1900, max: 2100, desc: "2번 연" },
+      { name: "m2", min: 1, max: 12, desc: "2번 월" },
+      { name: "d2", min: 1, max: 31, desc: "2번 일" },
+    ],
+    testCases: [
+      { input: "2024\n5\n15\n2025\n1\n1", expected: "-1" },
+      { input: "2024\n5\n15\n2024\n5\n15", expected: "0" },
+      { input: "2024\n5\n15\n2024\n4\n20", expected: "1" },
+    ],
+    concepts: ["structs", "cond", "operators"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int y;
+    int m;
+    int d;
+} Date;
+
+int main(void) {
+    Date a, b;
+    scanf("%d", &a.y);
+    scanf("%d", &a.m);
+    scanf("%d", &a.d);
+    scanf("%d", &b.y);
+    scanf("%d", &b.m);
+    scanf("%d", &b.d);
+
+    // TODO: -1, 0, 1 중 하나 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int y;
+    int m;
+    int d;
+} Date;
+
+int compareDates(Date a, Date b) {
+    if (a.y != b.y) return a.y < b.y ? -1 : 1;
+    if (a.m != b.m) return a.m < b.m ? -1 : 1;
+    if (a.d != b.d) return a.d < b.d ? -1 : 1;
+    return 0;
+}
+
+int main(void) {
+    Date a, b;
+    scanf("%d", &a.y);
+    scanf("%d", &a.m);
+    scanf("%d", &a.d);
+    scanf("%d", &b.y);
+    scanf("%d", &b.m);
+    scanf("%d", &b.d);
+    printf("%d\\n", compareDates(a, b));
+    return 0;
+}
+`,
+    expected: ({ y1, m1, d1, y2, m2, d2 }) => {
+      if (y1 !== y2) return y1 < y2 ? "-1" : "1";
+      if (m1 !== m2) return m1 < m2 ? "-1" : "1";
+      if (d1 !== d2) return d1 < d2 ? "-1" : "1";
+      return "0";
+    },
+  },
+  {
+    id: 200,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "RGB 회색조 변환",
+    description:
+      "세 색 성분 <code>R</code>, <code>G</code>, <code>B</code>(0~255)가 주어집니다. <code>Color</code> 구조체를 정의하고 " +
+      "회색조 값 <code>gray = (R + G + B) / 3</code>(정수 나눗셈)을 출력하세요.",
+    inputDesc: "세 줄에 걸쳐 <code>R</code>, <code>G</code>, <code>B</code>가 주어집니다.",
+    outputDesc: "회색조 값을 출력합니다.",
+    constraints: ["0 ≤ R, G, B ≤ 255"],
+    examples: [
+      { input: "100\n200\n50", output: "116" },
+      { input: "0\n0\n0", output: "0" },
+      { input: "255\n255\n255", output: "255" },
+    ],
+    inputs: [
+      { name: "R", min: 0, max: 255, desc: "Red" },
+      { name: "G", min: 0, max: 255, desc: "Green" },
+      { name: "B", min: 0, max: 255, desc: "Blue" },
+    ],
+    testCases: [
+      { input: "100\n200\n50", expected: "116" },
+      { input: "0\n0\n0", expected: "0" },
+      { input: "255\n255\n255", expected: "255" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int r;
+    int g;
+    int b;
+} Color;
+
+int main(void) {
+    Color c;
+    scanf("%d", &c.r);
+    scanf("%d", &c.g);
+    scanf("%d", &c.b);
+
+    // TODO: (r + g + b) / 3 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int r;
+    int g;
+    int b;
+} Color;
+
+int main(void) {
+    Color c;
+    scanf("%d", &c.r);
+    scanf("%d", &c.g);
+    scanf("%d", &c.b);
+    printf("%d\\n", (c.r + c.g + c.b) / 3);
+    return 0;
+}
+`,
+    expected: ({ R, G, B }) => String(Math.floor((R + G + B) / 3)),
+  },
+  {
+    id: 201,
+    difficulty: "medium",
+    tag: "중급 · 구조체",
+    title: "두 Point 합",
+    description:
+      "두 점 <code>(x1, y1)</code>, <code>(x2, y2)</code>가 주어집니다. <code>Point</code> 구조체로 표현해 " +
+      "두 점을 더한 점의 좌표를 <code>x y</code> 형식으로 출력하세요.",
+    inputDesc:
+      "네 줄에 걸쳐 <code>x1</code>, <code>y1</code>, <code>x2</code>, <code>y2</code>가 주어집니다.",
+    outputDesc: "합 좌표를 공백 구분으로 출력합니다.",
+    constraints: ["-1000 ≤ x1, y1, x2, y2 ≤ 1000"],
+    examples: [
+      { input: "1\n2\n3\n4", output: "4 6" },
+      { input: "-1\n-1\n1\n1", output: "0 0" },
+    ],
+    inputs: [
+      { name: "x1", min: -1000, max: 1000, desc: "p1.x" },
+      { name: "y1", min: -1000, max: 1000, desc: "p1.y" },
+      { name: "x2", min: -1000, max: 1000, desc: "p2.x" },
+      { name: "y2", min: -1000, max: 1000, desc: "p2.y" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n4", expected: "4 6" },
+      { input: "-1\n-1\n1\n1", expected: "0 0" },
+      { input: "100\n200\n300\n400", expected: "400 600" },
+    ],
+    concepts: ["structs", "operators", "io"],
+    starter:
+`#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+Point addPoint(Point a, Point b) {
+    Point r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    return r;
+}
+
+int main(void) {
+    Point p1, p2;
+    scanf("%d", &p1.x);
+    scanf("%d", &p1.y);
+    scanf("%d", &p2.x);
+    scanf("%d", &p2.y);
+    Point s = addPoint(p1, p2);
+    printf("%d %d\\n", s.x, s.y);
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+typedef struct {
+    int x;
+    int y;
+} Point;
+
+Point addPoint(Point a, Point b) {
+    Point r;
+    r.x = a.x + b.x;
+    r.y = a.y + b.y;
+    return r;
+}
+
+int main(void) {
+    Point p1, p2;
+    scanf("%d", &p1.x);
+    scanf("%d", &p1.y);
+    scanf("%d", &p2.x);
+    scanf("%d", &p2.y);
+    Point s = addPoint(p1, p2);
+    printf("%d %d\\n", s.x, s.y);
+    return 0;
+}
+`,
+    expected: ({ x1, y1, x2, y2 }) => `${x1 + x2} ${y1 + y2}`,
+  },
+  /* --- memory medium (10) --- */
+  {
+    id: 202,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "malloc 배열에 시작값부터 채우기",
+    description:
+      "길이 <code>N</code>과 시작값 <code>V</code>가 주어집니다. <code>malloc</code>으로 길이 <code>N</code>인 " +
+      "배열을 할당해 <code>V, V+1, V+2, ..., V+N-1</code>로 채운 뒤 합을 출력하고 <code>free</code>하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>V</code>가 주어집니다.",
+    outputDesc: "<code>N × V + N × (N - 1) / 2</code>의 값을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 100", "-100 ≤ V ≤ 100"],
+    examples: [
+      { input: "5\n1", output: "15" },
+      { input: "3\n10", output: "33" },
+      { input: "1\n7", output: "7" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 100, desc: "배열 길이" },
+      { name: "V", min: -100, max: 100, desc: "시작값" },
+    ],
+    testCases: [
+      { input: "5\n1", expected: "15" },
+      { input: "3\n10", expected: "33" },
+      { input: "1\n7", expected: "7" },
+    ],
+    concepts: ["memory", "arrays", "loops"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, V;
+    scanf("%d", &N);
+    scanf("%d", &V);
+
+    // TODO: malloc + 채우고 합 출력 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, V;
+    scanf("%d", &N);
+    scanf("%d", &V);
+    int *arr = (int *)malloc(sizeof(int) * N);
+    for (int i = 0; i < N; i++) arr[i] = V + i;
+    int sum = 0;
+    for (int i = 0; i < N; i++) sum += arr[i];
+    printf("%d\\n", sum);
+    free(arr);
+    return 0;
+}
+`,
+    expected: ({ N, V }) =>
+      String(N * V + Math.floor((N * (N - 1)) / 2)),
+  },
+  {
+    id: 203,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "두 동적 배열 합치기",
+    description:
+      "두 양의 정수 <code>N</code>, <code>M</code>이 주어집니다. <code>malloc</code>으로 두 배열을 만들어 " +
+      "첫 번째는 <code>1, 2, ..., N</code>, 두 번째는 <code>1, 2, ..., M</code>으로 채운 뒤, 두 배열의 합 전체를 " +
+      "출력하고 두 배열 모두 <code>free</code>하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>M</code>이 주어집니다.",
+    outputDesc: "<code>N(N+1)/2 + M(M+1)/2</code>를 출력합니다.",
+    constraints: ["1 ≤ N, M ≤ 100"],
+    examples: [
+      { input: "3\n2", output: "9" },
+      { input: "10\n5", output: "70" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 100, desc: "첫 배열 길이" },
+      { name: "M", min: 1, max: 100, desc: "두 번째 배열 길이" },
+    ],
+    testCases: [
+      { input: "3\n2", expected: "9" },
+      { input: "10\n5", expected: "70" },
+      { input: "1\n1", expected: "2" },
+    ],
+    concepts: ["memory", "arrays", "loops"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+
+    // TODO: malloc 두 개, 채우고 합 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+    int *a = (int *)malloc(sizeof(int) * N);
+    int *b = (int *)malloc(sizeof(int) * M);
+    for (int i = 0; i < N; i++) a[i] = i + 1;
+    for (int i = 0; i < M; i++) b[i] = i + 1;
+    long long sum = 0;
+    for (int i = 0; i < N; i++) sum += a[i];
+    for (int i = 0; i < M; i++) sum += b[i];
+    printf("%lld\\n", sum);
+    free(a);
+    free(b);
+    return 0;
+}
+`,
+    expected: ({ N, M }) =>
+      String((N * (N + 1)) / 2 + (M * (M + 1)) / 2),
+  },
+  {
+    id: 204,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "realloc로 크기 변경",
+    description:
+      "두 양의 정수 <code>N1</code>, <code>N2</code>가 주어집니다(<code>N2 ≥ N1</code>). 길이 <code>N1</code>인 배열을 " +
+      "<code>malloc</code>해 <code>1, 2, ..., N1</code>로 채우고, <code>realloc</code>으로 길이를 <code>N2</code>로 늘려 " +
+      "새로 추가된 칸을 <code>0</code>으로 채운 뒤 전체 합을 출력하고 <code>free</code>하세요.",
+    inputDesc:
+      "첫 줄에 <code>N1</code>, 그다음 줄에 <code>N2</code>가 주어집니다.",
+    outputDesc: "<code>1 + 2 + ... + N1</code>의 값을 출력합니다.",
+    constraints: ["1 ≤ N1 ≤ N2 ≤ 100"],
+    examples: [
+      { input: "3\n5", output: "6" },
+      { input: "5\n5", output: "15" },
+    ],
+    inputs: [
+      { name: "N1", min: 1, max: 100, desc: "초기 길이" },
+      { name: "N2", min: 1, max: 100, desc: "확장 후 길이" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "6" },
+      { input: "5\n5", expected: "15" },
+      { input: "1\n10", expected: "1" },
+    ],
+    concepts: ["memory", "arrays", "loops"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N1, N2;
+    scanf("%d", &N1);
+    scanf("%d", &N2);
+
+    // TODO: malloc -> realloc -> 합 출력 -> free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N1, N2;
+    scanf("%d", &N1);
+    scanf("%d", &N2);
+    int *arr = (int *)malloc(sizeof(int) * N1);
+    for (int i = 0; i < N1; i++) arr[i] = i + 1;
+    arr = (int *)realloc(arr, sizeof(int) * N2);
+    for (int i = N1; i < N2; i++) arr[i] = 0;
+    long long sum = 0;
+    for (int i = 0; i < N2; i++) sum += arr[i];
+    printf("%lld\\n", sum);
+    free(arr);
+    return 0;
+}
+`,
+    expected: ({ N1 }) => String((N1 * (N1 + 1)) / 2),
+  },
+  {
+    id: 205,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "calloc 0 카운트",
+    description:
+      "양의 정수 <code>N</code>과 <code>K</code>가 주어집니다. <code>calloc</code>으로 길이 <code>N</code>인 " +
+      "배열을 0으로 초기화하고, 인덱스 <code>0, K, 2K, 3K, ...</code>의 칸에 1을 대입한 뒤 0인 칸의 개수를 " +
+      "출력하고 <code>free</code>하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "0인 칸의 개수를 출력합니다.",
+    constraints: ["1 ≤ N ≤ 1000", "1 ≤ K ≤ 100"],
+    examples: [
+      { input: "10\n3", output: "6" },
+      { input: "10\n1", output: "0" },
+      { input: "10\n100", output: "9" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 1000, desc: "배열 길이" },
+      { name: "K", min: 1, max: 100, desc: "스텝" },
+    ],
+    testCases: [
+      { input: "10\n3", expected: "6" },
+      { input: "10\n1", expected: "0" },
+      { input: "10\n100", expected: "9" },
+    ],
+    concepts: ["memory", "arrays", "loops"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+
+    // TODO: calloc + 인덱스 0, K, 2K ...에 1 대입 후 0 카운트 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    int *arr = (int *)calloc(N, sizeof(int));
+    for (int i = 0; i < N; i += K) arr[i] = 1;
+    int zeros = 0;
+    for (int i = 0; i < N; i++) if (arr[i] == 0) zeros++;
+    printf("%d\\n", zeros);
+    free(arr);
+    return 0;
+}
+`,
+    expected: ({ N, K }) => {
+      let marked = 0;
+      for (let i = 0; i < N; i += K) marked++;
+      return String(N - marked);
+    },
+  },
+  {
+    id: 206,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "동적 문자열 반복",
+    description:
+      "양의 정수 <code>N</code>과 알파벳 순서 <code>K</code>(1~26, 소문자)가 주어집니다. <code>malloc</code>으로 길이 " +
+      "<code>N + 1</code>인 <code>char</code> 배열을 할당해 <code>'a' + (K - 1)</code> 글자를 <code>N</code>번 채우고 " +
+      "<code>'\\0'</code>으로 종료한 뒤 문자열을 출력하고 <code>free</code>하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "만든 문자열을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 50", "1 ≤ K ≤ 26"],
+    examples: [
+      { input: "3\n1", output: "aaa" },
+      { input: "5\n26", output: "zzzzz" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 50, desc: "반복 횟수" },
+      { name: "K", min: 1, max: 26, desc: "알파벳 순서" },
+    ],
+    testCases: [
+      { input: "3\n1", expected: "aaa" },
+      { input: "5\n26", expected: "zzzzz" },
+      { input: "1\n5", expected: "e" },
+    ],
+    concepts: ["memory", "strings", "loops"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+
+    // TODO: malloc char + 채움 + 출력 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    char *s = (char *)malloc(sizeof(char) * (N + 1));
+    char c = 'a' + (K - 1);
+    for (int i = 0; i < N; i++) s[i] = c;
+    s[N] = '\\0';
+    printf("%s\\n", s);
+    free(s);
+    return 0;
+}
+`,
+    expected: ({ N, K }) =>
+      String.fromCharCode("a".charCodeAt(0) + (K - 1)).repeat(N),
+  },
+  {
+    id: 207,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "free 후 재할당",
+    description:
+      "두 양의 정수 <code>K</code>, <code>M</code>이 주어집니다. <code>malloc</code>으로 길이 <code>K</code>인 배열을 " +
+      "할당해 <code>1~K</code>로 채워 합을 구하고 <code>free</code>한 뒤, 다시 <code>malloc</code>으로 길이 <code>M</code>인 " +
+      "배열을 할당해 <code>1~M</code>으로 채워 합을 구한 결과 두 줄을 출력하세요.",
+    inputDesc: "첫 줄에 <code>K</code>, 그다음 줄에 <code>M</code>이 주어집니다.",
+    outputDesc: "두 줄에 걸쳐 두 합을 출력합니다.",
+    constraints: ["1 ≤ K, M ≤ 100"],
+    examples: [
+      { input: "3\n5", output: "6\n15" },
+      { input: "10\n10", output: "55\n55" },
+    ],
+    inputs: [
+      { name: "K", min: 1, max: 100, desc: "첫 배열 길이" },
+      { name: "M", min: 1, max: 100, desc: "두 번째 배열 길이" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "6\n15" },
+      { input: "10\n10", expected: "55\n55" },
+      { input: "1\n100", expected: "1\n5050" },
+    ],
+    concepts: ["memory", "loops", "operators"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int K, M;
+    scanf("%d", &K);
+    scanf("%d", &M);
+
+    // TODO: malloc K -> 합 -> free, malloc M -> 합 -> free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int K, M;
+    scanf("%d", &K);
+    scanf("%d", &M);
+    int *a = (int *)malloc(sizeof(int) * K);
+    long long sa = 0;
+    for (int i = 0; i < K; i++) { a[i] = i + 1; sa += a[i]; }
+    free(a);
+    int *b = (int *)malloc(sizeof(int) * M);
+    long long sb = 0;
+    for (int i = 0; i < M; i++) { b[i] = i + 1; sb += b[i]; }
+    free(b);
+    printf("%lld\\n", sa);
+    printf("%lld\\n", sb);
+    return 0;
+}
+`,
+    expected: ({ K, M }) =>
+      `${(K * (K + 1)) / 2}\n${(M * (M + 1)) / 2}`,
+  },
+  {
+    id: 208,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "동적 배열 max - min",
+    description:
+      "두 양의 정수 <code>N</code>, <code>V</code>가 주어집니다. <code>malloc</code>으로 길이 <code>N</code>인 배열을 " +
+      "<code>V, V+1, V+2, ..., V+N-1</code>로 채운 뒤 최댓값과 최솟값의 차이(<code>N - 1</code>)를 출력하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>V</code>가 주어집니다.",
+    outputDesc: "<code>N - 1</code>의 값을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 1000", "-1000 ≤ V ≤ 1000"],
+    examples: [
+      { input: "5\n10", output: "4" },
+      { input: "1\n0", output: "0" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 1000, desc: "배열 길이" },
+      { name: "V", min: -1000, max: 1000, desc: "시작값" },
+    ],
+    testCases: [
+      { input: "5\n10", expected: "4" },
+      { input: "1\n0", expected: "0" },
+      { input: "100\n-50", expected: "99" },
+    ],
+    concepts: ["memory", "arrays", "operators"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, V;
+    scanf("%d", &N);
+    scanf("%d", &V);
+
+    // TODO: malloc + V..V+N-1로 채워 max-min 출력 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, V;
+    scanf("%d", &N);
+    scanf("%d", &V);
+    int *arr = (int *)malloc(sizeof(int) * N);
+    for (int i = 0; i < N; i++) arr[i] = V + i;
+    int mx = arr[0], mn = arr[0];
+    for (int i = 1; i < N; i++) {
+        if (arr[i] > mx) mx = arr[i];
+        if (arr[i] < mn) mn = arr[i];
+    }
+    printf("%d\\n", mx - mn);
+    free(arr);
+    return 0;
+}
+`,
+    expected: ({ N }) => String(N - 1),
+  },
+  {
+    id: 209,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "i² 채워서 합",
+    description:
+      "양의 정수 <code>N</code>이 주어집니다. <code>malloc</code>으로 길이 <code>N</code> 배열을 할당하고 " +
+      "<code>arr[i] = (i + 1)²</code>로 채운 뒤 전체 합을 출력하고 <code>free</code>하세요.",
+    inputDesc: "첫 줄에 정수 <code>N</code>이 주어집니다.",
+    outputDesc: "<code>1² + 2² + ... + N²</code>의 값을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 100"],
+    examples: [
+      { input: "3", output: "14" },
+      { input: "10", output: "385" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 100, desc: "배열 길이" },
+    ],
+    testCases: [
+      { input: "3", expected: "14" },
+      { input: "10", expected: "385" },
+      { input: "1", expected: "1" },
+    ],
+    concepts: ["memory", "arrays", "operators"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+
+    // TODO: malloc + i²로 채워 합 출력 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    int *arr = (int *)malloc(sizeof(int) * N);
+    for (int i = 0; i < N; i++) arr[i] = (i + 1) * (i + 1);
+    long long sum = 0;
+    for (int i = 0; i < N; i++) sum += arr[i];
+    printf("%lld\\n", sum);
+    free(arr);
+    return 0;
+}
+`,
+    expected: ({ N }) => {
+      let s = 0;
+      for (let i = 1; i <= N; i++) s += i * i;
+      return String(s);
+    },
+  },
+  {
+    id: 210,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "동적 2D 행 합",
+    description:
+      "두 양의 정수 <code>N</code>, <code>M</code>이 주어집니다. <code>malloc</code>으로 <code>N × M</code> 2차원 배열을 " +
+      "할당해 <code>mat[i][j] = i + j</code>로 채운 뒤, 각 행의 합을 한 줄씩 출력하고 메모리를 해제하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>M</code>이 주어집니다.",
+    outputDesc: "<code>N</code>개의 줄에 걸쳐 각 행의 합을 출력합니다.",
+    constraints: ["1 ≤ N, M ≤ 20"],
+    examples: [
+      { input: "3\n3", output: "3\n6\n9" },
+      { input: "2\n4", output: "6\n10" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 20, desc: "행 수" },
+      { name: "M", min: 1, max: 20, desc: "열 수" },
+    ],
+    testCases: [
+      { input: "3\n3", expected: "3\n6\n9" },
+      { input: "2\n4", expected: "6\n10" },
+      { input: "1\n1", expected: "0" },
+    ],
+    concepts: ["memory", "arrays", "loops"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+
+    // TODO: 동적 2D 배열에 i+j 채우고 행 합 출력 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, M;
+    scanf("%d", &N);
+    scanf("%d", &M);
+    int **mat = (int **)malloc(sizeof(int *) * N);
+    for (int i = 0; i < N; i++) {
+        mat[i] = (int *)malloc(sizeof(int) * M);
+        for (int j = 0; j < M; j++) mat[i][j] = i + j;
+    }
+    for (int i = 0; i < N; i++) {
+        long long s = 0;
+        for (int j = 0; j < M; j++) s += mat[i][j];
+        printf("%lld\\n", s);
+    }
+    for (int i = 0; i < N; i++) free(mat[i]);
+    free(mat);
+    return 0;
+}
+`,
+    expected: ({ N, M }) => {
+      const out = [];
+      for (let i = 0; i < N; i++) {
+        let s = 0;
+        for (let j = 0; j < M; j++) s += i + j;
+        out.push(s);
+      }
+      return out.join("\n");
+    },
+  },
+  /* --- structs killer --- */
+  {
+    id: 211,
+    difficulty: "killer",
+    tag: "킬러 · 시뮬레이션",
+    title: "학생 점수 내림차순 정렬",
+    description:
+      "<code>N</code>명의 학생 데이터(<code>id</code>, <code>score</code>)가 주어집니다. 점수 내림차순으로, 점수가 같으면 " +
+      "id 오름차순으로 정렬한 결과의 <code>id</code> 목록을 공백 구분으로 한 줄에 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>N</code>, 이후 <code>N</code>개의 줄에 각각 <code>id score</code>가 주어집니다.",
+    outputDesc: "정렬된 id 목록을 공백 구분으로 출력합니다.",
+    constraints: ["1 ≤ N ≤ 1000", "id, score는 0~10000 사이 정수"],
+    examples: [
+      { input: "3\n1 80\n2 90\n3 80", output: "2 1 3" },
+      { input: "1\n5 100", output: "5" },
+    ],
+    testCases: [
+      { input: "3\n1 80\n2 90\n3 80", expected: "2 1 3" },
+      { input: "1\n5 100", expected: "5" },
+      {
+        input: "5\n10 70\n20 80\n30 80\n40 90\n50 70",
+        expected: "40 20 30 10 50",
+      },
+    ],
+    concepts: ["structs", "arrays", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int id;
+    int score;
+} Student;
+
+int cmpStudent(const void *a, const void *b) {
+    const Student *sa = a;
+    const Student *sb = b;
+    if (sa->score != sb->score) return sb->score - sa->score;
+    return sa->id - sb->id;
+}
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    Student s[1000];
+    for (int i = 0; i < N; i++) scanf("%d %d", &s[i].id, &s[i].score);
+
+    // TODO: qsort로 정렬 후 id 공백 구분 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct {
+    int id;
+    int score;
+} Student;
+
+int cmpStudent(const void *a, const void *b) {
+    const Student *sa = a;
+    const Student *sb = b;
+    if (sa->score != sb->score) return sb->score - sa->score;
+    return sa->id - sb->id;
+}
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    Student s[1000];
+    for (int i = 0; i < N; i++) scanf("%d %d", &s[i].id, &s[i].score);
+    qsort(s, N, sizeof(Student), cmpStudent);
+    for (int i = 0; i < N; i++) {
+        if (i > 0) printf(" ");
+        printf("%d", s[i].id);
+    }
+    printf("\\n");
+    return 0;
+}
+`,
+  },
+  /* --- memory killer --- */
+  {
+    id: 212,
+    difficulty: "killer",
+    tag: "킬러 · 시뮬레이션",
+    title: "큐 시뮬레이션",
+    description:
+      "<code>M</code>개의 명령이 주어집니다. 각 명령은 <code>1 x</code>(큐에 <code>x</code>를 push)이거나 " +
+      "<code>2</code>(큐 front를 pop, 큐가 비었으면 무시)입니다. 모든 명령을 처리한 뒤 큐에 남아있는 " +
+      "값들을 front부터 공백 구분으로 한 줄에 출력하세요. 큐가 비었으면 <code>empty</code>를 출력합니다.",
+    inputDesc:
+      "첫 줄에 <code>M</code>이 주어집니다. 이후 <code>M</code>개의 줄에 각 명령이 주어집니다.",
+    outputDesc: "최종 큐 상태를 공백 구분으로 출력하거나 <code>empty</code>를 출력합니다.",
+    constraints: ["0 ≤ M ≤ 100000", "1 ≤ push 값 ≤ 1000000000"],
+    examples: [
+      { input: "5\n1 3\n1 5\n2\n1 7\n1 2", output: "5 7 2" },
+      { input: "3\n1 10\n2\n2", output: "empty" },
+      { input: "0", output: "empty" },
+    ],
+    testCases: [
+      { input: "5\n1 3\n1 5\n2\n1 7\n1 2", expected: "5 7 2" },
+      { input: "3\n1 10\n2\n2", expected: "empty" },
+      { input: "4\n1 1\n1 2\n1 3\n1 4", expected: "1 2 3 4" },
+    ],
+    concepts: ["memory", "arrays", "loops", "cond"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int M;
+    scanf("%d", &M);
+    long long *q = (long long *)malloc(sizeof(long long) * (M + 1));
+    int head = 0, tail = 0;
+
+    // TODO: M개의 명령을 처리해 큐 상태를 출력
+
+    free(q);
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int M;
+    scanf("%d", &M);
+    long long *q = (long long *)malloc(sizeof(long long) * (M + 1));
+    int head = 0, tail = 0;
+    for (int i = 0; i < M; i++) {
+        int op;
+        scanf("%d", &op);
+        if (op == 1) {
+            long long x;
+            scanf("%lld", &x);
+            q[tail++] = x;
+        } else {
+            if (head < tail) head++;
+        }
+    }
+    if (head == tail) {
+        printf("empty\\n");
+    } else {
+        for (int i = head; i < tail; i++) {
+            if (i > head) printf(" ");
+            printf("%lld", q[i]);
+        }
+        printf("\\n");
+    }
+    free(q);
+    return 0;
+}
+`,
+  },
+  /* --- memory medium (1 more to total 10) --- */
+  {
+    id: 213,
+    difficulty: "medium",
+    tag: "중급 · 동적 메모리",
+    title: "동적 배열 두 칸 교환",
+    description:
+      "양의 정수 <code>N</code>과 두 인덱스 <code>I</code>, <code>J</code>(0-indexed)가 주어집니다. " +
+      "<code>malloc</code>으로 길이 <code>N</code>인 배열을 잡고 <code>1, 2, ..., N</code>을 채운 뒤, " +
+      "<code>I</code>번 칸과 <code>J</code>번 칸을 교환하고 공백 구분으로 출력한 다음 <code>free</code>하세요.",
+    inputDesc:
+      "첫 줄에 <code>N</code>, 그다음 줄에 <code>I</code>, 그다음 줄에 <code>J</code>가 주어집니다.",
+    outputDesc: "교환 후 배열을 공백 구분으로 출력합니다.",
+    constraints: ["1 ≤ N ≤ 30", "0 ≤ I, J < N"],
+    examples: [
+      { input: "5\n0\n4", output: "5 2 3 4 1" },
+      { input: "3\n0\n2", output: "3 2 1" },
+      { input: "1\n0\n0", output: "1" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 30, desc: "배열 길이" },
+      { name: "I", min: 0, max: 29, desc: "첫 인덱스" },
+      { name: "J", min: 0, max: 29, desc: "두 번째 인덱스" },
+    ],
+    testCases: [
+      { input: "5\n0\n4", expected: "5 2 3 4 1" },
+      { input: "3\n0\n2", expected: "3 2 1" },
+      { input: "1\n0\n0", expected: "1" },
+    ],
+    concepts: ["memory", "arrays", "operators"],
+    starter:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, I, J;
+    scanf("%d", &N);
+    scanf("%d", &I);
+    scanf("%d", &J);
+
+    // TODO: malloc + 1~N 채우고 arr[I] 와 arr[J] 교환 후 출력 + free
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+#include <stdlib.h>
+
+int main(void) {
+    int N, I, J;
+    scanf("%d", &N);
+    scanf("%d", &I);
+    scanf("%d", &J);
+    int *arr = (int *)malloc(sizeof(int) * N);
+    for (int i = 0; i < N; i++) arr[i] = i + 1;
+    int t = arr[I]; arr[I] = arr[J]; arr[J] = t;
+    for (int i = 0; i < N; i++) {
+        if (i > 0) printf(" ");
+        printf("%d", arr[i]);
+    }
+    printf("\\n");
+    free(arr);
+    return 0;
+}
+`,
+    expected: ({ N, I, J }) => {
+      const arr = Array.from({ length: N }, (_, i) => i + 1);
+      const t = arr[I]; arr[I] = arr[J]; arr[J] = t;
+      return arr.join(" ");
+    },
+  },
+  /* --- recursion medium (10) --- */
+  {
+    id: 214,
+    difficulty: "medium",
+    tag: "중급 · 재귀",
+    title: "재귀로 구간 합",
+    description:
+      "두 정수 <code>A</code>, <code>B</code>가 주어집니다 (<code>A ≤ B</code>). 재귀 함수 <code>sumRange(a, b)</code>를 정의해 " +
+      "<code>A + (A + 1) + ... + B</code>를 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "구간 합을 출력합니다.",
+    constraints: ["-100 ≤ A ≤ B ≤ 100"],
+    examples: [
+      { input: "1\n5", output: "15" },
+      { input: "10\n10", output: "10" },
+      { input: "-3\n3", output: "0" },
+    ],
+    inputs: [
+      { name: "A", min: -100, max: 100, desc: "구간 시작" },
+      { name: "B", min: -100, max: 100, desc: "구간 끝" },
+    ],
+    testCases: [
+      { input: "1\n5", expected: "15" },
+      { input: "10\n10", expected: "10" },
+      { input: "-3\n3", expected: "0" },
+    ],
+    concepts: ["recursion", "functions", "operators"],
+    starter:
+`#include <stdio.h>
+
+int sumRange(int a, int b) {
+    // TODO: a > b 이면 0, 아니면 a + sumRange(a + 1, b)
+    return 0;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d\\n", sumRange(A, B));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int sumRange(int a, int b) {
+    if (a > b) return 0;
+    return a + sumRange(a + 1, b);
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d\\n", sumRange(A, B));
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      let s = 0;
+      for (let i = A; i <= B; i++) s += i;
+      return String(s);
+    },
+  },
+  {
+    id: 215,
+    difficulty: "medium",
+    tag: "중급 · 재귀",
+    title: "재귀 거듭제곱",
+    description:
+      "정수 <code>A</code>와 <code>K</code>가 주어집니다. 재귀로 <code>A^K</code>를 계산해 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "<code>A^K</code>를 출력합니다.",
+    constraints: ["1 ≤ A ≤ 20", "0 ≤ K ≤ 15"],
+    examples: [
+      { input: "2\n10", output: "1024" },
+      { input: "3\n0", output: "1" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 20, desc: "밑" },
+      { name: "K", min: 0, max: 15, desc: "지수" },
+    ],
+    testCases: [
+      { input: "2\n10", expected: "1024" },
+      { input: "3\n0", expected: "1" },
+      { input: "5\n3", expected: "125" },
+    ],
+    concepts: ["recursion", "functions", "operators"],
+    starter:
+`#include <stdio.h>
+
+long long power(int a, int k) {
+    // TODO
+    return 0;
+}
+
+int main(void) {
+    int A, K;
+    scanf("%d", &A);
+    scanf("%d", &K);
+    printf("%lld\\n", power(A, K));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+long long power(int a, int k) {
+    if (k == 0) return 1;
+    return (long long)a * power(a, k - 1);
+}
+
+int main(void) {
+    int A, K;
+    scanf("%d", &A);
+    scanf("%d", &K);
+    printf("%lld\\n", power(A, K));
+    return 0;
+}
+`,
+    expected: ({ A, K }) => String(A ** K),
+  },
+  {
+    id: 216,
+    difficulty: "medium",
+    tag: "중급 · 재귀",
+    title: "재귀 gcd",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>int gcd(int a, int b)</code>를 재귀로 정의해 " +
+      "최대공약수를 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>gcd(A, B)</code>를 출력합니다.",
+    constraints: ["1 ≤ A, B ≤ 100000"],
+    examples: [
+      { input: "12\n18", output: "6" },
+      { input: "7\n13", output: "1" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 100000, desc: "정수 A" },
+      { name: "B", min: 1, max: 100000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "12\n18", expected: "6" },
+      { input: "100\n75", expected: "25" },
+      { input: "7\n13", expected: "1" },
+    ],
+    concepts: ["recursion", "functions", "operators"],
+    starter:
+`#include <stdio.h>
+
+int gcd(int a, int b) {
+    // TODO
+    return 0;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d\\n", gcd(A, B));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int gcd(int a, int b) {
+    if (b == 0) return a;
+    return gcd(b, a % b);
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d\\n", gcd(A, B));
+    return 0;
+}
+`,
+    expected: ({ A, B }) => {
+      const g = (a, b) => (b === 0 ? a : g(b, a % b));
+      return String(g(A, B));
+    },
+  },
+  {
+    id: 217,
+    difficulty: "medium",
+    tag: "중급 · 재귀",
+    title: "재귀로 짝수 fib 합",
+    description:
+      "양의 정수 <code>N</code>이 주어집니다. <code>fib(1) = 1</code>, <code>fib(2) = 1</code>, " +
+      "<code>fib(i) = fib(i - 1) + fib(i - 2)</code>로 정의된 피보나치 수열에서 1부터 <code>N</code>번째까지의 짝수 항의 " +
+      "합을 출력하세요. 피보나치 함수를 재귀로 작성하세요.",
+    inputDesc: "첫 줄에 정수 <code>N</code>이 주어집니다. 둘째 줄에 더미 정수 <code>D</code>가 주어집니다(미사용).",
+    outputDesc: "짝수 피보나치 항의 합을 출력합니다.",
+    constraints: ["1 ≤ N ≤ 20", "0 ≤ D ≤ 10"],
+    examples: [
+      { input: "10\n0", output: "44" },
+      { input: "1\n0", output: "0" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 20, desc: "피보나치 항 수" },
+      { name: "D", min: 0, max: 10, desc: "더미(미사용)" },
+    ],
+    testCases: [
+      { input: "10\n0", expected: "44" },
+      { input: "1\n0", expected: "0" },
+      { input: "6\n0", expected: "10" },
+    ],
+    concepts: ["recursion", "functions", "cond"],
+    starter:
+`#include <stdio.h>
+
+long long fib(int n) {
+    if (n <= 2) return 1;
+    return fib(n - 1) + fib(n - 2);
+}
+
+int main(void) {
+    int N, D;
+    scanf("%d", &N);
+    scanf("%d", &D);
+    (void)D;
+
+    // TODO: fib(1) + fib(2) + ... + fib(N) 중 짝수만 합산
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+long long fib(int n) {
+    if (n <= 2) return 1;
+    return fib(n - 1) + fib(n - 2);
+}
+
+int main(void) {
+    int N, D;
+    scanf("%d", &N);
+    scanf("%d", &D);
+    (void)D;
+    long long sum = 0;
+    for (int i = 1; i <= N; i++) {
+        long long f = fib(i);
+        if (f % 2 == 0) sum += f;
+    }
+    printf("%lld\\n", sum);
+    return 0;
+}
+`,
+    expected: ({ N }) => {
+      let a = 1, b = 1;
+      let s = 0;
+      for (let i = 1; i <= N; i++) {
+        const v = i <= 2 ? 1 : a + b;
+        if (i > 2) { a = b; b = v; }
+        if (v % 2 === 0) s += v;
+      }
+      return String(s);
+    },
+  },
+  {
+    id: 218,
+    difficulty: "medium",
+    tag: "중급 · 재귀",
+    title: "재귀로 곱셈 (덧셈만 사용)",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. 재귀와 덧셈만 사용해 <code>A × B</code>를 출력하세요. " +
+      "곱셈 연산자 <code>*</code>는 사용 금지입니다. (힌트: <code>mul(a, b) = a + mul(a, b - 1)</code>, " +
+      "<code>mul(a, 0) = 0</code>)",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>A × B</code>를 출력합니다.",
+    constraints: ["0 ≤ A, B ≤ 100"],
+    examples: [
+      { input: "3\n5", output: "15" },
+      { input: "0\n10", output: "0" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 100, desc: "정수 A" },
+      { name: "B", min: 0, max: 100, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "15" },
+      { input: "0\n10", expected: "0" },
+      { input: "7\n7", expected: "49" },
+    ],
+    concepts: ["recursion", "functions", "operators"],
+    starter:
+`#include <stdio.h>
+
+int mul(int a, int b) {
+    // TODO: 곱셈 연산자 없이 재귀로 a*b 구현
+    return 0;
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d\\n", mul(A, B));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int mul(int a, int b) {
+    if (b == 0) return 0;
+    return a + mul(a, b - 1);
+}
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d\\n", mul(A, B));
+    return 0;
+}
+`,
+    expected: ({ A, B }) => String(A * B),
+  },
+  {
+    id: 219,
+    difficulty: "medium",
+    tag: "중급 · 재귀",
+    title: "재귀로 자릿수 곱",
+    description:
+      "양의 정수 <code>A</code>와 더미 정수 <code>D</code>가 주어집니다. <code>int digitProd(int n)</code>을 재귀로 " +
+      "정의해 <code>A</code>의 모든 자릿수의 곱을 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>D</code>(미사용)가 주어집니다.",
+    outputDesc: "<code>A</code>의 자릿수 곱을 출력합니다.",
+    constraints: ["1 ≤ A ≤ 99999", "0 ≤ D ≤ 10"],
+    examples: [
+      { input: "123\n0", output: "6" },
+      { input: "204\n0", output: "0" },
+      { input: "9\n0", output: "9" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 99999, desc: "정수 A" },
+      { name: "D", min: 0, max: 10, desc: "더미(미사용)" },
+    ],
+    testCases: [
+      { input: "123\n0", expected: "6" },
+      { input: "204\n0", expected: "0" },
+      { input: "9\n0", expected: "9" },
+    ],
+    concepts: ["recursion", "functions", "operators"],
+    starter:
+`#include <stdio.h>
+
+int digitProd(int n) {
+    if (n < 10) return n;
+    return (n % 10) * digitProd(n / 10);
+}
+
+int main(void) {
+    int A, D;
+    scanf("%d", &A);
+    scanf("%d", &D);
+    (void)D;
+    printf("%d\\n", digitProd(A));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int digitProd(int n) {
+    if (n < 10) return n;
+    return (n % 10) * digitProd(n / 10);
+}
+
+int main(void) {
+    int A, D;
+    scanf("%d", &A);
+    scanf("%d", &D);
+    (void)D;
+    printf("%d\\n", digitProd(A));
+    return 0;
+}
+`,
+    expected: ({ A }) =>
+      String(String(A).split("").reduce((p, d) => p * Number(d), 1)),
+  },
+  {
+    id: 220,
+    difficulty: "medium",
+    tag: "중급 · 재귀",
+    title: "재귀로 배열 거꾸로 출력",
+    description:
+      "다섯 정수 <code>A</code>~<code>E</code>가 차례로 주어집니다. <code>void revPrint(int *arr, int n)</code>을 " +
+      "재귀로 정의해 배열을 끝에서부터 한 줄에 공백 구분으로 출력하세요.",
+    inputDesc: "총 다섯 줄에 걸쳐 정수가 주어집니다.",
+    outputDesc: "거꾸로 한 줄로 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "1\n2\n3\n4\n5", output: "5 4 3 2 1" },
+      { input: "9\n9\n9\n9\n9", output: "9 9 9 9 9" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "1번째 값" },
+      { name: "B", min: -1000, max: 1000, desc: "2번째 값" },
+      { name: "C", min: -1000, max: 1000, desc: "3번째 값" },
+      { name: "D", min: -1000, max: 1000, desc: "4번째 값" },
+      { name: "E", min: -1000, max: 1000, desc: "5번째 값" },
+    ],
+    testCases: [
+      { input: "1\n2\n3\n4\n5", expected: "5 4 3 2 1" },
+      { input: "9\n9\n9\n9\n9", expected: "9 9 9 9 9" },
+      { input: "-1\n-2\n-3\n-4\n-5", expected: "-5 -4 -3 -2 -1" },
+    ],
+    concepts: ["recursion", "arrays", "functions"],
+    starter:
+`#include <stdio.h>
+
+void revPrint(int *arr, int n) {
+    if (n == 0) return;
+    printf("%d", arr[n - 1]);
+    if (n > 1) printf(" ");
+    revPrint(arr, n - 1);
+}
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    revPrint(arr, 5);
+    printf("\\n");
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+void revPrint(int *arr, int n) {
+    if (n == 0) return;
+    printf("%d", arr[n - 1]);
+    if (n > 1) printf(" ");
+    revPrint(arr, n - 1);
+}
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    revPrint(arr, 5);
+    printf("\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) =>
+      [A, B, C, D, E].slice().reverse().join(" "),
+  },
+  {
+    id: 221,
+    difficulty: "medium",
+    tag: "중급 · 재귀",
+    title: "재귀로 K 배수 개수",
+    description:
+      "양의 정수 <code>N</code>, <code>K</code>가 주어집니다. <code>1</code>부터 <code>N</code>까지 중 <code>K</code>의 " +
+      "배수의 개수를 재귀로 구해 출력하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "<code>K</code>의 배수 개수를 출력합니다.",
+    constraints: ["1 ≤ N ≤ 1000", "1 ≤ K ≤ 100"],
+    examples: [
+      { input: "20\n3", output: "6" },
+      { input: "100\n7", output: "14" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 1000, desc: "상한" },
+      { name: "K", min: 1, max: 100, desc: "기준" },
+    ],
+    testCases: [
+      { input: "20\n3", expected: "6" },
+      { input: "100\n7", expected: "14" },
+      { input: "1\n1", expected: "1" },
+    ],
+    concepts: ["recursion", "functions", "cond"],
+    starter:
+`#include <stdio.h>
+
+int countMultiples(int n, int k) {
+    if (n <= 0) return 0;
+    return (n % k == 0 ? 1 : 0) + countMultiples(n - 1, k);
+}
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    printf("%d\\n", countMultiples(N, K));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int countMultiples(int n, int k) {
+    if (n <= 0) return 0;
+    return (n % k == 0 ? 1 : 0) + countMultiples(n - 1, k);
+}
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    printf("%d\\n", countMultiples(N, K));
+    return 0;
+}
+`,
+    expected: ({ N, K }) => String(Math.floor(N / K)),
+  },
+  {
+    id: 222,
+    difficulty: "medium",
+    tag: "중급 · 재귀",
+    title: "재귀로 배열 최댓값",
+    description:
+      "다섯 정수가 차례로 주어집니다. <code>int arrayMax(int *arr, int n)</code>을 재귀로 정의해 최댓값을 출력하세요.",
+    inputDesc: "총 다섯 줄에 걸쳐 정수가 주어집니다.",
+    outputDesc: "최댓값을 출력합니다.",
+    constraints: ["-1000 ≤ A, B, C, D, E ≤ 1000"],
+    examples: [
+      { input: "1\n5\n3\n7\n2", output: "7" },
+      { input: "-1\n-5\n-2\n-10\n-3", output: "-1" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "1번째 값" },
+      { name: "B", min: -1000, max: 1000, desc: "2번째 값" },
+      { name: "C", min: -1000, max: 1000, desc: "3번째 값" },
+      { name: "D", min: -1000, max: 1000, desc: "4번째 값" },
+      { name: "E", min: -1000, max: 1000, desc: "5번째 값" },
+    ],
+    testCases: [
+      { input: "1\n5\n3\n7\n2", expected: "7" },
+      { input: "-1\n-5\n-2\n-10\n-3", expected: "-1" },
+      { input: "9\n9\n9\n9\n9", expected: "9" },
+    ],
+    concepts: ["recursion", "arrays", "functions"],
+    starter:
+`#include <stdio.h>
+
+int arrayMax(int *arr, int n) {
+    if (n == 1) return arr[0];
+    int rest = arrayMax(arr, n - 1);
+    return arr[n - 1] > rest ? arr[n - 1] : rest;
+}
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    printf("%d\\n", arrayMax(arr, 5));
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int arrayMax(int *arr, int n) {
+    if (n == 1) return arr[0];
+    int rest = arrayMax(arr, n - 1);
+    return arr[n - 1] > rest ? arr[n - 1] : rest;
+}
+
+int main(void) {
+    int arr[5];
+    for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+    printf("%d\\n", arrayMax(arr, 5));
+    return 0;
+}
+`,
+    expected: ({ A, B, C, D, E }) => String(Math.max(A, B, C, D, E)),
+  },
+  {
+    id: 223,
+    difficulty: "medium",
+    tag: "중급 · 재귀",
+    title: "재귀로 누적합 출력",
+    description:
+      "양의 정수 <code>N</code>과 더미 정수 <code>D</code>가 주어집니다. 재귀로 <code>1</code>부터 <code>N</code>까지의 " +
+      "누적합을 한 줄씩 출력하세요. 즉, <code>1</code>, <code>1+2</code>, <code>1+2+3</code>, ... 를 차례로 출력합니다.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>D</code>(미사용)가 주어집니다.",
+    outputDesc: "각 누적합을 한 줄씩 출력합니다.",
+    constraints: ["1 ≤ N ≤ 100", "0 ≤ D ≤ 10"],
+    examples: [
+      { input: "5\n0", output: "1\n3\n6\n10\n15" },
+      { input: "1\n0", output: "1" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 100, desc: "상한" },
+      { name: "D", min: 0, max: 10, desc: "더미(미사용)" },
+    ],
+    testCases: [
+      { input: "5\n0", expected: "1\n3\n6\n10\n15" },
+      { input: "1\n0", expected: "1" },
+      { input: "3\n0", expected: "1\n3\n6" },
+    ],
+    concepts: ["recursion", "functions", "io"],
+    starter:
+`#include <stdio.h>
+
+void prefix(int k, int n, int acc) {
+    if (k > n) return;
+    acc += k;
+    printf("%d\\n", acc);
+    prefix(k + 1, n, acc);
+}
+
+int main(void) {
+    int N, D;
+    scanf("%d", &N);
+    scanf("%d", &D);
+    (void)D;
+    prefix(1, N, 0);
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+void prefix(int k, int n, int acc) {
+    if (k > n) return;
+    acc += k;
+    printf("%d\\n", acc);
+    prefix(k + 1, n, acc);
+}
+
+int main(void) {
+    int N, D;
+    scanf("%d", &N);
+    scanf("%d", &D);
+    (void)D;
+    prefix(1, N, 0);
+    return 0;
+}
+`,
+    expected: ({ N }) => {
+      const lines = [];
+      let s = 0;
+      for (let i = 1; i <= N; i++) { s += i; lines.push(s); }
+      return lines.join("\n");
+    },
+  },
+  /* --- io medium (10) --- */
+  {
+    id: 224,
+    difficulty: "medium",
+    tag: "중급 · 입출력",
+    title: "두 수 5칸 폭 우측 정렬",
+    description:
+      "두 양의 정수 <code>A</code>, <code>B</code>가 주어집니다. 각 수를 5칸 폭으로 우측 정렬해 한 줄에 출력하세요 " +
+      "(<code>%5d</code> 형식 지정자).",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "5칸 폭으로 정렬된 두 수를 한 줄에 출력합니다.",
+    constraints: ["0 ≤ A, B ≤ 99999"],
+    examples: [
+      { input: "3\n7", output: "    3    7" },
+      { input: "100\n200", output: "  100  200" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 99999, desc: "정수 A" },
+      { name: "B", min: 0, max: 99999, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "3\n7", expected: "    3    7" },
+      { input: "100\n200", expected: "  100  200" },
+      { input: "12345\n67890", expected: "1234567890" },
+    ],
+    concepts: ["io", "vars", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: %5d %5d 형식으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%5d%5d\\n", A, B);
+    return 0;
+}
+`,
+    expected: ({ A, B }) =>
+      `${String(A).padStart(5, " ")}${String(B).padStart(5, " ")}`,
+  },
+  {
+    id: 225,
+    difficulty: "중급 · 입출력",
+    tag: "중급 · 입출력",
+    difficulty: "medium",
+    title: "세 수 3칸 폭",
+    description:
+      "세 양의 정수 <code>A</code>, <code>B</code>, <code>C</code>가 주어집니다. 각 수를 3칸 폭으로 우측 정렬해 " +
+      "한 줄에 출력하세요(<code>%3d</code>).",
+    inputDesc:
+      "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>, 그다음 줄에 <code>C</code>가 주어집니다.",
+    outputDesc: "3칸 폭으로 정렬된 세 수를 한 줄에 출력합니다.",
+    constraints: ["0 ≤ A, B, C ≤ 999"],
+    examples: [
+      { input: "1\n22\n333", output: "  1 22333" },
+      { input: "100\n200\n300", output: "100200300" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 999, desc: "정수 A" },
+      { name: "B", min: 0, max: 999, desc: "정수 B" },
+      { name: "C", min: 0, max: 999, desc: "정수 C" },
+    ],
+    testCases: [
+      { input: "1\n22\n333", expected: "  1 22333" },
+      { input: "100\n200\n300", expected: "100200300" },
+      { input: "0\n0\n0", expected: "  0  0  0" },
+    ],
+    concepts: ["io", "vars", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+
+    // TODO: %3d%3d%3d 형식으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+    printf("%3d%3d%3d\\n", A, B, C);
+    return 0;
+}
+`,
+    expected: ({ A, B, C }) =>
+      `${String(A).padStart(3, " ")}${String(B).padStart(3, " ")}${String(C).padStart(3, " ")}`,
+  },
+  {
+    id: 226,
+    difficulty: "medium",
+    tag: "중급 · 입출력",
+    title: "합과 차를 한 줄에",
+    description:
+      "두 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>A + B</code>와 <code>A - B</code>를 한 줄에 공백 구분으로 " +
+      "출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>합 차</code> 형식으로 출력합니다.",
+    constraints: ["-1000 ≤ A, B ≤ 1000"],
+    examples: [
+      { input: "5\n3", output: "8 2" },
+      { input: "-2\n7", output: "5 -9" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "정수 A" },
+      { name: "B", min: -1000, max: 1000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "5\n3", expected: "8 2" },
+      { input: "-2\n7", expected: "5 -9" },
+      { input: "0\n0", expected: "0 0" },
+    ],
+    concepts: ["io", "operators", "vars"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: 합과 차를 한 줄에 공백 구분으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d %d\\n", A + B, A - B);
+    return 0;
+}
+`,
+    expected: ({ A, B }) => `${A + B} ${A - B}`,
+  },
+  {
+    id: 227,
+    difficulty: "medium",
+    tag: "중급 · 입출력",
+    title: "10진/8진/16진 한 줄에",
+    description:
+      "양의 정수 <code>A</code>가 주어집니다. <code>A</code>를 10진, 8진, 16진(소문자) 표기로 한 줄에 공백 구분으로 " +
+      "출력하세요. 두 번째 입력 <code>D</code>는 더미입니다.",
+    inputDesc:
+      "첫 줄에 <code>A</code>, 그다음 줄에 <code>D</code>(미사용)가 주어집니다.",
+    outputDesc: "<code>10진 8진 16진</code> 순서로 출력합니다.",
+    constraints: ["1 ≤ A ≤ 65535", "0 ≤ D ≤ 10"],
+    examples: [
+      { input: "255\n0", output: "255 377 ff" },
+      { input: "8\n0", output: "8 10 8" },
+    ],
+    inputs: [
+      { name: "A", min: 1, max: 65535, desc: "정수 A" },
+      { name: "D", min: 0, max: 10, desc: "더미(미사용)" },
+    ],
+    testCases: [
+      { input: "255\n0", expected: "255 377 ff" },
+      { input: "8\n0", expected: "8 10 8" },
+      { input: "16\n0", expected: "16 20 10" },
+    ],
+    concepts: ["io", "operators", "vars"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, D;
+    scanf("%d", &A);
+    scanf("%d", &D);
+    (void)D;
+
+    // TODO: %d %o %x 형식으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, D;
+    scanf("%d", &A);
+    scanf("%d", &D);
+    (void)D;
+    printf("%d %o %x\\n", A, A, A);
+    return 0;
+}
+`,
+    expected: ({ A }) => `${A} ${A.toString(8)} ${A.toString(16)}`,
+  },
+  {
+    id: 228,
+    difficulty: "medium",
+    tag: "중급 · 입출력",
+    title: "6칸 폭으로 세 수",
+    description:
+      "세 정수 <code>A</code>, <code>B</code>, <code>C</code>가 주어집니다. 각 수를 6칸 폭으로 우측 정렬해 한 줄에 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>, 그다음 줄에 <code>C</code>가 주어집니다.",
+    outputDesc: "6칸 폭으로 정렬된 세 수를 한 줄에 출력합니다.",
+    constraints: ["-99999 ≤ A, B, C ≤ 99999"],
+    examples: [
+      { input: "3\n-12\n123", output: "     3   -12   123" },
+      { input: "0\n0\n0", output: "     0     0     0" },
+    ],
+    inputs: [
+      { name: "A", min: -99999, max: 99999, desc: "정수 A" },
+      { name: "B", min: -99999, max: 99999, desc: "정수 B" },
+      { name: "C", min: -99999, max: 99999, desc: "정수 C" },
+    ],
+    testCases: [
+      { input: "3\n-12\n123", expected: "     3   -12   123" },
+      { input: "0\n0\n0", expected: "     0     0     0" },
+      { input: "-1\n-1\n-1", expected: "    -1    -1    -1" },
+    ],
+    concepts: ["io", "vars", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+
+    // TODO: %6d%6d%6d 형식으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B, C;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    scanf("%d", &C);
+    printf("%6d%6d%6d\\n", A, B, C);
+    return 0;
+}
+`,
+    expected: ({ A, B, C }) =>
+      `${String(A).padStart(6, " ")}${String(B).padStart(6, " ")}${String(C).padStart(6, " ")}`,
+  },
+  {
+    id: 229,
+    difficulty: "medium",
+    tag: "중급 · 입출력",
+    title: "비교 결과 출력",
+    description:
+      "두 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>A &lt; B</code>이면 <code>A&lt;B</code>, " +
+      "<code>A == B</code>이면 <code>A==B</code>, <code>A &gt; B</code>이면 <code>A&gt;B</code>를 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "비교 기호로 만든 문자열을 출력합니다.",
+    constraints: ["-1000 ≤ A, B ≤ 1000"],
+    examples: [
+      { input: "3\n5", output: "A<B" },
+      { input: "5\n5", output: "A==B" },
+      { input: "10\n2", output: "A>B" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "정수 A" },
+      { name: "B", min: -1000, max: 1000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "3\n5", expected: "A<B" },
+      { input: "5\n5", expected: "A==B" },
+      { input: "10\n2", expected: "A>B" },
+    ],
+    concepts: ["io", "cond", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: A < B, A == B, A > B 중 알맞은 문자열 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    if (A < B)      printf("A<B\\n");
+    else if (A > B) printf("A>B\\n");
+    else            printf("A==B\\n");
+    return 0;
+}
+`,
+    expected: ({ A, B }) => (A < B ? "A<B" : A > B ? "A>B" : "A==B"),
+  },
+  {
+    id: 230,
+    difficulty: "medium",
+    tag: "중급 · 입출력",
+    title: "문자와 정수 한 줄에",
+    description:
+      "두 양의 정수 <code>N</code>(1~26), <code>K</code>가 주어집니다. <code>'a' + (N - 1)</code> 문자와 <code>K</code>를 " +
+      "<code>문자=K</code> 형식으로 출력하세요. 예) <code>N = 1</code>, <code>K = 5</code> → <code>a=5</code>",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>K</code>가 주어집니다.",
+    outputDesc: "<code>문자=K</code> 형식으로 출력합니다.",
+    constraints: ["1 ≤ N ≤ 26", "0 ≤ K ≤ 1000"],
+    examples: [
+      { input: "1\n5", output: "a=5" },
+      { input: "26\n0", output: "z=0" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 26, desc: "알파벳 순서" },
+      { name: "K", min: 0, max: 1000, desc: "정수 값" },
+    ],
+    testCases: [
+      { input: "1\n5", expected: "a=5" },
+      { input: "26\n0", expected: "z=0" },
+      { input: "13\n100", expected: "m=100" },
+    ],
+    concepts: ["io", "vars", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+
+    // TODO: 'a'+(N-1)과 K를 "문자=K" 형식으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N, K;
+    scanf("%d", &N);
+    scanf("%d", &K);
+    printf("%c=%d\\n", 'a' + (N - 1), K);
+    return 0;
+}
+`,
+    expected: ({ N, K }) =>
+      `${String.fromCharCode("a".charCodeAt(0) + (N - 1))}=${K}`,
+  },
+  {
+    id: 231,
+    difficulty: "medium",
+    tag: "중급 · 입출력",
+    title: "0 패딩 5칸",
+    description:
+      "양의 정수 <code>A</code>, <code>B</code>가 주어집니다. 각 수를 5칸 폭으로 <strong>0</strong>으로 채워 출력하세요 " +
+      "(<code>%05d</code> 형식). 한 줄에 공백 없이 두 수를 이어 붙입니다.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "0 패딩 5칸 폭 두 수를 한 줄에 출력합니다.",
+    constraints: ["0 ≤ A, B ≤ 99999"],
+    examples: [
+      { input: "3\n42", output: "0000300042" },
+      { input: "12345\n0", output: "1234500000" },
+    ],
+    inputs: [
+      { name: "A", min: 0, max: 99999, desc: "정수 A" },
+      { name: "B", min: 0, max: 99999, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "3\n42", expected: "0000300042" },
+      { input: "12345\n0", expected: "1234500000" },
+      { input: "0\n0", expected: "0000000000" },
+    ],
+    concepts: ["io", "vars", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: %05d%05d 형식으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%05d%05d\\n", A, B);
+    return 0;
+}
+`,
+    expected: ({ A, B }) =>
+      `${String(A).padStart(5, "0")}${String(B).padStart(5, "0")}`,
+  },
+  {
+    id: 232,
+    difficulty: "medium",
+    tag: "중급 · 입출력",
+    title: "콤마 구분 두 수",
+    description:
+      "두 정수 <code>A</code>, <code>B</code>가 주어집니다. <code>A, B</code> 형식(콤마 + 공백)으로 한 줄에 출력하세요.",
+    inputDesc: "첫 줄에 <code>A</code>, 그다음 줄에 <code>B</code>가 주어집니다.",
+    outputDesc: "<code>A, B</code> 형식으로 출력합니다.",
+    constraints: ["-1000 ≤ A, B ≤ 1000"],
+    examples: [
+      { input: "3\n7", output: "3, 7" },
+      { input: "-5\n10", output: "-5, 10" },
+    ],
+    inputs: [
+      { name: "A", min: -1000, max: 1000, desc: "정수 A" },
+      { name: "B", min: -1000, max: 1000, desc: "정수 B" },
+    ],
+    testCases: [
+      { input: "3\n7", expected: "3, 7" },
+      { input: "-5\n10", expected: "-5, 10" },
+      { input: "0\n0", expected: "0, 0" },
+    ],
+    concepts: ["io", "vars", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+
+    // TODO: "A, B" 형식으로 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int A, B;
+    scanf("%d", &A);
+    scanf("%d", &B);
+    printf("%d, %d\\n", A, B);
+    return 0;
+}
+`,
+    expected: ({ A, B }) => `${A}, ${B}`,
+  },
+  {
+    id: 233,
+    difficulty: "medium",
+    tag: "중급 · 입출력",
+    title: "Line K 반복 출력",
+    description:
+      "양의 정수 <code>N</code>(1~20)과 더미 정수 <code>D</code>가 주어집니다. <code>Line 1</code>, <code>Line 2</code>, ..., " +
+      "<code>Line N</code>을 각 줄에 한 번씩 출력하세요.",
+    inputDesc: "첫 줄에 <code>N</code>, 그다음 줄에 <code>D</code>(미사용)가 주어집니다.",
+    outputDesc: "<code>N</code>개의 줄에 걸쳐 <code>Line i</code>를 출력합니다.",
+    constraints: ["1 ≤ N ≤ 20", "0 ≤ D ≤ 10"],
+    examples: [
+      { input: "3\n0", output: "Line 1\nLine 2\nLine 3" },
+      { input: "1\n0", output: "Line 1" },
+    ],
+    inputs: [
+      { name: "N", min: 1, max: 20, desc: "줄 수" },
+      { name: "D", min: 0, max: 10, desc: "더미(미사용)" },
+    ],
+    testCases: [
+      { input: "3\n0", expected: "Line 1\nLine 2\nLine 3" },
+      { input: "1\n0", expected: "Line 1" },
+      { input: "5\n0", expected: "Line 1\nLine 2\nLine 3\nLine 4\nLine 5" },
+    ],
+    concepts: ["io", "loops", "vars"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N, D;
+    scanf("%d", &N);
+    scanf("%d", &D);
+    (void)D;
+
+    // TODO: "Line 1" ~ "Line N"을 각 줄에 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N, D;
+    scanf("%d", &N);
+    scanf("%d", &D);
+    (void)D;
+    for (int i = 1; i <= N; i++) {
+        printf("Line %d\\n", i);
+    }
+    return 0;
+}
+`,
+    expected: ({ N }) =>
+      Array.from({ length: N }, (_, i) => `Line ${i + 1}`).join("\n"),
+  },
+  /* --- strings killer --- */
+  {
+    id: 234,
+    difficulty: "killer",
+    tag: "킬러 · 시뮬레이션",
+    title: "문자열 RLE 압축",
+    description:
+      "양의 정수 <code>N</code>과 <code>N</code>개의 알파벳 위치(1=a, ..., 26=z)가 주어집니다. 각 위치를 소문자 알파벳으로 " +
+      "치환한 문자열을 만들고, 연속된 같은 문자를 <code>글자개수</code> 형식으로 RLE 압축한 결과를 한 줄에 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>N</code>, 둘째 줄에 <code>N</code>개의 알파벳 위치가 공백 구분으로 주어집니다.",
+    outputDesc: "RLE 압축 결과를 출력합니다.",
+    constraints: ["1 ≤ N ≤ 1000", "1 ≤ 각 위치 ≤ 26"],
+    examples: [
+      { input: "5\n1 1 2 2 2", output: "a2b3" },
+      { input: "3\n5 5 5", output: "e3" },
+      { input: "6\n1 2 3 4 5 6", output: "a1b1c1d1e1f1" },
+    ],
+    testCases: [
+      { input: "5\n1 1 2 2 2", expected: "a2b3" },
+      { input: "3\n5 5 5", expected: "e3" },
+      { input: "6\n1 2 3 4 5 6", expected: "a1b1c1d1e1f1" },
+    ],
+    concepts: ["strings", "loops", "arrays"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    int pos[1000];
+    for (int i = 0; i < N; i++) scanf("%d", &pos[i]);
+
+    // TODO: 연속된 같은 위치를 RLE로 압축해 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    int pos[1000];
+    for (int i = 0; i < N; i++) scanf("%d", &pos[i]);
+    int i = 0;
+    while (i < N) {
+        int j = i;
+        while (j < N && pos[j] == pos[i]) j++;
+        printf("%c%d", 'a' + pos[i] - 1, j - i);
+        i = j;
+    }
+    printf("\\n");
+    return 0;
+}
+`,
+  },
+  /* --- io killer --- */
+  {
+    id: 235,
+    difficulty: "killer",
+    tag: "킬러 · 시뮬레이션",
+    title: "은행 거래 영수증",
+    description:
+      "초기 잔액 <code>0</code>에서 시작해 <code>N</code>개의 거래를 처리합니다. 각 거래는 <code>op amount</code> 형식이며 " +
+      "<code>op = 1</code>이면 입금, <code>op = 2</code>이면 출금입니다. 거래마다 한 줄씩 " +
+      "<code>[i] +amount 잔액: X</code> 또는 <code>[i] -amount 잔액: X</code> 형식으로 출력하세요.",
+    inputDesc:
+      "첫 줄에 <code>N</code>, 이후 <code>N</code>개의 줄에 <code>op amount</code>가 주어집니다.",
+    outputDesc: "각 거래에 대해 한 줄씩 영수증을 출력합니다.",
+    constraints: ["0 ≤ N ≤ 10000", "op ∈ {1, 2}", "0 ≤ amount ≤ 1000000"],
+    examples: [
+      {
+        input: "3\n1 100\n2 30\n1 50",
+        output: "[1] +100 잔액: 100\n[2] -30 잔액: 70\n[3] +50 잔액: 120",
+      },
+      { input: "1\n2 50", output: "[1] -50 잔액: -50" },
+    ],
+    testCases: [
+      {
+        input: "3\n1 100\n2 30\n1 50",
+        expected: "[1] +100 잔액: 100\n[2] -30 잔액: 70\n[3] +50 잔액: 120",
+      },
+      { input: "1\n2 50", expected: "[1] -50 잔액: -50" },
+      {
+        input: "2\n1 1000\n1 2000",
+        expected: "[1] +1000 잔액: 1000\n[2] +2000 잔액: 3000",
+      },
+    ],
+    concepts: ["io", "loops", "cond", "operators"],
+    starter:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    long long balance = 0;
+
+    // TODO: 거래 N개를 처리하며 영수증을 한 줄씩 출력
+
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    long long balance = 0;
+    for (int i = 1; i <= N; i++) {
+        int op;
+        long long amt;
+        scanf("%d %lld", &op, &amt);
+        if (op == 1) {
+            balance += amt;
+            printf("[%d] +%lld 잔액: %lld\\n", i, amt, balance);
+        } else {
+            balance -= amt;
+            printf("[%d] -%lld 잔액: %lld\\n", i, amt, balance);
+        }
+    }
+    return 0;
+}
+`,
+  },
+  /* --- recursion killer --- */
+  {
+    id: 236,
+    difficulty: "killer",
+    tag: "킬러 · 시뮬레이션",
+    title: "하노이 탑 이동 출력",
+    description:
+      "<code>N</code>개의 원반을 기둥 A에서 기둥 C로 옮기는 모든 이동 단계를 출력하세요. 각 이동은 " +
+      "<code>출발기둥 도착기둥</code> 형식으로 한 줄에 출력합니다. 보조 기둥은 B입니다. 표준 재귀 알고리즘을 사용하세요.",
+    inputDesc: "첫 줄에 정수 <code>N</code>이 주어집니다.",
+    outputDesc: "<code>2^N - 1</code>개의 이동을 한 줄씩 출력합니다.",
+    constraints: ["1 ≤ N ≤ 10"],
+    examples: [
+      { input: "1", output: "A C" },
+      { input: "2", output: "A B\nA C\nB C" },
+      { input: "3", output: "A C\nA B\nC B\nA C\nB A\nB C\nA C" },
+    ],
+    testCases: [
+      { input: "1", expected: "A C" },
+      { input: "2", expected: "A B\nA C\nB C" },
+      { input: "3", expected: "A C\nA B\nC B\nA C\nB A\nB C\nA C" },
+    ],
+    concepts: ["recursion", "functions", "io"],
+    starter:
+`#include <stdio.h>
+
+void hanoi(int n, char src, char aux, char dst) {
+    if (n == 0) return;
+    hanoi(n - 1, src, dst, aux);
+    printf("%c %c\\n", src, dst);
+    hanoi(n - 1, aux, src, dst);
+}
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    hanoi(N, 'A', 'B', 'C');
+    return 0;
+}
+`,
+    solution:
+`#include <stdio.h>
+
+void hanoi(int n, char src, char aux, char dst) {
+    if (n == 0) return;
+    hanoi(n - 1, src, dst, aux);
+    printf("%c %c\\n", src, dst);
+    hanoi(n - 1, aux, src, dst);
+}
+
+int main(void) {
+    int N;
+    scanf("%d", &N);
+    hanoi(N, 'A', 'B', 'C');
+    return 0;
+}
+`,
+  },
 ];
 
 /* =====================================================================
@@ -4269,4 +12263,100 @@ export function getTestCases(problem) {
     A,
     values: null,
   }));
+}
+
+// Deterministic per-problem PRNG — same problem.id always yields the same
+// hidden case sequence so a verdict is reproducible across submissions.
+function seededRng(seed) {
+  let s = (seed >>> 0) || 1;
+  return () => {
+    s = (s + 0x6D2B79F5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+/**
+ * Build the **grading** plan — visible display cases plus hidden cases that
+ * are NOT shown in the UI. Used by submitTest. The visible-case-only path
+ * (`getTestCases`) is what the dock renders; if grading shared that list, a
+ * student could hard-code the displayed sample I/O and still pass.
+ *
+ *   easy   → caller already uses gradingSample(); we just return display cases.
+ *   medium → 3 visible + 7 hidden (random inputs + boundary combos), all
+ *            deterministic per problem.id via seededRng.
+ *   killer → visible cases plus problem.hiddenTestCases if provided.
+ *            Killer problems are hand-crafted so we cannot auto-generate
+ *            additional cases without a reference solution.
+ */
+export function getGradingCases(problem) {
+  const visible = getTestCases(problem);
+  const diff = problemDifficulty(problem);
+
+  if (diff === "killer") {
+    const extra = Array.isArray(problem.hiddenTestCases)
+      ? problem.hiddenTestCases.map((tc, i) => ({
+          id: visible.length + i + 1,
+          input: tc.input,
+          expected: tc.expected,
+          A: null,
+          values: tc.values ?? null,
+        }))
+      : [];
+    return [...visible, ...extra];
+  }
+
+  if (diff === "medium" && Array.isArray(problem.inputs) && typeof problem.expected === "function") {
+    const rng = seededRng(problem.id * 2654435761);
+    const hidden = [];
+
+    // Boundary combinations: all-min variant covered by visible cases; add
+    // all-max alternatives + a few mixed boundary corners.
+    const cornerMasks = problem.inputs.length <= 3
+      ? Array.from({ length: 1 << problem.inputs.length }, (_, i) => i)
+      : [0, (1 << problem.inputs.length) - 1, 0b101, 0b010, 0b110, 0b001];
+    for (const mask of cornerMasks) {
+      if (hidden.length >= 4) break;
+      const values = {};
+      const lines = [];
+      problem.inputs.forEach((inp, i) => {
+        const v = (mask >> i) & 1 ? inp.max : inp.min;
+        values[inp.name] = v;
+        lines.push(String(v));
+      });
+      hidden.push({ values, input: lines.join("\n") });
+    }
+
+    // Random samples in-range, deterministic via the per-problem RNG.
+    while (hidden.length < 7) {
+      const values = {};
+      const lines = [];
+      for (const inp of problem.inputs) {
+        const span = inp.max - inp.min;
+        const v = inp.min + Math.floor(rng() * (span + 1));
+        values[inp.name] = v;
+        lines.push(String(v));
+      }
+      hidden.push({ values, input: lines.join("\n") });
+    }
+
+    return [
+      ...visible,
+      ...hidden.map((h, i) => ({
+        id: visible.length + i + 1,
+        input: h.input,
+        expected: problem.expected(h.values),
+        A: null,
+        values: h.values,
+        hidden: true,
+      })),
+    ];
+  }
+
+  // Easy difficulty: submitTest builds its own gradingSample-driven plan,
+  // so grading cases collapse to the visible set. Returning visible keeps
+  // a single function name in case callers want a uniform entry point.
+  return visible;
 }

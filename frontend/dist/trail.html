@@ -10,9 +10,11 @@
         z-index: 9999; opacity: 1; pointer-events: auto;
       }
     </style>
-    <script type="module" crossorigin src="/assets/trail-uD5fi640.js"></script>
-    <link rel="modulepreload" crossorigin href="/assets/main-B2IttiPe.js">
-    <link rel="stylesheet" crossorigin href="/assets/main-8ZyMrQ3_.css">
+    <script type="module" crossorigin src="/assets/trail-DA8c76l2.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/assets/main-Qt7JoFFu.js">
+    <link rel="modulepreload" crossorigin href="/assets/lesson-data-B2CEYwgD.js">
+    <link rel="stylesheet" crossorigin href="/assets/main-DThxlVUU.css">
   </head>
   <body>
     <div class="page-fade" id="page-fade"></div>
@@ -26,9 +28,8 @@
       <div class="nav-collapse" id="nav-collapse">
         <nav class="menu" id="menu">
           <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
+          <a href="lectures.html" data-i18n="nav.lectures">강의</a>
           <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
-          <a href="index.html" data-action="reviews" data-i18n="nav.reviews">후기</a>
-          <a href="index.html" data-action="invite" data-i18n="nav.invite">친구 초대</a>
           <a href="#" data-action="avatar" data-i18n="nav.avatar">아바타</a>
         </nav>
         <div class="actions">
@@ -61,7 +62,6 @@
                 </div>
               </div>
               <ul class="my-menu__list">
-                <li><button type="button" class="my-menu__item" data-i18n="my.mypage">마이페이지</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.invite">친구 초대</button></li>
@@ -92,6 +92,10 @@
           <span>Gmail</span>
           <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
         </label>
+        <label class="field-code" id="code-field" hidden>
+          <span>인증코드</span>
+          <input name="code" type="text" placeholder="인증코드 5자리" autocomplete="off" />
+        </label>
         <p class="modal-info" id="modal-info" hidden></p>
         <p class="modal-error" id="modal-error" hidden></p>
         <div class="modal-recovery" id="modal-recovery">
@@ -102,6 +106,19 @@
           <button type="button" class="link-button" id="alt-find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
           <button type="button" class="link-button" id="alt-find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
         </div>
+        <div class="modal-social" id="modal-social" style="margin-top: 15px; display: flex; flex-direction: column; gap: 8px;">
+          <div style="display: flex; align-items: center; text-align: center; color: #888; font-size: 12px; margin: 10px 0;">
+            <div style="flex: 1; height: 1px; background: #333;"></div>
+            <span style="padding: 0 10px;">또는</span>
+            <div style="flex: 1; height: 1px; background: #333;"></div>
+          </div>
+          <button type="button" class="ghost" style="border: 1px solid #444; color: #fff;" onclick="alert('구글 로그인 연동은 준비중입니다.')">
+            Google 계정으로 계속하기
+          </button>
+          <button type="button" class="ghost" style="border: 1px solid #03c75a; background: #03c75a; color: #fff;" onclick="alert('네이버 로그인 연동은 준비중입니다.')">
+            Naver 계정으로 계속하기
+          </button>
+        </div>
         <div class="modal-actions">
           <button type="button" class="ghost" data-close data-i18n="action.cancel">취소</button>
           <button type="submit" class="cta" id="submit-btn" data-i18n="auth.login">로그인</button>
@@ -111,11 +128,14 @@
 
     <main class="trail-page" id="trail-page" data-color="green">
       <header class="trail-page__topbar">
-        <button type="button" class="trail-page__name" id="trail-name-btn" aria-haspopup="true" aria-expanded="false">
-          <span class="trail-page__name-eyebrow" id="trail-eyebrow">Trail 0. Codetree 101</span>
-          <span class="trail-page__name-title" id="trail-title">프로그래밍 시작</span>
-          <span class="trail-page__name-caret" aria-hidden="true">▾</span>
-        </button>
+        <div class="trail-page__name-wrap">
+          <button type="button" class="trail-page__name" id="trail-name-btn" aria-haspopup="true" aria-expanded="false" aria-controls="trail-name-menu">
+            <span class="trail-page__name-eyebrow" id="trail-eyebrow">Trail 0. Codetree 101</span>
+            <span class="trail-page__name-title" id="trail-title">프로그래밍 시작</span>
+            <span class="trail-page__name-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="trail-page__name-menu" id="trail-name-menu" role="menu" hidden></div>
+        </div>
         <div class="trail-page__stats">
           <div class="trail-stat trail-stat--streak">
             <span class="trail-stat__icon" aria-hidden="true">▬</span>
@@ -187,6 +207,6 @@
         </section>
       </div>
     </main>
-
+
   </body>
 </html>

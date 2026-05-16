@@ -1,9 +1,20 @@
-﻿{
-    "permissions":  {
-                        "allow":  [
-                                      "Bash(npm run *)",
-                                      "Bash(node --input-type=module -e \"import\\(\u0027./src/test-problems.js\u0027\\).then\\(m =\u003e { console.log\\(\u0027count:\u0027, m.PROBLEMS.length\\); const cc = {}; for \\(const p of m.PROBLEMS\\) for \\(const c of p.concepts\\) cc[c] = \\(cc[c]||0\\)+1; console.log\\(JSON.stringify\\(cc\\)\\); for \\(const p of m.PROBLEMS\\) { try { p.expected\\(p.aDefault\\); p.expected\\(p.aMin\\); p.expected\\(p.aMax\\); } catch\\(e\\) { console.error\\(\u0027id\u0027, p.id, e.message\\); } } console.log\\(\u0027OK\u0027\\); }\\);\")",
-                                      "Bash(powershell *)"
-                                  ]
-                    }
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm run *)",
+      "Bash(node --input-type=module -e \"import\\('./src/test-problems.js'\\).then\\(m => { console.log\\('count:', m.PROBLEMS.length\\); const cc = {}; for \\(const p of m.PROBLEMS\\) for \\(const c of p.concepts\\) cc[c] = \\(cc[c]||0\\)+1; console.log\\(JSON.stringify\\(cc\\)\\); for \\(const p of m.PROBLEMS\\) { try { p.expected\\(p.aDefault\\); p.expected\\(p.aMin\\); p.expected\\(p.aMax\\); } catch\\(e\\) { console.error\\('id', p.id, e.message\\); } } console.log\\('OK'\\); }\\);\")",
+      "Bash(powershell *)",
+      "Bash(where codex *)",
+      "Bash(npm ls *)",
+      "Bash(npm uninstall *)",
+      "Bash(npm install *)",
+      "Bash(git stash *)",
+      "Bash(git cherry-pick *)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(GIT_EDITOR=true git cherry-pick --continue)",
+      "Bash(node --input-type=module -e \"import\\('node:sqlite'\\).then\\(\\({DatabaseSync}\\) => { const db = new DatabaseSync\\('backend/data/app.db'\\); const cols = db.prepare\\('PRAGMA table_info\\(lectures\\)'\\).all\\(\\); console.log\\('lectures:', cols.map\\(c => c.name\\)\\); const sc = db.prepare\\('PRAGMA table_info\\(surveys\\)'\\).all\\(\\); console.log\\('surveys:', sc.map\\(c => c.name + ':' + c.type\\)\\); }\\);\")",
+      "Bash(node -e \"import\\('./src/db.js'\\).then\\(\\(\\) => { console.log\\('db loaded ok'\\); process.exit\\(0\\); }\\).catch\\(e => { console.error\\('FAIL:', e.message\\); process.exit\\(1\\); }\\);\")"
+    ]
+  }
 }

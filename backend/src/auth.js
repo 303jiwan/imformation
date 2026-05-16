@@ -59,7 +59,7 @@ function destroySession(req, res) {
  * Express middleware: looks up the session cookie and attaches `req.user`
  * (or null) to the request. Does NOT block unauthenticated requests.
  */
-export function loadSession(req, _res, next) {
+export function loadSession(req, res, next) {
   const token = req.cookies?.[SESSION_COOKIE];
   if (!token) {
     req.user = null;
@@ -75,10 +75,19 @@ export function loadSession(req, _res, next) {
     req.user = null;
     return next();
   }
+  // Suspended accounts: wipe every session for the user and clear the cookie
+  // so an admin's suspension takes effect even for already-logged-in users.
+  if (row.is_suspended) {
+    stmts.deleteSessionsForUser.run(row.user_id);
+    res.clearCookie(SESSION_COOKIE, { path: "/" });
+    req.user = null;
+    return next();
+  }
   req.user = {
     id: row.user_id,
     username: row.username,
     email: row.email,
+    is_admin: row.is_admin ? 1 : 0,
   };
   next();
 }
@@ -86,6 +95,13 @@ export function loadSession(req, _res, next) {
 /** Express middleware: requires a logged-in user (else 401). */
 export function requireAuth(req, res, next) {
   if (!req.user) return res.status(401).json({ error: "not logged in" });
+  next();
+}
+
+/** Express middleware: requires the logged-in user to be an admin (else 403). */
+export function requireAdmin(req, res, next) {
+  if (!req.user) return res.status(401).json({ error: "not logged in" });
+  if (!req.user.is_admin) return res.status(403).json({ error: "admin only" });
   next();
 }
 
@@ -139,6 +155,10 @@ authRouter.post("/login", async (req, res) => {
 
   const ok = await bcrypt.compare(String(password), row.password_hash);
   if (!ok) return res.status(401).json({ error: "invalid credentials" });
+
+  if (row.is_suspended) {
+    return res.status(403).json({ error: "계정이 정지되었습니다." });
+  }
 
   createSession(res, row.id);
   res.json(publicUser(row));

@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codenergy — 레슨</title>
+    <style>
+      .page-fade {
+        position: fixed; inset: 0; background: #fff;
+        z-index: 9999; opacity: 1; pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-fade" id="page-fade"></div>
+    <header class="nav">
+      <div class="logo"><a href="index.html">Codenergy ▲</a></div>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-collapse">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="nav-collapse" id="nav-collapse">
+        <nav class="menu" id="menu">
+          <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
+          <a href="lectures.html" data-i18n="nav.lectures">강의</a>
+          <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
+          <a href="#" data-action="avatar" data-i18n="nav.avatar">아바타</a>
+        </nav>
+        <div class="actions">
+          <div class="lang-wrap" id="lang-wrap">
+            <button class="ghost" id="lang-btn" type="button">🌐 <span id="lang-current">한국어</span> ▾</button>
+            <div class="lang-menu" id="lang-menu" hidden>
+              <button type="button" class="lang-menu__item" data-lang="ko">한국어</button>
+              <button type="button" class="lang-menu__item" data-lang="en">English</button>
+            </div>
+          </div>
+          <div class="notif-wrap" id="notif-wrap">
+            <button class="icon" id="notif-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="알림">🔔</button>
+            <div class="notif-menu" id="notif-menu" hidden>
+              <div class="notif-menu__header">알림</div>
+              <ul class="notif-menu__list" id="notif-list"></ul>
+              <p class="notif-menu__empty" id="notif-empty" hidden>새 알림이 없어요</p>
+              <p class="notif-menu__signin" id="notif-signin" hidden>로그인 후 확인할 수 있어요</p>
+            </div>
+          </div>
+          <button class="ghost" id="login-btn" data-i18n="action.login">로그인</button>
+          <button class="ghost" id="signup-btn" data-i18n="action.signup">회원가입</button>
+          <div class="my-wrap" id="my-wrap" hidden>
+            <button class="ghost" id="my-btn" data-i18n="action.my">My</button>
+            <div class="my-menu" id="my-menu" hidden>
+              <div class="my-menu__profile">
+                <div class="my-menu__avatar" aria-hidden="true">👤</div>
+                <div class="my-menu__user">
+                  <div class="my-menu__name" id="my-name" data-i18n="my.name">사용자 이름</div>
+                  <div class="my-menu__email" id="my-email">user@example.com</div>
+                </div>
+              </div>
+              <ul class="my-menu__list">
+                <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.invite">친구 초대</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.settings">설정</button></li>
+              </ul>
+              <div class="my-menu__divider"></div>
+              <button type="button" class="my-menu__item my-menu__logout" id="logout-btn" data-i18n="my.logout">로그아웃</button>
+            </div>
+          </div>
+          <button class="cta" data-i18n="action.cta">학습하기 →</button>
+        </div>
+      </div>
+    </header>
+
+    <div id="auth-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <form class="modal-card" id="auth-form">
+        <h3 id="modal-title" data-i18n="auth.login">로그인</h3>
+        <label class="field-username">
+          <span data-i18n="auth.username">아이디</span>
+          <input name="username" autocomplete="username" required minlength="2" />
+        </label>
+        <label class="field-password">
+          <span data-i18n="auth.password">비밀번호</span>
+          <input name="password" type="password" autocomplete="current-password" required minlength="6" />
+        </label>
+        <label class="field-email" id="email-field" hidden>
+          <span>Gmail</span>
+          <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
+        </label>
+        <p class="modal-info" id="modal-info" hidden></p>
+        <p class="modal-error" id="modal-error" hidden></p>
+        <div class="modal-recovery" id="modal-recovery">
+          <button type="button" class="link-button" id="find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-recovery-alt" id="modal-recovery-alt" hidden>
+          <button type="button" class="link-button" id="alt-find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="alt-find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close data-i18n="action.cancel">취소</button>
+          <button type="submit" class="cta" id="submit-btn" data-i18n="auth.login">로그인</button>
+        </div>
+      </form>
+    </div>
+
+    <main class="lessons-page" id="lessons-page">
+      <section class="lesson-empty" id="lesson-empty" hidden>
+        <h1 class="lesson-empty__title">레슨을 찾을 수 없어요</h1>
+        <p class="lesson-empty__sub" id="lesson-empty-sub">잘못된 주소이거나, 아직 준비 중인 레슨입니다.</p>
+        <a class="lesson-empty__back" href="codetrails.html">← 코드트레일로 돌아가기</a>
+      </section>
+
+      <section class="lesson-locked" id="lesson-locked" hidden>
+        <h1 class="lesson-locked__title">아직 잠긴 레슨이에요</h1>
+        <p class="lesson-locked__sub">이전 레슨을 먼저 완료해야 들어올 수 있어요.</p>
+        <a class="lesson-locked__back" href="codetrails.html">← 코드트레일로 돌아가기</a>
+      </section>
+
+      <section class="lesson-shell" id="lesson-shell" hidden>
+        <header class="lesson-shell__head">
+          <a class="lesson-shell__back" href="codetrails.html">← 코드트레일</a>
+          <div class="lesson-shell__title">
+            <span class="lesson-shell__crumb" id="lesson-crumb"></span>
+            <h1 class="lesson-shell__name" id="lesson-name"></h1>
+          </div>
+          <span class="lesson-shell__badge" id="lesson-badge" hidden></span>
+        </header>
+
+        <nav class="lesson-tabs" id="lesson-tabs" role="tablist">
+          <button type="button" class="lesson-tab is-active" data-tab="concept" role="tab" aria-selected="true">개념</button>
+          <button type="button" class="lesson-tab" data-tab="problem" role="tab" aria-selected="false">문제</button>
+        </nav>
+
+        <article class="lesson-pane lesson-pane--concept" id="pane-concept" data-tab="concept"></article>
+
+        <article class="lesson-pane lesson-pane--problem" id="pane-problem" data-tab="problem" hidden>
+          <aside class="lesson-problem-list" id="problem-list" aria-label="문제 목록"></aside>
+          <section class="lesson-problem-detail" id="problem-detail">
+            <header class="lesson-problem-detail__head">
+              <h2 id="problem-title">문제</h2>
+              <span class="diff" id="problem-diff"></span>
+            </header>
+            <div class="lesson-problem-detail__desc" id="problem-desc"></div>
+            <div class="lesson-problem-detail__example" id="problem-example"></div>
+            <label class="lesson-editor-label" for="lesson-editor">코드 (C)</label>
+            <textarea id="lesson-editor" class="lesson-editor" spellcheck="false" autocomplete="off"
+              placeholder="#include <stdio.h>&#10;int main() {&#10;  // 여기에 코드를 작성하세요&#10;  return 0;&#10;}"></textarea>
+            <div class="lesson-actions">
+              <button type="button" class="ghost" id="lesson-reset">코드 초기화</button>
+              <button type="button" class="cta" id="lesson-submit">제출</button>
+            </div>
+            <div class="lesson-result" id="lesson-result" hidden></div>
+          </section>
+        </article>
+
+        <footer class="lesson-shell__foot" id="lesson-foot" hidden>
+          <button type="button" class="cta" id="lesson-next">다음 레슨 →</button>
+        </footer>
+      </section>
+    </main>
+
+    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/lessons.js"></script>
+  </body>
+</html>
