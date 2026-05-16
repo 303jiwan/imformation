@@ -11,5 +11,10 @@
   },
   "devDependencies": {
     "concurrently": "^9.0.0"
+  },
+  "dependencies": {
+    "jimp": "^1.6.1",
+    "pptxgenjs": "^4.0.1",
+    "puppeteer-core": "^25.0.2"
   }
 }
