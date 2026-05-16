@@ -230,12 +230,19 @@ test.describe('아바타 에디터', () => {
 
     const before = await readPreviewSvg(page);
 
-    const candidate = items.locator(':not(.is-equipped)').first();
-    await expect(candidate).toBeVisible({ timeout: 5000 });
-    await candidate.click();
+    // Find an item that is NOT currently equipped, capture its data-id, then click
+    const candidateEl = page.locator('.avatar-grid .avatar-item:not(.is-equipped)').first();
+    await expect(candidateEl).toBeVisible({ timeout: 5000 });
+    const candidateId = await candidateEl.getAttribute('data-id');
+    await candidateEl.click();
 
-    await expect(candidate).toHaveClass(/\bis-equipped\b/, { timeout: 5000 });
+    // After clicking, find the now-equipped item by its stable data-id
+    if (candidateId) {
+      const equippedItem = page.locator(`.avatar-grid .avatar-item[data-id="${candidateId}"]`);
+      await expect(equippedItem).toHaveClass(/\bis-equipped\b/, { timeout: 5000 });
+    }
 
+    // SVG content should differ.
     await expect
       .poll(async () => (await readPreviewSvg(page)) !== before, { timeout: 5000 })
       .toBe(true);
