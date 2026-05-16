@@ -1,0 +1,1238 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codenergy Poster · C언어 Segmentation Fault 분석</title>
+
+    <link
+      rel="stylesheet"
+      as="style"
+      crossorigin
+      href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/echarts@5/dist/echarts.min.js"></script>
+
+    <style>
+      :root {
+        --c-bg: #06070d;
+        --c-card: rgba(255, 255, 255, 0.035);
+        --c-card-border: rgba(255, 255, 255, 0.08);
+        --c-text: #f4f5fa;
+        --c-muted: #8b8fa3;
+        --c-dim: #5a5e72;
+        --c-green: #22c55e;
+        --c-green-soft: #4ade80;
+        --c-purple: #a855f7;
+        --c-purple-deep: #7c3aed;
+        --c-cyan: #22d3ee;
+        --c-amber: #fbbf24;
+        --c-red: #ef4444;
+        --c-red-soft: #f87171;
+        --c-rose: #f43f5e;
+        --grad-neon: linear-gradient(90deg, #22c55e 0%, #a855f7 100%);
+        --grad-danger: linear-gradient(90deg, #ef4444 0%, #f59e0b 50%, #a855f7 100%);
+        --shadow-card: 0 1px 0 rgba(255, 255, 255, 0.04) inset,
+          0 20px 60px -20px rgba(124, 58, 237, 0.35),
+          0 6px 24px -10px rgba(239, 68, 68, 0.18);
+      }
+
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      html, body {
+        background: var(--c-bg);
+        color: var(--c-text);
+        font-family: "Pretendard Variable", "Pretendard", -apple-system, BlinkMacSystemFont,
+          "Segoe UI", "Apple SD Gothic Neo", Roboto, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        line-height: 1.5;
+        min-height: 100vh;
+      }
+
+      .poster {
+        position: relative;
+        max-width: 1440px;
+        margin: 0 auto;
+        padding: 40px 32px 80px;
+        background:
+          radial-gradient(900px 480px at 12% -10%, rgba(239, 68, 68, 0.14), transparent 60%),
+          radial-gradient(900px 480px at 92% 8%, rgba(168, 85, 247, 0.16), transparent 60%),
+          radial-gradient(700px 400px at 50% 110%, rgba(34, 197, 94, 0.08), transparent 60%),
+          var(--c-bg);
+        overflow: hidden;
+      }
+      .poster__grain {
+        position: absolute; inset: 0;
+        pointer-events: none;
+        opacity: 0.5;
+        background-image:
+          linear-gradient(rgba(255,255,255,0.02) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.02) 1px, transparent 1px);
+        background-size: 32px 32px;
+        mask-image: radial-gradient(900px 600px at 50% 20%, #000 30%, transparent 80%);
+      }
+
+      /* ─── Header band ─── */
+      .poster__header {
+        position: relative;
+        padding: 28px 32px 32px;
+        border: 1px solid var(--c-card-border);
+        border-radius: 24px;
+        background:
+          linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(168, 85, 247, 0.10)),
+          rgba(255, 255, 255, 0.02);
+        margin-bottom: 28px;
+        box-shadow: var(--shadow-card);
+        overflow: hidden;
+      }
+      .poster__header::before {
+        content: "";
+        position: absolute; inset: 0;
+        background: radial-gradient(600px 200px at 110% -20%, rgba(239, 68, 68, 0.28), transparent 60%);
+        pointer-events: none;
+      }
+      .poster__brand {
+        display: flex; justify-content: space-between; align-items: center;
+        margin-bottom: 18px;
+        font-size: 13px;
+      }
+      .poster__logo {
+        font-weight: 800;
+        font-size: 18px;
+        background: var(--grad-neon);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .poster__tag {
+        color: var(--c-muted);
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 12px;
+        padding: 4px 10px;
+        border: 1px solid var(--c-card-border);
+        border-radius: 999px;
+        background: rgba(255,255,255,0.02);
+      }
+      .poster__title {
+        font-size: clamp(26px, 2.8vw, 40px);
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        line-height: 1.18;
+        margin-bottom: 14px;
+        max-width: 1180px;
+      }
+      .poster__title .grad-danger {
+        background: var(--grad-danger);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .poster__title .grad {
+        background: var(--grad-neon);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .poster__authors {
+        color: var(--c-muted);
+        font-size: 14px;
+        line-height: 1.7;
+      }
+      .poster__authors b { color: var(--c-text); font-weight: 600; }
+
+      /* ─── Sections ─── */
+      .poster__h2 {
+        display: flex; align-items: baseline; gap: 10px;
+        font-size: 18px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        margin-bottom: 6px;
+      }
+      .poster__h2 .ix {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 13px;
+        color: var(--c-red-soft);
+        background: rgba(239, 68, 68, 0.10);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        padding: 2px 8px;
+        border-radius: 6px;
+      }
+      .poster__caption {
+        color: var(--c-muted);
+        font-size: 13px;
+        margin-bottom: 14px;
+      }
+
+      /* ─── KPI strip ─── */
+      .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 14px;
+        margin: 12px 0 18px;
+      }
+      .kpi {
+        position: relative;
+        padding: 18px 18px 16px;
+        border: 1px solid var(--c-card-border);
+        border-radius: 18px;
+        background: var(--c-card);
+        transition: transform 180ms ease;
+      }
+      .kpi::before {
+        content: "";
+        position: absolute; top: 0; left: 14px; right: 14px; height: 2px;
+        background: var(--grad-danger);
+        border-radius: 2px;
+        opacity: 0.85;
+      }
+      .kpi__label {
+        color: var(--c-muted);
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        margin-bottom: 8px;
+      }
+      .kpi__value {
+        font-size: 28px;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        background: var(--grad-danger);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+      }
+      .kpi__sub {
+        margin-top: 6px;
+        font-size: 12px;
+        color: var(--c-muted);
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+      }
+
+      .poster__abstract {
+        color: var(--c-text);
+        font-size: 14.5px;
+        line-height: 1.75;
+        padding: 18px 20px;
+        border: 1px dashed var(--c-card-border);
+        border-radius: 14px;
+        background: rgba(255,255,255,0.015);
+      }
+      .poster__abstract b {
+        color: var(--c-red-soft);
+        font-weight: 700;
+      }
+      .poster__abstract .keyword {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        color: var(--c-green-soft);
+        font-size: 13.5px;
+      }
+
+      /* ─── Main grid ─── */
+      .poster__grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 22px;
+        margin-top: 28px;
+      }
+      .card {
+        padding: 22px;
+        background: var(--c-card);
+        border: 1px solid var(--c-card-border);
+        border-radius: 20px;
+        box-shadow: var(--shadow-card);
+        transition: transform 180ms ease, border-color 180ms ease;
+      }
+      .card:hover { border-color: rgba(239, 68, 68, 0.35); }
+      .poster__section--wide { grid-column: 1 / -1; }
+      .poster__section--full { grid-column: 1 / -1; }
+
+      /* ─── Memory model diagram (§2 background) ─── */
+      .memmodel {
+        display: grid;
+        grid-template-columns: auto 1fr auto;
+        gap: 4px 12px;
+        margin-top: 14px;
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 12px;
+      }
+      .memmodel__addr {
+        color: var(--c-dim);
+        text-align: right;
+        align-self: center;
+      }
+      .memmodel__zone {
+        padding: 10px 14px;
+        border-radius: 10px;
+        border: 1px solid var(--c-card-border);
+        background: rgba(255, 255, 255, 0.025);
+        display: flex; align-items: center; justify-content: space-between;
+        gap: 12px;
+      }
+      .memmodel__zone--stack    { border-color: rgba(34, 211, 238, 0.4);  background: rgba(34, 211, 238, 0.08); }
+      .memmodel__zone--heap     { border-color: rgba(168, 85, 247, 0.4);  background: rgba(168, 85, 247, 0.08); }
+      .memmodel__zone--bss      { border-color: rgba(251, 191, 36, 0.3);  background: rgba(251, 191, 36, 0.06); }
+      .memmodel__zone--data     { border-color: rgba(34, 197, 94, 0.35);  background: rgba(34, 197, 94, 0.07); }
+      .memmodel__zone--rodata   { border-color: rgba(251, 191, 36, 0.55); background: rgba(251, 191, 36, 0.12); }
+      .memmodel__zone--text     { border-color: rgba(124, 58, 237, 0.4);  background: rgba(124, 58, 237, 0.08); }
+      .memmodel__zone--null     { border-color: rgba(239, 68, 68, 0.5);   background: rgba(239, 68, 68, 0.12); }
+      .memmodel__name {
+        font-weight: 700;
+        color: var(--c-text);
+      }
+      .memmodel__note {
+        color: var(--c-muted);
+        font-size: 11px;
+      }
+      .memmodel__flow {
+        align-self: center;
+        font-size: 14px;
+        color: var(--c-muted);
+      }
+
+      /* ─── Figures grid (§5) ─── */
+      .figures {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 18px;
+        margin-top: 10px;
+      }
+      .figure {
+        padding: 16px;
+        border: 1px solid var(--c-card-border);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.02);
+        transition: border-color 200ms ease, box-shadow 200ms ease;
+      }
+      .figure:hover {
+        border-color: rgba(239, 68, 68, 0.4);
+        box-shadow: 0 10px 26px -10px rgba(239, 68, 68, 0.22);
+      }
+      .figure__head {
+        display: flex; justify-content: space-between; align-items: baseline;
+        gap: 12px;
+        margin-bottom: 4px;
+        flex-wrap: wrap;
+      }
+      .figure__title {
+        font-size: 14px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .figure__n {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 10px;
+        color: var(--c-muted);
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .figure__caption {
+        font-size: 11.5px;
+        color: var(--c-muted);
+        margin-bottom: 10px;
+        line-height: 1.5;
+      }
+      .figure__chart {
+        width: 100%;
+        height: 260px;
+      }
+      .figure__chart--tall { height: 300px; }
+      .figure__note {
+        font-size: 11px;
+        color: var(--c-dim);
+        margin-top: 6px;
+        font-style: italic;
+      }
+
+      /* ─── Results case grid (§6) ─── */
+      .cases {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 8px;
+      }
+      .case {
+        position: relative;
+        padding: 16px;
+        border: 1px solid var(--c-card-border);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.02);
+        display: flex; flex-direction: column; gap: 10px;
+        transition: transform 200ms cubic-bezier(0.22, 1, 0.36, 1),
+                    border-color 200ms ease, box-shadow 200ms ease;
+      }
+      .case:hover {
+        transform: translateY(-3px);
+        border-color: rgba(239, 68, 68, 0.5);
+        box-shadow: 0 12px 30px -10px rgba(239, 68, 68, 0.25);
+      }
+      .case::before {
+        content: "";
+        position: absolute; top: 0; left: 16px; right: 16px; height: 2px;
+        background: var(--grad-danger);
+        border-radius: 2px;
+        opacity: 0.7;
+      }
+      .case__head {
+        display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      }
+      .case__num {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        color: var(--c-red-soft);
+        background: rgba(239, 68, 68, 0.10);
+        border: 1px solid rgba(239, 68, 68, 0.3);
+        padding: 2px 8px;
+        border-radius: 6px;
+      }
+      .case__sev {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 10px;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        padding: 2px 8px;
+        border-radius: 999px;
+      }
+      .case__sev--critical { background: rgba(239, 68, 68, 0.15); color: var(--c-red-soft); border: 1px solid rgba(239, 68, 68, 0.3); }
+      .case__sev--common   { background: rgba(251, 191, 36, 0.12); color: var(--c-amber);   border: 1px solid rgba(251, 191, 36, 0.3); }
+      .case__sev--classic  { background: rgba(168, 85, 247, 0.12); color: var(--c-purple);  border: 1px solid rgba(168, 85, 247, 0.3); }
+      .case__title {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        line-height: 1.3;
+      }
+
+      .case__code {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11.5px;
+        line-height: 1.55;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: rgba(0, 0, 0, 0.35);
+        border: 1px solid var(--c-card-border);
+        overflow-x: auto;
+        white-space: pre;
+      }
+      .case__code .line { display: block; }
+      .case__code .line--err {
+        background: rgba(239, 68, 68, 0.18);
+        margin: 0 -12px;
+        padding: 0 12px;
+        border-left: 2px solid var(--c-red);
+        position: relative;
+      }
+      .case__code .line--err::after {
+        content: "💥";
+        position: absolute; right: 8px; top: 0;
+        font-size: 11px;
+      }
+      .tok-kw  { color: #c084fc; font-weight: 600; }
+      .tok-fn  { color: #7dd3fc; }
+      .tok-num { color: var(--c-amber); }
+      .tok-str { color: var(--c-green-soft); }
+      .tok-mac { color: var(--c-rose); }
+      .tok-cmt { color: var(--c-dim); font-style: italic; }
+
+      .case__diag {
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        padding: 8px 10px;
+        border-radius: 8px;
+        background: rgba(239, 68, 68, 0.06);
+        border: 1px dashed rgba(239, 68, 68, 0.25);
+        color: var(--c-muted);
+        line-height: 1.55;
+      }
+      .case__diag b { color: var(--c-red-soft); font-weight: 700; }
+      .case__diag .ok { color: var(--c-green-soft); }
+
+      .case__why {
+        font-size: 12.5px;
+        line-height: 1.6;
+        color: var(--c-muted);
+      }
+      .case__why b { color: var(--c-text); font-weight: 600; }
+
+      /* ─── Discussion matrix (§5) ─── */
+      .matrix {
+        display: grid;
+        grid-template-columns: 1.4fr 1fr 1fr 1.2fr;
+        gap: 0;
+        margin-top: 10px;
+        border: 1px solid var(--c-card-border);
+        border-radius: 12px;
+        overflow: hidden;
+        font-size: 12.5px;
+      }
+      .matrix > div {
+        padding: 10px 14px;
+        border-bottom: 1px solid var(--c-card-border);
+        border-right: 1px solid var(--c-card-border);
+      }
+      .matrix > div:nth-child(4n) { border-right: none; }
+      .matrix > div:nth-last-child(-n+4) { border-bottom: none; }
+      .matrix__head {
+        background: rgba(255, 255, 255, 0.03);
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--c-muted);
+      }
+      .matrix__cell b { color: var(--c-text); }
+      .matrix__cell .mono { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 11.5px; color: var(--c-green-soft); }
+      .matrix .check { color: var(--c-green-soft); }
+      .matrix .x     { color: var(--c-red-soft); }
+
+      /* ─── Insights cards (§6 takeaways) ─── */
+      .takeaways {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-top: 10px;
+      }
+      .takeaway {
+        padding: 16px;
+        border: 1px solid var(--c-card-border);
+        border-radius: 14px;
+        background: rgba(255, 255, 255, 0.02);
+      }
+      .takeaway__icon {
+        font-size: 24px;
+        margin-bottom: 6px;
+      }
+      .takeaway__title {
+        font-weight: 700;
+        font-size: 14px;
+        margin-bottom: 4px;
+      }
+      .takeaway__body {
+        font-size: 12.5px;
+        color: var(--c-muted);
+        line-height: 1.6;
+      }
+
+      /* ─── Conclusion ─── */
+      .conclusion {
+        font-size: 17px;
+        line-height: 1.8;
+        padding: 8px 4px;
+      }
+      .conclusion b {
+        background: var(--grad-neon);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-weight: 800;
+      }
+      .conclusion .danger {
+        background: var(--grad-danger);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        font-weight: 800;
+      }
+
+      /* ─── References ─── */
+      .refs {
+        margin-top: 10px;
+        font-size: 12.5px;
+        color: var(--c-muted);
+        line-height: 1.8;
+        columns: 2;
+        column-gap: 32px;
+      }
+      .refs li {
+        list-style: none;
+        margin-bottom: 4px;
+        break-inside: avoid;
+      }
+      .refs b {
+        color: var(--c-green-soft);
+        font-family: "JetBrains Mono", ui-monospace, monospace;
+        font-size: 11.5px;
+        margin-right: 6px;
+      }
+
+      /* ─── Footer ─── */
+      .poster__footer {
+        display: flex; justify-content: space-between;
+        margin-top: 32px;
+        padding: 18px 4px;
+        color: var(--c-muted);
+        font-size: 12.5px;
+        border-top: 1px solid var(--c-card-border);
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+      .poster__footer a {
+        color: var(--c-green-soft);
+        text-decoration: none;
+      }
+      .poster__footer a:hover { text-decoration: underline; }
+
+      /* ─── Responsive ─── */
+      @media (max-width: 1100px) {
+        .kpi-grid { grid-template-columns: repeat(2, 1fr); }
+        .poster__grid { grid-template-columns: 1fr; }
+        .cases { grid-template-columns: repeat(2, 1fr); }
+        .takeaways { grid-template-columns: 1fr; }
+        .matrix { grid-template-columns: 1fr 1fr; }
+        .matrix > div:nth-child(4n)         { border-right: 1px solid var(--c-card-border); }
+        .matrix > div:nth-child(2n)         { border-right: none; }
+        .matrix > div:nth-last-child(-n+4)  { border-bottom: 1px solid var(--c-card-border); }
+        .matrix > div:nth-last-child(-n+2)  { border-bottom: none; }
+        .refs { columns: 1; }
+      }
+      @media (max-width: 560px) {
+        .poster { padding: 20px 14px 60px; }
+        .kpi-grid { grid-template-columns: 1fr 1fr; gap: 10px; }
+        .cases { grid-template-columns: 1fr; }
+        .poster__title { font-size: 24px; }
+      }
+
+      /* ─── Print (A2/A3 export) ─── */
+      @media print {
+        html, body { background: #fff !important; color: #111 !important; }
+        .poster { background: #fff !important; padding: 16mm; }
+        .poster__header, .card, .case, .takeaway, .kpi, .poster__abstract {
+          background: #fff !important;
+          color: #111 !important;
+          border-color: #ccc !important;
+          box-shadow: none !important;
+          page-break-inside: avoid;
+        }
+        .poster__title, .conclusion b, .kpi__value, .poster__logo {
+          color: #b91c1c !important;
+          background: none !important;
+          -webkit-text-fill-color: initial !important;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="poster">
+      <div class="poster__grain" aria-hidden="true"></div>
+
+      <!-- ─────────── Header band ─────────── -->
+      <header class="poster__header">
+        <div class="poster__brand">
+          <span class="poster__logo">Codenergy ▲</span>
+          <span class="poster__tag">RESEARCH POSTER · CS-EDU 2026</span>
+        </div>
+        <h1 class="poster__title">
+          C언어 학습자의 <span class="grad-danger">Segmentation Fault</span> 6대 원인
+          <span class="grad">— 메모리 구조 관점의 시각적 분석</span>
+        </h1>
+        <p class="poster__authors">
+          Codenergy Education Lab · 대응 저자 <b>support@codenergy.io</b><br/>
+          분석 기간 <b>2026-01 ~ 2026-05</b> · 대상 학습자 <b>n = 1,284</b> (Trail 0~2) ·
+          데이터 소스 <b>Judge0 stderr 로그 (모의)</b>
+        </p>
+      </header>
+
+      <!-- ─────────── §1 Abstract / KPI strip ─────────── -->
+      <section data-section="1">
+        <h2 class="poster__h2"><span class="ix">§1</span> Abstract · 핵심 지표</h2>
+
+        <div class="kpi-grid">
+          <article class="kpi" data-tilt>
+            <div class="kpi__label">총 segfault 케이스</div>
+            <div class="kpi__value">6 유형</div>
+            <div class="kpi__sub">포인터 3 · 배열 1 · 스택 1 · RO 1</div>
+          </article>
+          <article class="kpi" data-tilt>
+            <div class="kpi__label">초보자 점유율</div>
+            <div class="kpi__value">87%</div>
+            <div class="kpi__sub">Trail 0~2 학습자 기준 (모의)</div>
+          </article>
+          <article class="kpi" data-tilt>
+            <div class="kpi__label">평균 해결 시간</div>
+            <div class="kpi__value">12분</div>
+            <div class="kpi__sub">가이드 동반 시 4.3분 ↓</div>
+          </article>
+          <article class="kpi" data-tilt>
+            <div class="kpi__label">시각화 효과</div>
+            <div class="kpi__value">+38%p</div>
+            <div class="kpi__sub">메모리 다이어그램 학습자 정답률 향상</div>
+          </article>
+        </div>
+
+        <p class="poster__abstract">
+          C 언어 입문자에게 <b>Segmentation Fault</b>는 가장 좌절감을 주는 런타임 에러다.
+          본 포스터는 Judge0 채점 로그에서 추출한 6가지 대표 원인을
+          <span class="keyword">C 메모리 모델</span>(text · rodata · data · bss · heap · stack · NULL)의
+          어느 영역과 충돌했는지로 분류한다. 각 사례에 대해 <b>코드 라인 빨강 하이라이팅</b>,
+          <b>일상 비유</b>, <b>수정안</b>을 제시하며, 메모리 다이어그램 동반 학습이 정답률을
+          <b>38%p</b> 끌어올린다는 관찰을 함께 보고한다.
+        </p>
+      </section>
+
+      <!-- ─────────── Main grid ─────────── -->
+      <div class="poster__grid">
+
+        <!-- §2 Background: C Memory Model -->
+        <section class="card poster__section--wide" data-tilt>
+          <h2 class="poster__h2"><span class="ix">§2</span> Background · C 프로세스 메모리 모델</h2>
+          <p class="poster__caption">
+            세그멘테이션 폴트는 프로세스가 자신에게 <b>허용되지 않은 가상 메모리 영역</b>에 접근할 때
+            OS가 보내는 SIGSEGV 시그널이다. 아래는 일반적인 Linux x86_64 프로세스 메모리 레이아웃이다.
+          </p>
+
+          <div class="memmodel">
+            <div class="memmodel__addr">0x7FFF…FFFF</div>
+            <div class="memmodel__zone memmodel__zone--stack">
+              <span class="memmodel__name">📥 Stack</span>
+              <span class="memmodel__note">↓ 함수 호출 프레임 · 지역변수 · 복귀 주소</span>
+            </div>
+            <div class="memmodel__flow">↓</div>
+
+            <div class="memmodel__addr"></div>
+            <div class="memmodel__zone" style="background: rgba(255,255,255,0.015); border-style: dashed;">
+              <span class="memmodel__name" style="color: var(--c-dim)">⋯ 사용 가능 가상 공간</span>
+              <span class="memmodel__note">(Stack과 Heap이 서로 향해 자람)</span>
+            </div>
+            <div class="memmodel__flow">↑</div>
+
+            <div class="memmodel__addr"></div>
+            <div class="memmodel__zone memmodel__zone--heap">
+              <span class="memmodel__name">🧱 Heap</span>
+              <span class="memmodel__note">malloc / calloc / realloc 할당 · 명시적 free</span>
+            </div>
+            <div class="memmodel__flow"></div>
+
+            <div class="memmodel__addr"></div>
+            <div class="memmodel__zone memmodel__zone--bss">
+              <span class="memmodel__name">📦 BSS</span>
+              <span class="memmodel__note">초기화되지 않은 전역 · static (0으로 채워짐)</span>
+            </div>
+            <div class="memmodel__flow"></div>
+
+            <div class="memmodel__addr"></div>
+            <div class="memmodel__zone memmodel__zone--data">
+              <span class="memmodel__name">💾 Data</span>
+              <span class="memmodel__note">초기화된 전역 · static</span>
+            </div>
+            <div class="memmodel__flow"></div>
+
+            <div class="memmodel__addr"></div>
+            <div class="memmodel__zone memmodel__zone--rodata">
+              <span class="memmodel__name">🔒 .rodata</span>
+              <span class="memmodel__note">읽기 전용 — 문자열 리터럴 · const</span>
+            </div>
+            <div class="memmodel__flow"></div>
+
+            <div class="memmodel__addr"></div>
+            <div class="memmodel__zone memmodel__zone--text">
+              <span class="memmodel__name">🧠 .text</span>
+              <span class="memmodel__note">실행 코드 · 함수 본체 (실행 가능, 쓰기 금지)</span>
+            </div>
+            <div class="memmodel__flow"></div>
+
+            <div class="memmodel__addr">0x000…0000</div>
+            <div class="memmodel__zone memmodel__zone--null">
+              <span class="memmodel__name">🚫 NULL 페이지</span>
+              <span class="memmodel__note">접근 시 즉시 SIGSEGV — 의도된 함정</span>
+            </div>
+            <div class="memmodel__flow"></div>
+          </div>
+        </section>
+
+        <!-- §3 Methods -->
+        <section class="card" data-tilt>
+          <h2 class="poster__h2"><span class="ix">§3</span> Methods · 분석 방법론</h2>
+          <p class="poster__caption">5개월간 수집한 stderr·exit code·core dump 패턴을 기반으로 분류.</p>
+          <ul style="margin-top: 6px; padding-left: 0; list-style: none; font-size: 13.5px; line-height: 1.85; color: var(--c-text);">
+            <li><b style="color: var(--c-green-soft); font-family: monospace; margin-right: 8px;">1.</b> Judge0 stderr 정규식 매칭 → segfault 후보 추출</li>
+            <li><b style="color: var(--c-green-soft); font-family: monospace; margin-right: 8px;">2.</b> 학습자 제출 코드 정적 분석 → 의심 라인 선별</li>
+            <li><b style="color: var(--c-green-soft); font-family: monospace; margin-right: 8px;">3.</b> 메모리 충돌 영역별 6 클러스터로 군집화 (k=6, manual seed)</li>
+            <li><b style="color: var(--c-green-soft); font-family: monospace; margin-right: 8px;">4.</b> 각 클러스터 대표 사례에 <b>비유 · 시각화 · 수정안</b> 부착</li>
+            <li><b style="color: var(--c-green-soft); font-family: monospace; margin-right: 8px;">5.</b> A/B 테스트로 다이어그램 동반 그룹의 재제출 성공률 측정</li>
+          </ul>
+        </section>
+
+        <!-- §4 Severity scale -->
+        <section class="card" data-tilt>
+          <h2 class="poster__h2"><span class="ix">§4</span> Severity Scale · 심각도 분류</h2>
+          <p class="poster__caption">발생 빈도와 디버깅 난이도를 종합한 3단계 분류.</p>
+          <div style="display: grid; grid-template-columns: 1fr; gap: 8px; margin-top: 10px;">
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; background: rgba(239, 68, 68, 0.08); border: 1px solid rgba(239, 68, 68, 0.3);">
+              <span class="case__sev case__sev--critical">치명적</span>
+              <span style="font-size: 13px; color: var(--c-muted);">즉시 충돌 · 디버거 없이 원인 파악 어려움 · UB 동반</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; background: rgba(251, 191, 36, 0.06); border: 1px solid rgba(251, 191, 36, 0.3);">
+              <span class="case__sev case__sev--common">흔한 실수</span>
+              <span style="font-size: 13px; color: var(--c-muted);">초보자에 빈번 · 단순 검증 로직 추가로 예방 가능</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 10px; background: rgba(168, 85, 247, 0.06); border: 1px solid rgba(168, 85, 247, 0.3);">
+              <span class="case__sev case__sev--classic">단골 실수</span>
+              <span style="font-size: 13px; color: var(--c-muted);">개념적 오해에서 비롯 · 시각화로 직관 형성 효과 큼</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- §5 Figures: statistical charts -->
+        <section class="card poster__section--full" data-section="5">
+          <h2 class="poster__h2"><span class="ix">§5</span> Figures · 통계 도표</h2>
+          <p class="poster__caption">
+            n = 1,284 학습자 · 제출 47,210건 · 2026-01 ~ 2026-05 (모의 데이터).
+            도표 위에 마우스를 올리면 정확한 수치 확인 가능.
+          </p>
+
+          <div class="figures">
+            <article class="figure">
+              <div class="figure__head">
+                <span class="figure__title">Figure 1. 6대 원인 발생 빈도</span>
+                <span class="figure__n">n = 2,847 segfault</span>
+              </div>
+              <p class="figure__caption">stderr 로그에서 분류된 segfault 케이스 분포.</p>
+              <div class="figure__chart" id="fig-frequency"></div>
+              <div class="figure__note">▶ NULL 역참조와 배열 OOB 둘이 전체의 56% 차지.</div>
+            </article>
+
+            <article class="figure">
+              <div class="figure__head">
+                <span class="figure__title">Figure 2. 다이어그램 동반 학습자 정답률</span>
+                <span class="figure__n">A/B test · n = 642</span>
+              </div>
+              <p class="figure__caption">메모리 시각화 카드 노출(A) vs 텍스트 에러만 노출(B).</p>
+              <div class="figure__chart" id="fig-ab"></div>
+              <div class="figure__note">▶ 모든 케이스에서 A군이 우세 · 평균 격차 +38.2%p.</div>
+            </article>
+
+            <article class="figure">
+              <div class="figure__head">
+                <span class="figure__title">Figure 3. SIGSEGV 충돌 메모리 영역</span>
+                <span class="figure__n">n = 2,847</span>
+              </div>
+              <p class="figure__caption">실제로 어느 메모리 영역에서 충돌이 일어났는가.</p>
+              <div class="figure__chart" id="fig-region"></div>
+              <div class="figure__note">▶ NULL 페이지 + 스택 영역이 62% — “경계”와 “주소 0x0” 학습이 핵심.</div>
+            </article>
+
+            <article class="figure">
+              <div class="figure__head">
+                <span class="figure__title">Figure 4. 트레일별 segfault 발생률</span>
+                <span class="figure__n">제출 1,000건 당</span>
+              </div>
+              <p class="figure__caption">학습 트레일이 깊어질수록 어떻게 변하는가.</p>
+              <div class="figure__chart" id="fig-trail"></div>
+              <div class="figure__note">▶ Trail 2~3(함수/포인터/자료구조 도입)에서 피크 — 보조 자료가 가장 필요한 구간.</div>
+            </article>
+          </div>
+        </section>
+
+        <!-- §6 Results: 6 cases -->
+        <section class="card poster__section--full" data-section="6">
+          <h2 class="poster__h2"><span class="ix">§6</span> Results · 6대 원인 케이스 카드</h2>
+          <p class="poster__caption">
+            각 케이스: 에러 라인 빨강 하이라이팅 · 충돌한 메모리 영역 · 한 줄 원인 · 비유.
+            카드 위에 마우스를 올리면 시각 효과가 강화됩니다.
+          </p>
+          <div class="cases" id="cases"></div>
+        </section>
+
+        <!-- §7 Discussion matrix -->
+        <section class="card poster__section--wide" data-tilt>
+          <h2 class="poster__h2"><span class="ix">§7</span> Discussion · 원인별 충돌 영역 매트릭스</h2>
+          <p class="poster__caption">어떤 케이스가 어떤 메모리 영역과 충돌하며, 어떤 도구로 잡히는가.</p>
+          <div class="matrix">
+            <div class="matrix__head">케이스</div>
+            <div class="matrix__head">충돌 영역</div>
+            <div class="matrix__head">컴파일러 경고로 감지</div>
+            <div class="matrix__head">권장 도구</div>
+
+            <div class="matrix__cell"><b>① NULL 역참조</b></div>
+            <div class="matrix__cell">NULL 페이지</div>
+            <div class="matrix__cell"><span class="x">△ (정적 분석 한정)</span></div>
+            <div class="matrix__cell"><span class="mono">valgrind</span> · <span class="mono">ASan</span></div>
+
+            <div class="matrix__cell"><b>② 배열 OOB</b></div>
+            <div class="matrix__cell">스택 (다른 변수/복귀주소)</div>
+            <div class="matrix__cell"><span class="check">○ <span class="mono">-fstack-protector</span></span></div>
+            <div class="matrix__cell"><span class="mono">ASan</span></div>
+
+            <div class="matrix__cell"><b>③ 무한 재귀</b></div>
+            <div class="matrix__cell">스택 한계선</div>
+            <div class="matrix__cell"><span class="x">✗ (런타임)</span></div>
+            <div class="matrix__cell"><span class="mono">ulimit -s</span> 조정 · 디버거</div>
+
+            <div class="matrix__cell"><b>④ RO 메모리 쓰기</b></div>
+            <div class="matrix__cell">.rodata</div>
+            <div class="matrix__cell"><span class="check">○ <span class="mono">-Wwrite-strings</span></span></div>
+            <div class="matrix__cell">컴파일러</div>
+
+            <div class="matrix__cell"><b>⑤ Dangling 포인터</b></div>
+            <div class="matrix__cell">해제된 스택 프레임</div>
+            <div class="matrix__cell"><span class="check">○ <span class="mono">-Wreturn-local-addr</span></span></div>
+            <div class="matrix__cell"><span class="mono">ASan</span></div>
+
+            <div class="matrix__cell"><b>⑥ 미초기화 포인터</b></div>
+            <div class="matrix__cell">임의 (쓰레기값)</div>
+            <div class="matrix__cell"><span class="check">○ <span class="mono">-Wuninitialized -O2</span></span></div>
+            <div class="matrix__cell"><span class="mono">MSan</span> · <span class="mono">valgrind</span></div>
+          </div>
+        </section>
+
+        <!-- §8 Takeaways -->
+        <section class="card poster__section--wide" data-section="8">
+          <h2 class="poster__h2"><span class="ix">§8</span> Takeaways · 학습자를 위한 3가지 원칙</h2>
+          <div class="takeaways">
+            <article class="takeaway" data-tilt>
+              <div class="takeaway__icon">🧭</div>
+              <div class="takeaway__title">포인터는 항상 “어딘가”를 가리켜야 한다</div>
+              <div class="takeaway__body">
+                선언과 동시에 <b style="color: var(--c-green-soft); font-family: monospace;">NULL</b>
+                또는 유효 주소로 초기화. <b style="color: var(--c-text);">선언 ≠ 메모리 할당</b>이라는
+                사실을 명시적으로 가르쳐야 한다.
+              </div>
+            </article>
+            <article class="takeaway" data-tilt>
+              <div class="takeaway__icon">📏</div>
+              <div class="takeaway__title">경계는 코드보다 머리 속에서 먼저 그린다</div>
+              <div class="takeaway__body">
+                배열·재귀·문자열 — 모두 “여기까지 OK, 여기부터 위험”이라는 경계가 있다.
+                컴파일러 옵션(<b style="color: var(--c-green-soft); font-family: monospace;">-Wall -fsanitize=address</b>)으로
+                경계 위반을 조기에 탐지하라.
+              </div>
+            </article>
+            <article class="takeaway" data-tilt>
+              <div class="takeaway__icon">🧠</div>
+              <div class="takeaway__title">메모리 다이어그램이 디버깅을 38% 빠르게 한다</div>
+              <div class="takeaway__body">
+                stderr 한 줄만으로는 부족하다. <b style="color: var(--c-text);">스택/힙/rodata/NULL</b>
+                중 어디와 충돌했는지 시각적으로 보여주면 학습자가 스스로 원인을 추론한다.
+              </div>
+            </article>
+          </div>
+        </section>
+
+        <!-- §9 Conclusion -->
+        <section class="card poster__section--full" data-tilt>
+          <h2 class="poster__h2"><span class="ix">§9</span> Conclusion</h2>
+          <p class="conclusion">
+            <span class="danger">Segmentation Fault</span>는 단일 에러처럼 보이지만,
+            실제로는 <b>6가지 서로 다른 메모리 영역 충돌</b>의 공통 이름이다.
+            stderr 로그만 보고는 어느 영역이 깨졌는지 알 수 없기 때문에,
+            교육 플랫폼이 가져야 할 차별점은 <b>충돌 영역을 시각화하는 자동화된 분석 카드</b>다.
+            우리는 이 컴포넌트를 Codenergy에 통합하여
+            <b>학습자의 디버깅 시간을 평균 7.7분 단축</b>하는 것을 목표로 한다.
+          </p>
+        </section>
+
+        <!-- §10 References -->
+        <section class="card poster__section--full">
+          <h2 class="poster__h2"><span class="ix">§10</span> References · 관련 학습 자료</h2>
+          <ul class="refs">
+            <li><b>[1]</b> ISO/IEC 9899:2018 — Programming Languages: C (§6.5.16 assignment, §7.22.3 memory)</li>
+            <li><b>[2]</b> Linux Programmer's Manual: <span style="font-family: monospace; color: var(--c-green-soft);">signal(7)</span> · SIGSEGV semantics</li>
+            <li><b>[3]</b> AddressSanitizer (ASan), Google — github.com/google/sanitizers</li>
+            <li><b>[4]</b> Valgrind Memcheck — valgrind.org/docs/manual/mc-manual.html</li>
+            <li><b>[5]</b> Codenergy Trail 2 · Ch1 함수 / Ch2 재귀함수 — 본문 §6-③ 관련</li>
+            <li><b>[6]</b> Codenergy Trail 3 · Ch2 배열·연결리스트 — 본문 §6-② 관련</li>
+            <li><b>[7]</b> Kernighan & Ritchie, The C Programming Language, 2nd ed. (1988), Ch.5 Pointers</li>
+            <li><b>[8]</b> CWE-476: NULL Pointer Dereference / CWE-787: Out-of-bounds Write</li>
+          </ul>
+        </section>
+
+      </div>
+
+      <footer class="poster__footer">
+        <span>Codenergy ▲ · 코딩테스트, 지식에서 스킬로</span>
+        <span>Generated <span id="gen-time">—</span> · 모의 데이터 기반 · <a href="error-card-demo.html">← 인터랙티브 데모로</a> · <a href="index.html">메인</a></span>
+      </footer>
+    </div>
+
+    <script>
+      // ════════════════ 6 case data ════════════════
+      const cases = [
+        {
+          n: '①', sev: 'critical', sevLabel: '치명적',
+          title: 'NULL 포인터 역참조',
+          collide: 'NULL 페이지 (0x0)',
+          code: [
+            ['kw int','* p = ','kw NULL',';'],
+            ['*p = ','num 42','; ','cmt // 💥 0x0에 쓰기 시도'],
+          ],
+          errLine: 2,
+          why: '<b>0x0</b>은 OS가 의도적으로 막아둔 영역. 주소가 적히지 않은 우편물을 부치는 셈.',
+        },
+        {
+          n: '②', sev: 'common', sevLabel: '흔한 실수',
+          title: '배열 범위 초과',
+          collide: '스택 (다른 변수/복귀주소)',
+          code: [
+            ['kw int',' arr[','num 5','] = {','num 1',',',' num 2','...};'],
+            ['arr[','num 100','] = ','num 999','; ','cmt // 95칸 너머'],
+          ],
+          errLine: 2,
+          why: '<b>5층 빌딩의 100층</b>을 누르는 것. 옆 함수의 복귀 주소를 덮어쓸 수도 있음.',
+        },
+        {
+          n: '③', sev: 'classic', sevLabel: '단골 실수',
+          title: '무한 재귀 → 스택 오버플로우',
+          collide: '스택 한계선 (1~8 MB)',
+          code: [
+            ['kw void',' ','fn f','(','kw int',' n) {'],
+            ['    ','fn f','(n + ','num 1','); ','cmt // 종료조건 없음'],
+            ['}'],
+          ],
+          errLine: 2,
+          why: '<b>마주 보는 거울</b>처럼 호출 프레임이 끝없이 쌓이다 한계선 돌파.',
+        },
+        {
+          n: '④', sev: 'critical', sevLabel: '치명적',
+          title: '문자열 리터럴 수정',
+          collide: '.rodata (읽기 전용)',
+          code: [
+            ['kw char',' *s = ','str "hello"','; ','cmt // .rodata 가리킴'],
+            ['s[','num 0','] = ','str \'H\'','; ','cmt // 💥 RO 쓰기'],
+          ],
+          errLine: 2,
+          why: '<b>도서관 책에 낙서</b>하는 행위. 컴파일러가 박아둔 상수 영역.',
+        },
+        {
+          n: '⑤', sev: 'critical', sevLabel: '치명적',
+          title: 'Dangling 포인터',
+          collide: '해제된 스택 프레임',
+          code: [
+            ['kw int','* ','fn danger','(','kw void',') {'],
+            ['    ','kw int',' x = ','num 42','; ','kw return',' &x; ','cmt // 죽은 주소'],
+            ['}'],
+          ],
+          errLine: 2,
+          why: '<b>이미 떠난 친구의 빈자리</b>를 가리키는 것. 이후 호출이 자리를 덮어씀.',
+        },
+        {
+          n: '⑥', sev: 'common', sevLabel: '흔한 실수',
+          title: '초기화되지 않은 포인터',
+          collide: '임의 영역 (쓰레기값)',
+          code: [
+            ['kw int','* p; ','cmt // 0x?? ?? ?? ??'],
+            ['*p = ','num 5','; ','cmt // 💥 어디로 갈지 모름'],
+          ],
+          errLine: 2,
+          why: '<b>무작위 번호로 전화</b>하는 것. 보호 영역에 닿으면 SIGSEGV.',
+        },
+      ];
+
+      function renderLine(parts) {
+        return parts.map((p) => {
+          const m = p.match(/^(kw|fn|num|str|mac|cmt) (.*)$/s);
+          if (m) return `<span class="tok-${m[1]}">${escapeHtml(m[2])}</span>`;
+          return escapeHtml(p);
+        }).join('');
+      }
+      function escapeHtml(s) {
+        return String(s).replace(/[&<>]/g, (m) => ({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]));
+      }
+      function renderCase(c) {
+        return `
+          <article class="case" data-tilt>
+            <header class="case__head">
+              <span class="case__num">${c.n}</span>
+              <span class="case__sev case__sev--${c.sev}">${c.sevLabel}</span>
+            </header>
+            <h3 class="case__title">${c.title}</h3>
+            <pre class="case__code">${c.code.map((line, i) => {
+              const cls = (i + 1 === c.errLine) ? 'line line--err' : 'line';
+              return `<span class="${cls}">${renderLine(line)}</span>`;
+            }).join('')}</pre>
+            <div class="case__diag">
+              <b>충돌:</b> ${c.collide}
+            </div>
+            <div class="case__why">${c.why}</div>
+          </article>`;
+      }
+
+      document.getElementById('cases').innerHTML = cases.map(renderCase).join('');
+
+      // ════════════════ ECharts: 4 figures ════════════════
+      const COLOR = {
+        red: '#ef4444', redSoft: '#f87171',
+        amber: '#fbbf24',
+        purple: '#a855f7', purpleSoft: '#c084fc',
+        green: '#22c55e', greenSoft: '#4ade80',
+        cyan: '#22d3ee',
+        rose: '#f43f5e',
+        slate: '#64748b',
+        text: '#f4f5fa',
+        muted: '#8b8fa3',
+        grid: 'rgba(255,255,255,0.06)',
+      };
+      const baseText = { color: COLOR.text, fontFamily: 'Pretendard, sans-serif' };
+      const axisCommon = {
+        axisLine: { lineStyle: { color: COLOR.grid } },
+        axisTick: { lineStyle: { color: COLOR.grid } },
+        axisLabel: { color: COLOR.muted, fontSize: 11 },
+        splitLine: { lineStyle: { color: COLOR.grid } },
+      };
+      const tooltipDark = {
+        backgroundColor: 'rgba(13, 15, 26, 0.95)',
+        borderColor: 'rgba(239, 68, 68, 0.4)',
+        textStyle: { color: COLOR.text },
+      };
+
+      // ── Figure 1: 6대 원인 발생 빈도 (horizontal bar) ──
+      const fig1Data = [
+        { name: '① NULL 역참조',       v: 32, color: COLOR.red },
+        { name: '② 배열 OOB',          v: 24, color: COLOR.rose },
+        { name: '⑥ 미초기화 포인터',    v: 18, color: COLOR.amber },
+        { name: '④ RO 메모리 쓰기',     v: 12, color: COLOR.purple },
+        { name: '⑤ Dangling',          v:  8, color: COLOR.purpleSoft },
+        { name: '③ 무한 재귀',          v:  6, color: COLOR.cyan },
+      ].sort((a, b) => a.v - b.v);
+
+      echarts.init(document.getElementById('fig-frequency')).setOption({
+        textStyle: baseText,
+        tooltip: { ...tooltipDark, trigger: 'axis', axisPointer: { type: 'shadow' },
+                   valueFormatter: (v) => `${v}%` },
+        grid: { top: 8, right: 36, bottom: 24, left: 110 },
+        xAxis: { type: 'value', ...axisCommon,
+                 axisLabel: { ...axisCommon.axisLabel, formatter: '{value}%' } },
+        yAxis: { type: 'category', data: fig1Data.map(d => d.name), ...axisCommon,
+                 axisLabel: { ...axisCommon.axisLabel, color: COLOR.text, fontSize: 12 } },
+        series: [{
+          type: 'bar',
+          data: fig1Data.map(d => ({
+            value: d.v,
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 1, 0, [
+                { offset: 0, color: d.color + '99' },
+                { offset: 1, color: d.color },
+              ]),
+              borderRadius: [0, 8, 8, 0],
+            },
+          })),
+          label: { show: true, position: 'right', color: COLOR.text, fontSize: 11,
+                   formatter: '{c}%' },
+          barWidth: 18,
+        }],
+      });
+
+      // ── Figure 2: A/B test grouped bar ──
+      const caseLabels = ['NULL', 'OOB', '재귀', 'RO', 'Dang', 'Uninit'];
+      echarts.init(document.getElementById('fig-ab')).setOption({
+        textStyle: baseText,
+        tooltip: { ...tooltipDark, trigger: 'axis',
+                   valueFormatter: (v) => `${v}%` },
+        legend: { data: ['텍스트 에러만 (B)', '다이어그램 동반 (A)'],
+                  top: 0, right: 0,
+                  textStyle: { color: COLOR.muted, fontSize: 11 },
+                  itemWidth: 12, itemHeight: 8 },
+        grid: { top: 36, right: 12, bottom: 28, left: 40 },
+        xAxis: { type: 'category', data: caseLabels, ...axisCommon },
+        yAxis: { type: 'value', max: 100, ...axisCommon,
+                 axisLabel: { ...axisCommon.axisLabel, formatter: '{value}%' } },
+        series: [
+          { name: '텍스트 에러만 (B)', type: 'bar',
+            data: [38, 42, 31, 55, 28, 34],
+            itemStyle: { color: 'rgba(148, 163, 184, 0.55)', borderRadius: [4, 4, 0, 0] },
+            barWidth: 14 },
+          { name: '다이어그램 동반 (A)', type: 'bar',
+            data: [76, 81, 68, 89, 65, 72],
+            itemStyle: {
+              color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                { offset: 0, color: '#4ade80' },
+                { offset: 1, color: '#22c55e' },
+              ]),
+              borderRadius: [4, 4, 0, 0],
+            },
+            barWidth: 14 },
+        ],
+      });
+
+      // ── Figure 3: 충돌 메모리 영역 (donut) ──
+      echarts.init(document.getElementById('fig-region')).setOption({
+        textStyle: baseText,
+        tooltip: { ...tooltipDark, trigger: 'item', valueFormatter: (v) => `${v}%` },
+        legend: { bottom: 0, textStyle: { color: COLOR.muted, fontSize: 11 },
+                  icon: 'circle', itemWidth: 8, itemHeight: 8 },
+        series: [{
+          type: 'pie',
+          radius: ['50%', '74%'],
+          center: ['50%', '42%'],
+          avoidLabelOverlap: true,
+          itemStyle: { borderColor: '#06070d', borderWidth: 3 },
+          label: { show: true, color: COLOR.text, fontSize: 11,
+                   formatter: '{b}\n{d}%' },
+          labelLine: { lineStyle: { color: COLOR.muted } },
+          data: [
+            { name: 'NULL 페이지',        value: 32, itemStyle: { color: COLOR.red } },
+            { name: '스택 영역',           value: 30, itemStyle: { color: COLOR.cyan } },
+            { name: '임의 영역',           value: 18, itemStyle: { color: COLOR.amber } },
+            { name: '.rodata',           value: 12, itemStyle: { color: COLOR.purple } },
+            { name: '해제된 프레임',        value:  8, itemStyle: { color: COLOR.slate } },
+          ],
+        }],
+      });
+
+      // ── Figure 4: 트레일별 segfault 발생률 (vertical bar) ──
+      const trailLabels = ['Trail 0', 'Trail 1', 'Trail 2', 'Trail 3', 'Trail 4', 'Trail 5', 'Trail 6'];
+      const trailValues = [18, 42, 67, 89, 54, 31, 19];
+      const peak = Math.max(...trailValues);
+      echarts.init(document.getElementById('fig-trail')).setOption({
+        textStyle: baseText,
+        tooltip: { ...tooltipDark, trigger: 'axis', axisPointer: { type: 'shadow' },
+                   valueFormatter: (v) => `${v}건 / 1,000 제출` },
+        grid: { top: 16, right: 12, bottom: 28, left: 40 },
+        xAxis: { type: 'category', data: trailLabels, ...axisCommon,
+                 axisLabel: { ...axisCommon.axisLabel, fontSize: 10 } },
+        yAxis: { type: 'value', ...axisCommon,
+                 axisLabel: { ...axisCommon.axisLabel, formatter: '{value}' } },
+        series: [{
+          type: 'bar',
+          data: trailValues.map((v) => ({
+            value: v,
+            itemStyle: {
+              color: v === peak
+                ? new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: '#f87171' }, { offset: 1, color: '#ef4444' } ])
+                : new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: 'rgba(168, 85, 247, 0.6)' },
+                    { offset: 1, color: 'rgba(168, 85, 247, 0.95)' } ]),
+              borderRadius: [6, 6, 0, 0],
+            },
+          })),
+          label: { show: true, position: 'top', color: COLOR.text, fontSize: 11,
+                   formatter: '{c}' },
+          barWidth: 28,
+          markLine: {
+            symbol: 'none',
+            lineStyle: { color: COLOR.muted, type: 'dashed' },
+            label: { color: COLOR.muted, fontSize: 10, formatter: '평균 {c}건' },
+            data: [{ type: 'average', name: '평균' }],
+          },
+        }],
+      });
+
+      // Resize charts on window resize
+      window.addEventListener('resize', () => {
+        ['fig-frequency', 'fig-ab', 'fig-region', 'fig-trail'].forEach((id) => {
+          const inst = echarts.getInstanceByDom(document.getElementById(id));
+          if (inst) inst.resize();
+        });
+      });
+
+      // ════════════════ Generated time ════════════════
+      document.getElementById('gen-time').textContent =
+        new Date().toLocaleString('ko-KR', { dateStyle: 'medium', timeStyle: 'short' });
+
+      // ════════════════ Subtle tilt on cards ════════════════
+      document.querySelectorAll('[data-tilt]').forEach((el) => {
+        el.style.transformStyle = 'preserve-3d';
+        el.addEventListener('mousemove', (e) => {
+          const r = el.getBoundingClientRect();
+          const x = (e.clientX - r.left) / r.width - 0.5;
+          const y = (e.clientY - r.top) / r.height - 0.5;
+          el.style.transform =
+            `perspective(900px) rotateY(${x * 4}deg) rotateX(${-y * 4}deg)`;
+        });
+        el.addEventListener('mouseleave', () => {
+          el.style.transform = 'perspective(900px) rotateY(0) rotateX(0)';
+        });
+      });
+    </script>
+  </body>
+</html>
