@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 **Codenergy** — a Korean-language **personalized coding-learning platform driven by coding tests** (slogan: "코딩테스트, 지식에서 스킬로"). The product loop: user takes a coding test → results identify weak concepts → the platform delivers tailored learning. Coding tests are the input signal, not the end product.
 
-Tech: full-stack app with a Vite multi-page frontend talking to an Express + SQLite backend. C code submitted by users is executed via Judge0 (RapidAPI).
+Tech: full-stack app with a Vite multi-page frontend talking to an Express backend. Backend persistence is **Supabase Postgres** (via the `pg` driver, async) so accounts and per-user data sync across machines — every backend instance pointed at the same `DATABASE_URL` sees the same rows. C code submitted by users is executed via Judge0 (RapidAPI).
 
 ## Repo layout
 
@@ -75,13 +75,13 @@ E2E tests in [frontend/tests/e2e/](frontend/tests/e2e/). Playwright config ([pla
 
 ## Backend ([backend/](backend/))
 
-Express 4 + `node:sqlite` (built-in, requires Node ≥ 22.5) + bcryptjs + nodemailer. CORS is locked to Vite dev origins with credentials enabled so frontend `fetch(..., { credentials: "include" })` works.
+Express 4 + Supabase Postgres (via the `pg` driver) + bcryptjs + nodemailer. CORS is locked to Vite dev origins with credentials enabled so frontend `fetch(..., { credentials: "include" })` works.
 
 - [src/index.js](backend/src/index.js) — entry point, port 3000 (override with `PORT`), mounts routers.
-- [src/auth.js](backend/src/auth.js) — `/api/signup`, `/api/login`, `/api/logout`, `/api/me`, `/api/find-username`, `/api/forgot-password`. Cookie session (`sid`), bcrypt password hashing.
+- [src/auth.js](backend/src/auth.js) — `/api/signup`, `/api/login`, `/api/logout`, `/api/me`, `/api/find-username`, `/api/forgot-password`, `/api/signup/send-code`, `/api/signup/verify-code`. Cookie session (`sid`), bcrypt password hashing. Email auth codes stored as sha256 hashes with attempt cap + 60s resend cooldown.
 - [src/test.js](backend/src/test.js) — `/api/test/progress`, `/api/test/answer`, `/api/test/state`, `/api/test/email-sample`.
 - [src/avatar.js](backend/src/avatar.js) — `/api/avatar/*`.
-- [src/db.js](backend/src/db.js) — SQLite init + schema migrations. DB at `backend/data/app.db`, created on first run. WAL mode, foreign keys on.
+- [src/db.js](backend/src/db.js) — `pg.Pool` against Supabase. Exports `stmts` (async; preserves the SQLite-style `.get`/`.all`/`.run` shape) and `withTx(fn)` for transactions. Schema lives in Supabase migrations, not in this file. Requires `DATABASE_URL` in `backend/.env` — see [backend/README.md](backend/README.md) for setup. Note: uploaded lecture media files still live on the local backend's disk under `backend/uploads/`; only metadata syncs through Postgres.
 - [src/mailer.js](backend/src/mailer.js) — nodemailer wrapper. Falls back to console-log when SMTP env vars are empty.
 
 Env in [backend/.env](backend/.env) (copy from `.env.example`):
@@ -89,8 +89,12 @@ Env in [backend/.env](backend/.env) (copy from `.env.example`):
 ```
 PORT=3000
 SESSION_SECRET=change-me-in-production
+DATABASE_URL=postgresql://postgres.<project-ref>:<password>@aws-0-<region>.pooler.supabase.com:6543/postgres
 SMTP_HOST= SMTP_PORT=587 SMTP_USER= SMTP_PASS= SMTP_FROM="…"
 ```
+
+`DATABASE_URL` is required — get the Transaction Pooler URI from
+Supabase Dashboard → Project Settings → Database → Connection string.
 
 See [backend/README.md](backend/README.md) for the full endpoint table and curl examples.
 

@@ -1,421 +1,397 @@
-// SQLite initialization and schema migrations.
-// Uses Node's built-in `node:sqlite` (stable since Node 22.5) — no native build,
-// no Python toolchain required. The exposed `stmts` shape matches a
-// better-sqlite3-style call site (`.run`, `.get`, `.all`).
+// Postgres (Supabase) data layer.
+//
+// Replaces the previous local SQLite implementation so that user accounts and
+// data sync across machines: any backend instance pointed at the same
+// DATABASE_URL sees the same rows.
+//
+// The exported `stmts` object preserves the call shape the rest of the codebase
+// already uses (`.get(...)`, `.all(...)`, `.run(...)`), but every method is now
+// async — callers must `await` them. `run()` returns `{ changes, lastInsertRowid }`
+// so existing call sites that read `result.lastInsertRowid` keep working.
+//
+// For multi-statement atomicity (e.g. learn.js's submit flow), use `withTx`:
+//
+//     const result = await withTx(async (tx) => {
+//       await tx.insertLessonAttempt.run(...);
+//       const cur = await tx.getLessonStatus.get(...);
+//       ...
+//     });
 
-import { DatabaseSync } from "node:sqlite";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import fs from "node:fs";
+import "dotenv/config";
+import pg from "pg";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { Pool } = pg;
 
-const DATA_DIR = path.resolve(__dirname, "..", "data");
-if (!fs.existsSync(DATA_DIR)) {
-  fs.mkdirSync(DATA_DIR, { recursive: true });
+const DATABASE_URL = process.env.DATABASE_URL;
+if (!DATABASE_URL) {
+  throw new Error(
+    "DATABASE_URL is not set. Copy your Supabase Postgres connection string " +
+      "(Supabase Dashboard → Project Settings → Database → Connection string → URI) " +
+      "into backend/.env as DATABASE_URL=postgresql://..."
+  );
 }
 
-const DB_PATH = path.join(DATA_DIR, "app.db");
+// Supabase requires TLS. The default node-postgres SSL handshake against
+// Supabase succeeds with this minimal config.
+export const pool = new Pool({
+  connectionString: DATABASE_URL,
+  ssl: { rejectUnauthorized: false },
+  max: 10,
+});
 
-export const db = new DatabaseSync(DB_PATH);
-db.exec("PRAGMA journal_mode = WAL");
-db.exec("PRAGMA foreign_keys = ON");
+pool.on("error", (err) => {
+  console.error("[pg pool error]", err);
+});
 
-// --- Schema -----------------------------------------------------------------
-db.exec(`
-  CREATE TABLE IF NOT EXISTS users (
-    id            INTEGER PRIMARY KEY AUTOINCREMENT,
-    username      TEXT UNIQUE NOT NULL,
-    email         TEXT NOT NULL,
-    password_hash TEXT NOT NULL,
-    is_admin      INTEGER NOT NULL DEFAULT 0,
-    is_suspended  INTEGER NOT NULL DEFAULT 0,
-    created_at    DATETIME DEFAULT CURRENT_TIMESTAMP
-  );
+// ---------------------------------------------------------------------------
+// Statement factory
+// ---------------------------------------------------------------------------
+// `querier` is either the Pool (default) or a per-transaction Client. Both
+// expose .query(text, params); building stmts against the right object lets
+// transactions share a single connection.
+function makeStmt(querier, text) {
+  return {
+    text,
+    async get(...args) {
+      const res = await querier.query(text, args);
+      return res.rows[0] ?? null;
+    },
+    async all(...args) {
+      const res = await querier.query(text, args);
+      return res.rows;
+    },
+    async run(...args) {
+      const res = await querier.query(text, args);
+      // For INSERT…RETURNING id, expose the new id under the SQLite-style key.
+      const lastInsertRowid = res.rows?.[0]?.id ?? null;
+      return { changes: res.rowCount ?? 0, lastInsertRowid };
+    },
+  };
+}
 
-  CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+function buildStmts(q) {
+  return {
+    // --- users ---------------------------------------------------------------
+    insertUser: makeStmt(
+      q,
+      "INSERT INTO users (username, email, password_hash) VALUES ($1, $2, $3) RETURNING id"
+    ),
+    findUserByUsername: makeStmt(q, "SELECT * FROM users WHERE username = $1"),
+    findUserByEmail: makeStmt(q, "SELECT * FROM users WHERE email = $1"),
+    findUserByEmailAndUsername: makeStmt(
+      q,
+      "SELECT * FROM users WHERE email = $1 AND username = $2"
+    ),
+    findUserById: makeStmt(
+      q,
+      "SELECT id, username, email, is_admin, is_suspended, created_at FROM users WHERE id = $1"
+    ),
+    updatePasswordHash: makeStmt(
+      q,
+      "UPDATE users SET password_hash = $1 WHERE id = $2"
+    ),
 
-  CREATE TABLE IF NOT EXISTS sessions (
-    token       TEXT PRIMARY KEY,
-    user_id     INTEGER NOT NULL,
-    created_at  DATETIME DEFAULT CURRENT_TIMESTAMP,
-    expires_at  DATETIME NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-  );
+    // --- sessions ------------------------------------------------------------
+    insertSession: makeStmt(
+      q,
+      "INSERT INTO sessions (token, user_id, expires_at) VALUES ($1, $2, $3)"
+    ),
+    findSession: makeStmt(
+      q,
+      `SELECT s.token AS token, s.user_id AS user_id, s.expires_at AS expires_at,
+              u.username AS username, u.email AS email,
+              u.is_admin AS is_admin, u.is_suspended AS is_suspended
+         FROM sessions s
+         JOIN users u ON u.id = s.user_id
+        WHERE s.token = $1`
+    ),
+    deleteSessionsForUser: makeStmt(q, "DELETE FROM sessions WHERE user_id = $1"),
+    deleteSession: makeStmt(q, "DELETE FROM sessions WHERE token = $1"),
+    deleteExpiredSessions: makeStmt(
+      q,
+      "DELETE FROM sessions WHERE expires_at < now()"
+    ),
 
-  CREATE INDEX IF NOT EXISTS idx_sessions_user ON sessions(user_id);
+    // --- test progress -------------------------------------------------------
+    upsertProgress: makeStmt(
+      q,
+      `INSERT INTO test_progress (user_id, current, total, updated_at)
+       VALUES ($1, $2, $3, now())
+       ON CONFLICT (user_id) DO UPDATE SET
+         current = EXCLUDED.current,
+         total = EXCLUDED.total,
+         updated_at = now()`
+    ),
+    getProgress: makeStmt(
+      q,
+      "SELECT current, total, updated_at FROM test_progress WHERE user_id = $1"
+    ),
 
-  CREATE TABLE IF NOT EXISTS test_progress (
-    user_id    INTEGER PRIMARY KEY,
-    current    INTEGER NOT NULL DEFAULT 0,
-    total      INTEGER NOT NULL DEFAULT 0,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-  );
+    // --- test answers --------------------------------------------------------
+    insertAnswer: makeStmt(
+      q,
+      "INSERT INTO test_answers (user_id, problem_id, code, verdict) VALUES ($1, $2, $3, $4) RETURNING id"
+    ),
+    listAnswers: makeStmt(
+      q,
+      `SELECT id, problem_id, code, verdict, submitted_at
+         FROM test_answers
+        WHERE user_id = $1
+        ORDER BY submitted_at DESC`
+    ),
 
-  CREATE TABLE IF NOT EXISTS test_answers (
-    id          INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id     INTEGER NOT NULL,
-    problem_id  TEXT NOT NULL,
-    code        TEXT NOT NULL,
-    verdict     TEXT,
-    submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-  );
+    // --- email samples -------------------------------------------------------
+    insertEmailSample: makeStmt(
+      q,
+      "INSERT INTO email_samples (email, user_id) VALUES ($1, $2) RETURNING id"
+    ),
 
-  CREATE INDEX IF NOT EXISTS idx_answers_user ON test_answers(user_id);
+    // --- avatars -------------------------------------------------------------
+    getAvatar: makeStmt(
+      q,
+      "SELECT config, updated_at FROM avatars WHERE user_id = $1"
+    ),
+    upsertAvatar: makeStmt(
+      q,
+      `INSERT INTO avatars (user_id, config, updated_at)
+       VALUES ($1, $2, now())
+       ON CONFLICT (user_id) DO UPDATE SET
+         config = EXCLUDED.config,
+         updated_at = now()`
+    ),
 
-  CREATE TABLE IF NOT EXISTS email_samples (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    email      TEXT NOT NULL,
-    user_id    INTEGER,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-  );
+    // --- surveys -------------------------------------------------------------
+    getSurvey: makeStmt(
+      q,
+      `SELECT interest, level, "time" AS time, updated_at
+         FROM surveys WHERE user_id = $1`
+    ),
+    upsertSurvey: makeStmt(
+      q,
+      `INSERT INTO surveys (user_id, interest, level, "time", updated_at)
+       VALUES ($1, $2, $3, $4, now())
+       ON CONFLICT (user_id) DO UPDATE SET
+         interest = EXCLUDED.interest,
+         level = EXCLUDED.level,
+         "time" = EXCLUDED."time",
+         updated_at = now()`
+    ),
 
-  CREATE TABLE IF NOT EXISTS avatars (
-    user_id    INTEGER PRIMARY KEY,
-    config     TEXT NOT NULL,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-  );
+    // --- lectures ------------------------------------------------------------
+    insertLecture: makeStmt(
+      q,
+      `INSERT INTO lectures
+         (user_id, title, description, source_type, source, thumbnail, category)
+       VALUES ($1, $2, $3, $4, $5, $6, $7)
+       RETURNING id`
+    ),
+    listLectures: makeStmt(
+      q,
+      `SELECT l.id, l.title, l.description, l.source_type, l.source,
+              l.thumbnail, l.view_count, l.category,
+              l.created_at, l.user_id, u.username AS uploader
+         FROM lectures l
+         JOIN users u ON u.id = l.user_id
+        WHERE u.is_suspended = 0
+        ORDER BY l.created_at DESC`
+    ),
+    listLecturesByCategory: makeStmt(
+      q,
+      `SELECT l.id, l.title, l.description, l.source_type, l.source,
+              l.thumbnail, l.view_count, l.category,
+              l.created_at, l.user_id, u.username AS uploader
+         FROM lectures l
+         JOIN users u ON u.id = l.user_id
+        WHERE l.category = $1 AND u.is_suspended = 0
+        ORDER BY l.created_at DESC`
+    ),
+    findLecture: makeStmt(
+      q,
+      `SELECT l.id, l.title, l.description, l.source_type, l.source,
+              l.thumbnail, l.view_count, l.category,
+              l.created_at, l.user_id, u.username AS uploader,
+              u.is_suspended AS uploader_suspended
+         FROM lectures l
+         JOIN users u ON u.id = l.user_id
+        WHERE l.id = $1`
+    ),
+    deleteLecture: makeStmt(
+      q,
+      "DELETE FROM lectures WHERE id = $1 AND user_id = $2"
+    ),
+    incrementLectureView: makeStmt(
+      q,
+      "UPDATE lectures SET view_count = view_count + 1 WHERE id = $1"
+    ),
+    getLectureViewCount: makeStmt(
+      q,
+      "SELECT view_count FROM lectures WHERE id = $1"
+    ),
 
-  CREATE TABLE IF NOT EXISTS lectures (
-    id           INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id      INTEGER NOT NULL,
-    title        TEXT NOT NULL,
-    description  TEXT NOT NULL DEFAULT '',
-    source_type  TEXT NOT NULL CHECK (source_type IN ('url', 'file')),
-    source       TEXT NOT NULL,
-    thumbnail    TEXT,
-    view_count   INTEGER NOT NULL DEFAULT 0,
-    category     TEXT NOT NULL DEFAULT 'other',
-    created_at   DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-  );
+    // --- admin ---------------------------------------------------------------
+    listAllUsers: makeStmt(
+      q,
+      `SELECT u.id, u.username, u.email, u.is_admin, u.is_suspended, u.created_at,
+              (SELECT COUNT(*) FROM lectures l WHERE l.user_id = u.id) AS lecture_count
+         FROM users u
+         ORDER BY u.created_at DESC`
+    ),
+    setUserSuspended: makeStmt(
+      q,
+      "UPDATE users SET is_suspended = $1 WHERE id = $2"
+    ),
+    listAllLectures: makeStmt(
+      q,
+      `SELECT l.id, l.title, l.description, l.source_type, l.source,
+              l.thumbnail, l.view_count, l.category,
+              l.created_at, l.user_id,
+              u.username AS uploader, u.is_suspended AS uploader_suspended
+         FROM lectures l
+         JOIN users u ON u.id = l.user_id
+         ORDER BY l.created_at DESC`
+    ),
+    adminDeleteLecture: makeStmt(q, "DELETE FROM lectures WHERE id = $1"),
 
-  CREATE INDEX IF NOT EXISTS idx_lectures_created ON lectures(created_at DESC);
-  -- idx_lectures_category is created AFTER the column-migration block below.
-  -- Creating it here would crash on legacy databases whose lectures table
-  -- pre-dates the category column (CREATE TABLE IF NOT EXISTS is a no-op
-  -- on existing tables, so the column would not exist yet at this point).
+    // --- email auth codes ----------------------------------------------------
+    // Codes are stored hashed (sha256) so a DB leak doesn't reveal active codes.
+    // `attempts` is bumped on every failed verify to cap brute-force tries.
+    insertEmailAuthCode: makeStmt(
+      q,
+      `INSERT INTO email_auth_codes (email, code_hash, expires_at)
+       VALUES ($1, $2, $3) RETURNING id`
+    ),
+    // Latest active (non-expired) code for an email, used by verify.
+    findLatestEmailAuthCode: makeStmt(
+      q,
+      `SELECT id, email, code_hash, attempts, created_at, expires_at
+         FROM email_auth_codes
+        WHERE email = $1 AND expires_at > now()
+        ORDER BY created_at DESC
+        LIMIT 1`
+    ),
+    // Most-recent code regardless of expiry, used by send-code to enforce
+    // a per-email resend cooldown.
+    findMostRecentEmailAuthCode: makeStmt(
+      q,
+      `SELECT created_at
+         FROM email_auth_codes
+        WHERE email = $1
+        ORDER BY created_at DESC
+        LIMIT 1`
+    ),
+    incrementEmailAuthCodeAttempts: makeStmt(
+      q,
+      "UPDATE email_auth_codes SET attempts = attempts + 1 WHERE id = $1"
+    ),
+    deleteEmailAuthCodeById: makeStmt(
+      q,
+      "DELETE FROM email_auth_codes WHERE id = $1"
+    ),
+    deleteEmailAuthCodesForEmail: makeStmt(
+      q,
+      "DELETE FROM email_auth_codes WHERE email = $1"
+    ),
+    deleteExpiredEmailAuthCodes: makeStmt(
+      q,
+      "DELETE FROM email_auth_codes WHERE expires_at < now()"
+    ),
 
-  CREATE TABLE IF NOT EXISTS surveys (
-    user_id    INTEGER PRIMARY KEY,
-    interest   TEXT NOT NULL,
-    level      TEXT NOT NULL,
-    time       TEXT NOT NULL,
-    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-  );
+    // --- learn: lesson progress ---------------------------------------------
+    getLessonProgress: makeStmt(
+      q,
+      "SELECT lesson_id, status, completed_at FROM lesson_progress WHERE user_id = $1"
+    ),
+    getLessonStatus: makeStmt(
+      q,
+      "SELECT status, completed_at FROM lesson_progress WHERE user_id = $1 AND lesson_id = $2"
+    ),
+    upsertLessonProgress: makeStmt(
+      q,
+      `INSERT INTO lesson_progress (user_id, lesson_id, status, completed_at)
+       VALUES ($1, $2, $3, now())
+       ON CONFLICT (user_id, lesson_id) DO UPDATE SET
+         status = EXCLUDED.status,
+         completed_at = CASE
+           WHEN EXCLUDED.status = 'done'
+             THEN COALESCE(lesson_progress.completed_at, now())
+           ELSE lesson_progress.completed_at
+         END`
+    ),
 
-  CREATE TABLE IF NOT EXISTS email_auth_codes (
-    id         INTEGER PRIMARY KEY AUTOINCREMENT,
-    email      TEXT NOT NULL,
-    code       TEXT NOT NULL,
-    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    expires_at DATETIME NOT NULL
-  );
+    // --- learn: lesson attempts ---------------------------------------------
+    insertLessonAttempt: makeStmt(
+      q,
+      `INSERT INTO lesson_attempts (user_id, lesson_id, problem_id, code, verdict, ungraded)
+       VALUES ($1, $2, $3, $4, $5, $6) RETURNING id`
+    ),
+    // SQLite's "GROUP BY problem_id HAVING submitted_at = MAX(submitted_at)"
+    // is invalid in standard SQL; use DISTINCT ON to get the latest row per
+    // problem_id deterministically.
+    listLatestGradedVerdicts: makeStmt(
+      q,
+      `SELECT DISTINCT ON (problem_id) problem_id, verdict
+         FROM lesson_attempts
+        WHERE user_id = $1 AND lesson_id = $2 AND ungraded = 0
+        ORDER BY problem_id, submitted_at DESC`
+    ),
+  };
+}
 
-  CREATE INDEX IF NOT EXISTS idx_email_auth_codes_email ON email_auth_codes(email);
+// Default statement set bound to the connection pool.
+export const stmts = buildStmts(pool);
 
-  CREATE TABLE IF NOT EXISTS lesson_progress (
-    user_id      INTEGER NOT NULL,
-    lesson_id    TEXT    NOT NULL,
-    status       TEXT    NOT NULL CHECK (status IN ('locked','in_progress','done')),
-    completed_at DATETIME,
-    PRIMARY KEY (user_id, lesson_id),
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_lesson_progress_user ON lesson_progress(user_id);
-
-  CREATE TABLE IF NOT EXISTS lesson_attempts (
-    id           INTEGER PRIMARY KEY AUTOINCREMENT,
-    user_id      INTEGER NOT NULL,
-    lesson_id    TEXT    NOT NULL,
-    problem_id   TEXT    NOT NULL,
-    code         TEXT    NOT NULL,
-    verdict      TEXT    NOT NULL,
-    ungraded     INTEGER NOT NULL DEFAULT 0,
-    submitted_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-  );
-
-  CREATE INDEX IF NOT EXISTS idx_lesson_attempts_user_lesson
-    ON lesson_attempts(user_id, lesson_id);
-`);
-
-// --- Lightweight column migrations -----------------------------------------
-// SQLite has no IF NOT EXISTS for ADD COLUMN, so we try each one and swallow
-// the "duplicate column name" failure. This keeps existing app.db files in
-// sync with the schema above without dropping data.
-const lectureColumnMigrations = [
-  "ALTER TABLE lectures ADD COLUMN thumbnail TEXT",
-  "ALTER TABLE lectures ADD COLUMN view_count INTEGER NOT NULL DEFAULT 0",
-  "ALTER TABLE lectures ADD COLUMN category TEXT NOT NULL DEFAULT 'other'",
-];
-for (const sql of lectureColumnMigrations) {
+/**
+ * Run `fn` inside a Postgres transaction. The argument passed to `fn` is a
+ * stmts-shaped object bound to the dedicated transaction client, so all
+ * statements executed via it share one connection and one BEGIN…COMMIT.
+ *
+ *     const status = await withTx(async (tx) => {
+ *       await tx.insertLessonAttempt.run(...);
+ *       const cur = await tx.getLessonStatus.get(...);
+ *       ...
+ *       return computedStatus;
+ *     });
+ */
+export async function withTx(fn) {
+  const client = await pool.connect();
   try {
-    db.exec(sql);
+    await client.query("BEGIN");
+    const txStmts = buildStmts(client);
+    const result = await fn(txStmts);
+    await client.query("COMMIT");
+    return result;
   } catch (err) {
-    // Ignore "duplicate column name: …" — that means the migration already ran.
-    if (!/duplicate column name/i.test(err?.message ?? "")) {
-      throw err;
+    try {
+      await client.query("ROLLBACK");
+    } catch {
+      // ignore rollback errors; surface the original
     }
+    throw err;
+  } finally {
+    client.release();
   }
 }
-// Fail loudly if a migration silently no-op'd — otherwise the issue surfaces
-// later as an opaque "no such column" during a prepared-statement compile.
-const lectureCols = new Set(
-  db.prepare("PRAGMA table_info(lectures)").all().map((c) => c.name)
-);
-const expectedLectureCols = ["thumbnail", "view_count", "category"];
-const missing = expectedLectureCols.filter((c) => !lectureCols.has(c));
-if (missing.length) {
-  throw new Error(
-    `lectures table is missing expected columns: ${missing.join(", ")}. ` +
-      `Migrations may have failed silently — inspect backend/data/app.db.`
-  );
-}
 
-// Now that we know `category` exists, create its index.
-db.exec("CREATE INDEX IF NOT EXISTS idx_lectures_category ON lectures(category)");
-
-// Same idempotent ADD COLUMN dance for the users table. Adds admin/suspension
-// flags to databases that pre-date the admin feature.
-const userColumnMigrations = [
-  "ALTER TABLE users ADD COLUMN is_admin INTEGER NOT NULL DEFAULT 0",
-  "ALTER TABLE users ADD COLUMN is_suspended INTEGER NOT NULL DEFAULT 0",
-];
-for (const sql of userColumnMigrations) {
+// One-shot connectivity check + housekeeping at startup. Logs a clear hint if
+// the connection string is wrong so the dev knows what to fix.
+(async () => {
   try {
-    db.exec(sql);
+    await stmts.deleteExpiredSessions.run();
+    await stmts.deleteExpiredEmailAuthCodes.run();
+    console.log("[db] connected to Postgres, expired sessions/codes cleaned");
   } catch (err) {
-    if (!/duplicate column name/i.test(err?.message ?? "")) {
-      throw err;
-    }
+    console.error(
+      "[db] failed to connect to Postgres. Check DATABASE_URL in backend/.env.\n" +
+        "    Underlying error:",
+      err?.message ?? err
+    );
   }
-}
-const userCols = new Set(
-  db.prepare("PRAGMA table_info(users)").all().map((c) => c.name)
-);
-const expectedUserCols = ["is_admin", "is_suspended"];
-const missingUserCols = expectedUserCols.filter((c) => !userCols.has(c));
-if (missingUserCols.length) {
-  throw new Error(
-    `users table is missing expected columns: ${missingUserCols.join(", ")}. ` +
-      `Migrations may have failed silently — inspect backend/data/app.db.`
-  );
-}
-
-// --- Prepared statements ----------------------------------------------------
-export const stmts = {
-  // users
-  insertUser: db.prepare(
-    "INSERT INTO users (username, email, password_hash) VALUES (?, ?, ?)"
-  ),
-  findUserByUsername: db.prepare("SELECT * FROM users WHERE username = ?"),
-  findUserByEmail: db.prepare("SELECT * FROM users WHERE email = ?"),
-  findUserByEmailAndUsername: db.prepare(
-    "SELECT * FROM users WHERE email = ? AND username = ?"
-  ),
-  findUserById: db.prepare(
-    "SELECT id, username, email, is_admin, is_suspended, created_at FROM users WHERE id = ?"
-  ),
-  updatePasswordHash: db.prepare(
-    "UPDATE users SET password_hash = ? WHERE id = ?"
-  ),
-
-  // sessions
-  insertSession: db.prepare(
-    "INSERT INTO sessions (token, user_id, expires_at) VALUES (?, ?, ?)"
-  ),
-  findSession: db.prepare(
-    "SELECT s.token AS token, s.user_id AS user_id, s.expires_at AS expires_at, " +
-      "u.username AS username, u.email AS email, " +
-      "u.is_admin AS is_admin, u.is_suspended AS is_suspended " +
-      "FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ?"
-  ),
-  deleteSessionsForUser: db.prepare("DELETE FROM sessions WHERE user_id = ?"),
-  deleteSession: db.prepare("DELETE FROM sessions WHERE token = ?"),
-  deleteExpiredSessions: db.prepare(
-    "DELETE FROM sessions WHERE expires_at < CURRENT_TIMESTAMP"
-  ),
-
-  // test progress
-  upsertProgress: db.prepare(
-    `INSERT INTO test_progress (user_id, current, total, updated_at)
-     VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-     ON CONFLICT(user_id) DO UPDATE SET
-       current = excluded.current,
-       total = excluded.total,
-       updated_at = CURRENT_TIMESTAMP`
-  ),
-  getProgress: db.prepare(
-    "SELECT current, total, updated_at FROM test_progress WHERE user_id = ?"
-  ),
-
-  // test answers
-  insertAnswer: db.prepare(
-    "INSERT INTO test_answers (user_id, problem_id, code, verdict) VALUES (?, ?, ?, ?)"
-  ),
-  listAnswers: db.prepare(
-    "SELECT id, problem_id, code, verdict, submitted_at FROM test_answers " +
-      "WHERE user_id = ? ORDER BY submitted_at DESC"
-  ),
-
-  // email samples
-  insertEmailSample: db.prepare(
-    "INSERT INTO email_samples (email, user_id) VALUES (?, ?)"
-  ),
-
-  // avatars
-  getAvatar: db.prepare(
-    "SELECT config, updated_at FROM avatars WHERE user_id = ?"
-  ),
-  upsertAvatar: db.prepare(
-    `INSERT INTO avatars (user_id, config, updated_at)
-     VALUES (?, ?, CURRENT_TIMESTAMP)
-     ON CONFLICT(user_id) DO UPDATE SET
-       config = excluded.config,
-       updated_at = CURRENT_TIMESTAMP`
-  ),
-
-  // surveys (one row per user; latest write wins via upsert)
-  getSurvey: db.prepare(
-    "SELECT interest, level, time, updated_at FROM surveys WHERE user_id = ?"
-  ),
-  upsertSurvey: db.prepare(
-    `INSERT INTO surveys (user_id, interest, level, time, updated_at)
-     VALUES (?, ?, ?, ?, CURRENT_TIMESTAMP)
-     ON CONFLICT(user_id) DO UPDATE SET
-       interest = excluded.interest,
-       level = excluded.level,
-       time = excluded.time,
-       updated_at = CURRENT_TIMESTAMP`
-  ),
-
-  // lectures
-  insertLecture: db.prepare(
-    `INSERT INTO lectures
-       (user_id, title, description, source_type, source, thumbnail, category)
-     VALUES (?, ?, ?, ?, ?, ?, ?)`
-  ),
-  // Public listings exclude lectures uploaded by suspended users. Admin views
-  // use listAllLectures below to see everything (including suspended).
-  listLectures: db.prepare(
-    `SELECT l.id, l.title, l.description, l.source_type, l.source,
-            l.thumbnail, l.view_count, l.category,
-            l.created_at, l.user_id, u.username AS uploader
-       FROM lectures l
-       JOIN users u ON u.id = l.user_id
-       WHERE u.is_suspended = 0
-       ORDER BY l.created_at DESC`
-  ),
-  listLecturesByCategory: db.prepare(
-    `SELECT l.id, l.title, l.description, l.source_type, l.source,
-            l.thumbnail, l.view_count, l.category,
-            l.created_at, l.user_id, u.username AS uploader
-       FROM lectures l
-       JOIN users u ON u.id = l.user_id
-       WHERE l.category = ? AND u.is_suspended = 0
-       ORDER BY l.created_at DESC`
-  ),
-  findLecture: db.prepare(
-    `SELECT l.id, l.title, l.description, l.source_type, l.source,
-            l.thumbnail, l.view_count, l.category,
-            l.created_at, l.user_id, u.username AS uploader,
-            u.is_suspended AS uploader_suspended
-       FROM lectures l
-       JOIN users u ON u.id = l.user_id
-       WHERE l.id = ?`
-  ),
-  deleteLecture: db.prepare("DELETE FROM lectures WHERE id = ? AND user_id = ?"),
-  incrementLectureView: db.prepare(
-    "UPDATE lectures SET view_count = view_count + 1 WHERE id = ?"
-  ),
-  getLectureViewCount: db.prepare(
-    "SELECT view_count FROM lectures WHERE id = ?"
-  ),
-
-  // admin: user management
-  listAllUsers: db.prepare(
-    `SELECT u.id, u.username, u.email, u.is_admin, u.is_suspended, u.created_at,
-            (SELECT COUNT(*) FROM lectures l WHERE l.user_id = u.id) AS lecture_count
-       FROM users u
-       ORDER BY u.created_at DESC`
-  ),
-  setUserSuspended: db.prepare(
-    "UPDATE users SET is_suspended = ? WHERE id = ?"
-  ),
-
-  // admin: lecture management (includes lectures from suspended users)
-  listAllLectures: db.prepare(
-    `SELECT l.id, l.title, l.description, l.source_type, l.source,
-            l.thumbnail, l.view_count, l.category,
-            l.created_at, l.user_id,
-            u.username AS uploader, u.is_suspended AS uploader_suspended
-       FROM lectures l
-       JOIN users u ON u.id = l.user_id
-       ORDER BY l.created_at DESC`
-  ),
-  adminDeleteLecture: db.prepare("DELETE FROM lectures WHERE id = ?"),
-
-  // email auth codes
-  insertEmailAuthCode: db.prepare(
-    "INSERT INTO email_auth_codes (email, code, expires_at) VALUES (?, ?, ?)"
-  ),
-  findEmailAuthCode: db.prepare(
-    "SELECT * FROM email_auth_codes WHERE email = ? AND code = ? AND expires_at > CURRENT_TIMESTAMP"
-  ),
-  deleteEmailAuthCode: db.prepare(
-    "DELETE FROM email_auth_codes WHERE email = ? AND code = ?"
-  ),
-
-  // learn: lesson progress
-  getLessonProgress: db.prepare(
-    "SELECT lesson_id, status, completed_at FROM lesson_progress WHERE user_id = ?"
-  ),
-  getLessonStatus: db.prepare(
-    "SELECT status, completed_at FROM lesson_progress WHERE user_id = ? AND lesson_id = ?"
-  ),
-  upsertLessonProgress: db.prepare(
-    `INSERT INTO lesson_progress (user_id, lesson_id, status, completed_at)
-     VALUES (?, ?, ?, CURRENT_TIMESTAMP)
-     ON CONFLICT(user_id, lesson_id) DO UPDATE SET
-       status = excluded.status,
-       completed_at = CASE
-         WHEN excluded.status = 'done' THEN COALESCE(lesson_progress.completed_at, CURRENT_TIMESTAMP)
-         ELSE lesson_progress.completed_at
-       END`
-  ),
-
-  // learn: lesson attempts
-  insertLessonAttempt: db.prepare(
-    `INSERT INTO lesson_attempts (user_id, lesson_id, problem_id, code, verdict, ungraded)
-     VALUES (?, ?, ?, ?, ?, ?)`
-  ),
-  // Latest non-ungraded verdict per problem within a lesson, used to detect
-  // when the lesson should flip to 'done'. Mock attempts (ungraded=1) are
-  // ignored so they never grant credit.
-  listLatestGradedVerdicts: db.prepare(
-    `SELECT problem_id, verdict
-       FROM lesson_attempts
-      WHERE user_id = ? AND lesson_id = ? AND ungraded = 0
-      GROUP BY problem_id
-      HAVING submitted_at = MAX(submitted_at)`
-  ),
-};
-
-// Light periodic cleanup: nuke expired sessions on startup.
-stmts.deleteExpiredSessions.run();
+})();
 
 export function publicUser(row) {
   if (!row) return null;
   return {
-    id: row.id,
+    id: Number(row.id),
     username: row.username,
     email: row.email,
     is_admin: row.is_admin ? 1 : 0,

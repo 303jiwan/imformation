@@ -1,19 +1,40 @@
 # Codenergy Backend
 
 Auth + coding-test API for the Codenergy frontend.
-Express 4 + better-sqlite3 + bcryptjs + nodemailer. No framework on top.
+Express 4 + Supabase Postgres (via `pg`) + bcryptjs + nodemailer. No framework on top.
 
 ## Quick start
 
 ```powershell
 cd backend
 npm install
-copy .env.example .env   # optional — defaults are fine for dev
+copy .env.example .env
+# then edit .env and paste your Supabase DATABASE_URL (see below)
 npm run dev              # node --watch src/index.js
 ```
 
 Server listens on **http://localhost:3000** (the frontend's `API_BASE`).
-SQLite database is created on first run at `backend/data/app.db`.
+
+### Connecting to Supabase
+
+User accounts and per-user data live in Supabase Postgres so they sync across
+machines. To wire up a backend instance:
+
+1. Open Supabase Dashboard → your project → **Project Settings → Database →
+   Connection string → URI**.
+2. Copy the **Transaction Pooler** URI (port 6543). Replace `[YOUR-PASSWORD]`
+   with your database password. If you forgot it, click *Reset database
+   password* on the same page.
+3. Paste it into `backend/.env` as `DATABASE_URL=postgresql://...`.
+
+The same `DATABASE_URL` on every machine = same user table = same login from
+anywhere. The schema is managed by SQL migrations applied to the Supabase
+project; new tables/columns ship as separate migrations rather than runtime
+`CREATE TABLE` calls.
+
+Uploaded lecture files (videos, thumbnails) are still stored on the local
+machine's disk under `backend/uploads/`; only the metadata syncs. Migrating
+files to Supabase Storage is a separate follow-up.
 
 ## Endpoints
 

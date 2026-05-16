@@ -49,63 +49,83 @@ function publicAdminLecture(row) {
 }
 
 // GET /api/admin/users — list every user with their lecture count and flags.
-adminRouter.get("/users", requireAdmin, (_req, res) => {
-  const rows = stmts.listAllUsers.all();
-  res.json({ users: rows.map(publicAdminUser) });
+adminRouter.get("/users", requireAdmin, async (_req, res, next) => {
+  try {
+    const rows = await stmts.listAllUsers.all();
+    res.json({ users: rows.map(publicAdminUser) });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // POST /api/admin/users/:id/suspend — set is_suspended=1 and drop the user's
 // active sessions so they're kicked out immediately.
-adminRouter.post("/users/:id/suspend", requireAdmin, (req, res) => {
-  const id = Number.parseInt(req.params.id, 10);
-  if (!Number.isInteger(id)) {
-    return res.status(400).json({ error: "invalid id" });
+adminRouter.post("/users/:id/suspend", requireAdmin, async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id, 10);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ error: "invalid id" });
+    }
+    if (id === req.user.id) {
+      return res.status(400).json({ error: "본인 계정은 정지할 수 없습니다." });
+    }
+    const target = await stmts.findUserById.get(id);
+    if (!target) return res.status(404).json({ error: "user not found" });
+    await stmts.setUserSuspended.run(1, id);
+    await stmts.deleteSessionsForUser.run(id);
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
   }
-  if (id === req.user.id) {
-    return res.status(400).json({ error: "본인 계정은 정지할 수 없습니다." });
-  }
-  const target = stmts.findUserById.get(id);
-  if (!target) return res.status(404).json({ error: "user not found" });
-  stmts.setUserSuspended.run(1, id);
-  stmts.deleteSessionsForUser.run(id);
-  res.json({ ok: true });
 });
 
 // POST /api/admin/users/:id/unsuspend — clear is_suspended.
-adminRouter.post("/users/:id/unsuspend", requireAdmin, (req, res) => {
-  const id = Number.parseInt(req.params.id, 10);
-  if (!Number.isInteger(id)) {
-    return res.status(400).json({ error: "invalid id" });
+adminRouter.post("/users/:id/unsuspend", requireAdmin, async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id, 10);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ error: "invalid id" });
+    }
+    const target = await stmts.findUserById.get(id);
+    if (!target) return res.status(404).json({ error: "user not found" });
+    await stmts.setUserSuspended.run(0, id);
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
   }
-  const target = stmts.findUserById.get(id);
-  if (!target) return res.status(404).json({ error: "user not found" });
-  stmts.setUserSuspended.run(0, id);
-  res.json({ ok: true });
 });
 
 // GET /api/admin/lectures — every lecture, including those from suspended
 // uploaders (the public /api/lectures filters those out).
-adminRouter.get("/lectures", requireAdmin, (_req, res) => {
-  const rows = stmts.listAllLectures.all();
-  res.json({ lectures: rows.map(publicAdminLecture) });
+adminRouter.get("/lectures", requireAdmin, async (_req, res, next) => {
+  try {
+    const rows = await stmts.listAllLectures.all();
+    res.json({ lectures: rows.map(publicAdminLecture) });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // DELETE /api/admin/lectures/:id — admin can remove anyone's lecture.
 // Also cleans up the underlying video and thumbnail files on disk so we
 // don't accumulate orphan uploads.
-adminRouter.delete("/lectures/:id", requireAdmin, (req, res) => {
-  const id = Number.parseInt(req.params.id, 10);
-  if (!Number.isInteger(id)) {
-    return res.status(400).json({ error: "invalid id" });
+adminRouter.delete("/lectures/:id", requireAdmin, async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id, 10);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ error: "invalid id" });
+    }
+    const row = await stmts.findLecture.get(id);
+    if (!row) return res.status(404).json({ error: "not found" });
+    if (row.source_type === "file") {
+      fs.unlink(path.join(LECTURES_DIR, row.source), () => {});
+    }
+    if (row.thumbnail && !/^https?:\/\//i.test(row.thumbnail)) {
+      fs.unlink(path.join(THUMBNAILS_DIR, row.thumbnail), () => {});
+    }
+    await stmts.adminDeleteLecture.run(id);
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
   }
-  const row = stmts.findLecture.get(id);
-  if (!row) return res.status(404).json({ error: "not found" });
-  if (row.source_type === "file") {
-    fs.unlink(path.join(LECTURES_DIR, row.source), () => {});
-  }
-  if (row.thumbnail && !/^https?:\/\//i.test(row.thumbnail)) {
-    fs.unlink(path.join(THUMBNAILS_DIR, row.thumbnail), () => {});
-  }
-  stmts.adminDeleteLecture.run(id);
-  res.json({ ok: true });
 });

@@ -16,31 +16,39 @@ const VALID = {
 };
 
 // GET /api/survey
-surveyRouter.get("/", requireAuth, (req, res) => {
-  const row = stmts.getSurvey.get(req.user.id);
-  if (!row) return res.json({ survey: null });
-  res.json({
-    survey: {
-      interest: row.interest,
-      level: row.level,
-      time: row.time,
-      updated_at: row.updated_at,
-    },
-  });
+surveyRouter.get("/", requireAuth, async (req, res, next) => {
+  try {
+    const row = await stmts.getSurvey.get(req.user.id);
+    if (!row) return res.json({ survey: null });
+    res.json({
+      survey: {
+        interest: row.interest,
+        level: row.level,
+        time: row.time,
+        updated_at: row.updated_at,
+      },
+    });
+  } catch (err) {
+    next(err);
+  }
 });
 
 // POST /api/survey  { interest, level, time }
-surveyRouter.post("/", requireAuth, (req, res) => {
-  const { interest, level, time } = req.body || {};
-  if (!VALID.interest.has(interest)) {
-    return res.status(400).json({ error: "invalid interest" });
+surveyRouter.post("/", requireAuth, async (req, res, next) => {
+  try {
+    const { interest, level, time } = req.body || {};
+    if (!VALID.interest.has(interest)) {
+      return res.status(400).json({ error: "invalid interest" });
+    }
+    if (!VALID.level.has(level)) {
+      return res.status(400).json({ error: "invalid level" });
+    }
+    if (!VALID.time.has(time)) {
+      return res.status(400).json({ error: "invalid time" });
+    }
+    await stmts.upsertSurvey.run(req.user.id, interest, level, time);
+    res.json({ ok: true, survey: { interest, level, time } });
+  } catch (err) {
+    next(err);
   }
-  if (!VALID.level.has(level)) {
-    return res.status(400).json({ error: "invalid level" });
-  }
-  if (!VALID.time.has(time)) {
-    return res.status(400).json({ error: "invalid time" });
-  }
-  stmts.upsertSurvey.run(req.user.id, interest, level, time);
-  res.json({ ok: true, survey: { interest, level, time } });
 });

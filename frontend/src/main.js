@@ -657,6 +657,7 @@ const findIdBtn = document.getElementById("find-id-btn");
 const findPasswordBtn = document.getElementById("find-password-btn");
 const altFindIdBtn = document.getElementById("alt-find-id-btn");
 const altFindPasswordBtn = document.getElementById("alt-find-password-btn");
+const resendBtn = document.getElementById("resend-code-btn");
 
 let mode = "login";
 // Tracks the most recent auth state so we can detect a logged-out -> logged-in
@@ -833,6 +834,9 @@ function setMode(nextMode) {
   errorEl.classList.remove("modal-error--offline");
   infoEl.hidden = true;
   form.reset();
+  // Reset the resend cooldown whenever the verify field is hidden — switching
+  // modes (e.g. back to login) should not leave the button stuck disabled.
+  if (!showCode) clearResendCooldown();
   const focusInput = (sel) => {
     const el = form.querySelector(sel);
     if (el) el.focus();
@@ -861,6 +865,7 @@ function closeModal() {
   // The successful-login path clears the intent itself before calling
   // closeModal(), so this clear is a no-op on that path.
   clearRedirectIntent();
+  clearResendCooldown();
 }
 
 loginBtn.addEventListener("click", () => openModal("login"));
@@ -941,6 +946,92 @@ function resetErrorEl() {
   errorEl.hidden = true;
 }
 
+// --- Email-verification code helpers --------------------------------------
+// Wrap POST /api/signup/send-code so both the first send (initial signup
+// submit) and the resend button can share one response shape. Network-level
+// failures surface as `{ networkErr }` so the caller can decide whether to
+// show the offline message.
+async function requestSignupCode(email) {
+  try {
+    const res = await fetch(`${API_BASE}/api/signup/send-code`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
+    });
+    const body = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, body };
+  } catch (netErr) {
+    return { ok: false, networkErr: netErr };
+  }
+}
+
+let resendCooldownTimer = null;
+function clearResendCooldown() {
+  if (resendCooldownTimer) {
+    clearInterval(resendCooldownTimer);
+    resendCooldownTimer = null;
+  }
+  if (resendBtn) {
+    resendBtn.disabled = false;
+    resendBtn.textContent = "재전송";
+  }
+}
+function startResendCooldown(seconds) {
+  if (!resendBtn) return;
+  clearResendCooldown();
+  let remain = Math.max(1, Math.floor(seconds));
+  resendBtn.disabled = true;
+  resendBtn.textContent = `재전송 (${remain}s)`;
+  resendCooldownTimer = setInterval(() => {
+    remain -= 1;
+    if (remain <= 0) {
+      clearResendCooldown();
+      return;
+    }
+    resendBtn.textContent = `재전송 (${remain}s)`;
+  }, 1000);
+}
+
+if (resendBtn) {
+  resendBtn.addEventListener("click", async () => {
+    if (resendBtn.disabled) return;
+    const storedEmail = sessionStorage.getItem("signup-email");
+    if (!storedEmail) {
+      errorEl.textContent = "이메일 정보가 없습니다. 다시 시도해주세요.";
+      errorEl.hidden = false;
+      return;
+    }
+    resendBtn.disabled = true;
+    resetErrorEl();
+    infoEl.hidden = true;
+    const result = await requestSignupCode(storedEmail);
+    if (result.networkErr) {
+      resendBtn.disabled = false;
+      if (isNetworkError(result.networkErr)) {
+        errorEl.textContent = t("auth.serverError") || "서버에 연결할 수 없습니다.";
+        errorEl.hidden = false;
+        return;
+      }
+      throw result.networkErr;
+    }
+    if (!result.ok) {
+      // 429 → server-provided retryAfter drives the countdown so the UI
+      // stays in lockstep with the backend cooldown.
+      if (result.status === 429 && Number.isFinite(result.body?.retryAfter)) {
+        startResendCooldown(result.body.retryAfter);
+      } else {
+        resendBtn.disabled = false;
+      }
+      errorEl.textContent = result.body?.error || "인증코드 전송 실패";
+      errorEl.hidden = false;
+      return;
+    }
+    infoEl.textContent = "인증코드를 다시 전송했습니다.";
+    infoEl.hidden = false;
+    startResendCooldown(result.body?.resendAfterSec ?? 60);
+  });
+}
+
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const data = Object.fromEntries(new FormData(form));
@@ -951,43 +1042,34 @@ form.addEventListener("submit", async (e) => {
   try {
     // Handle email verification step
     if (mode === "signup-email") {
-      try {
-        const res = await fetch(`${API_BASE}/api/signup/send-code`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ email: data.email }),
-        });
-        const body = await res.json().catch(() => ({}));
-
-        if (!res.ok) {
-          errorEl.textContent = body.error || "인증코드 전송 실패";
+      const result = await requestSignupCode(data.email);
+      if (result.networkErr) {
+        if (isNetworkError(result.networkErr)) {
+          errorEl.textContent = t("auth.serverError") || "서버에 연결할 수 없습니다.";
           errorEl.hidden = false;
           return;
         }
-
-        // Capture the username/password the user already typed in step 1 so the
-        // form.reset() inside setMode("signup-verify") doesn't wipe them out.
-        const usernameInput = form.querySelector("input[name=username]");
-        const passwordInput = form.querySelector("input[name=password]");
-        const carryUsername = usernameInput ? usernameInput.value : "";
-        const carryPassword = passwordInput ? passwordInput.value : "";
-        // Store email for next step
-        sessionStorage.setItem("signup-email", data.email);
-        // Switch to verify mode
-        setMode("signup-verify");
-        if (usernameInput) usernameInput.value = carryUsername;
-        if (passwordInput) passwordInput.value = carryPassword;
-        // Show the info banner AFTER setMode so its reset doesn't hide it.
-        infoEl.textContent = "인증코드를 이메일로 전송했습니다.";
-        infoEl.hidden = false;
-      } catch (netErr) {
-        if (isNetworkError(netErr)) {
-          errorEl.textContent = t("auth.serverError") || "서버에 연결할 수 없습니다.";
-          errorEl.hidden = false;
-        } else {
-          throw netErr;
-        }
+        throw result.networkErr;
       }
+      if (!result.ok) {
+        errorEl.textContent = result.body?.error || "인증코드 전송 실패";
+        errorEl.hidden = false;
+        return;
+      }
+
+      // Carry the typed username/password across the form.reset() inside
+      // setMode("signup-verify").
+      const usernameInput = form.querySelector("input[name=username]");
+      const passwordInput = form.querySelector("input[name=password]");
+      const carryUsername = usernameInput ? usernameInput.value : "";
+      const carryPassword = passwordInput ? passwordInput.value : "";
+      sessionStorage.setItem("signup-email", data.email);
+      setMode("signup-verify");
+      if (usernameInput) usernameInput.value = carryUsername;
+      if (passwordInput) passwordInput.value = carryPassword;
+      infoEl.textContent = "인증코드를 이메일로 전송했습니다.";
+      infoEl.hidden = false;
+      startResendCooldown(result.body?.resendAfterSec ?? 60);
       return;
     }
 

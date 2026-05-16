@@ -257,57 +257,69 @@ export const lecturesRouter = express.Router();
 
 // GET /api/lectures — public listing. Returns newest first.
 // Optional ?category=<algorithm|data-structure|programming-basic|other>.
-lecturesRouter.get("/", (req, res) => {
-  const rawCategory = req.query?.category;
-  let rows;
-  if (rawCategory != null && String(rawCategory).trim() !== "") {
-    const category = pickCategory(rawCategory);
-    if (!category) {
-      return res.status(400).json({ error: "invalid category" });
+lecturesRouter.get("/", async (req, res, next) => {
+  try {
+    const rawCategory = req.query?.category;
+    let rows;
+    if (rawCategory != null && String(rawCategory).trim() !== "") {
+      const category = pickCategory(rawCategory);
+      if (!category) {
+        return res.status(400).json({ error: "invalid category" });
+      }
+      rows = await stmts.listLecturesByCategory.all(category);
+    } else {
+      rows = await stmts.listLectures.all();
     }
-    rows = stmts.listLecturesByCategory.all(category);
-  } else {
-    rows = stmts.listLectures.all();
+    res.json({ lectures: rows.map(publicLecture) });
+  } catch (err) {
+    next(err);
   }
-  res.json({ lectures: rows.map(publicLecture) });
 });
 
 // GET /api/lectures/:id — single lecture (for the player view).
 // Suspended uploaders are hidden from non-admins (404) so direct URLs don't
 // leak content after a moderation action (Codex review P2, 2026-05-16).
-lecturesRouter.get("/:id", (req, res) => {
-  const id = Number.parseInt(req.params.id, 10);
-  if (!Number.isInteger(id)) {
-    return res.status(400).json({ error: "invalid id" });
+lecturesRouter.get("/:id", async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id, 10);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ error: "invalid id" });
+    }
+    const row = await stmts.findLecture.get(id);
+    if (!row) return res.status(404).json({ error: "not found" });
+    if (row.uploader_suspended && !req.user?.is_admin) {
+      return res.status(404).json({ error: "not found" });
+    }
+    res.json({ lecture: publicLecture(row) });
+  } catch (err) {
+    next(err);
   }
-  const row = stmts.findLecture.get(id);
-  if (!row) return res.status(404).json({ error: "not found" });
-  if (row.uploader_suspended && !req.user?.is_admin) {
-    return res.status(404).json({ error: "not found" });
-  }
-  res.json({ lecture: publicLecture(row) });
 });
 
 // POST /api/lectures/:id/view — bump the view counter. Public on purpose:
 // we want anonymous viewers to count too. Returns the new total.
 // Same suspension gate as GET /:id so view counts can't be inflated on
 // hidden lectures.
-lecturesRouter.post("/:id/view", (req, res) => {
-  const id = Number.parseInt(req.params.id, 10);
-  if (!Number.isInteger(id)) {
-    return res.status(400).json({ error: "invalid id" });
+lecturesRouter.post("/:id/view", async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id, 10);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ error: "invalid id" });
+    }
+    const lec = await stmts.findLecture.get(id);
+    if (!lec) return res.status(404).json({ error: "not found" });
+    if (lec.uploader_suspended && !req.user?.is_admin) {
+      return res.status(404).json({ error: "not found" });
+    }
+    const result = await stmts.incrementLectureView.run(id);
+    if (!result.changes) {
+      return res.status(404).json({ error: "not found" });
+    }
+    const row = await stmts.getLectureViewCount.get(id);
+    res.json({ viewCount: Number(row?.view_count ?? 0) });
+  } catch (err) {
+    next(err);
   }
-  const lec = stmts.findLecture.get(id);
-  if (!lec) return res.status(404).json({ error: "not found" });
-  if (lec.uploader_suspended && !req.user?.is_admin) {
-    return res.status(404).json({ error: "not found" });
-  }
-  const result = stmts.incrementLectureView.run(id);
-  if (!result.changes) {
-    return res.status(404).json({ error: "not found" });
-  }
-  const row = stmts.getLectureViewCount.get(id);
-  res.json({ viewCount: Number(row?.view_count ?? 0) });
 });
 
 // POST /api/lectures — auth required. Two body shapes:
@@ -319,7 +331,7 @@ lecturesRouter.post(
   "/",
   uploadVideoOptional,
   requireAuth,
-  (req, res, next) => {
+  async (req, res, next) => {
     const videoFile = takeFirst(req.files, "video");
     const thumbFile = takeFirst(req.files, "thumbnail");
     const cleanupAll = () => {
@@ -387,7 +399,7 @@ lecturesRouter.post(
         return res.status(400).json({ error: "sourceType must be url or file" });
       }
 
-      const result = stmts.insertLecture.run(
+      const result = await stmts.insertLecture.run(
         req.user.id,
         title,
         description,
@@ -396,7 +408,7 @@ lecturesRouter.post(
         thumbnailValue,
         category
       );
-      const row = stmts.findLecture.get(Number(result.lastInsertRowid));
+      const row = await stmts.findLecture.get(Number(result.lastInsertRowid));
       res.json({ lecture: publicLecture(row) });
     } catch (err) {
       cleanupAll();
@@ -406,23 +418,27 @@ lecturesRouter.post(
 );
 
 // DELETE /api/lectures/:id — only the original uploader may remove their lecture.
-lecturesRouter.delete("/:id", requireAuth, (req, res) => {
-  const id = Number.parseInt(req.params.id, 10);
-  if (!Number.isInteger(id)) {
-    return res.status(400).json({ error: "invalid id" });
+lecturesRouter.delete("/:id", requireAuth, async (req, res, next) => {
+  try {
+    const id = Number.parseInt(req.params.id, 10);
+    if (!Number.isInteger(id)) {
+      return res.status(400).json({ error: "invalid id" });
+    }
+    const row = await stmts.findLecture.get(id);
+    if (!row) return res.status(404).json({ error: "not found" });
+    if (Number(row.user_id) !== Number(req.user.id)) {
+      return res.status(403).json({ error: "forbidden" });
+    }
+    if (row.source_type === "file") {
+      fs.unlink(path.join(LECTURES_DIR, row.source), () => {});
+    }
+    // Remove uploaded thumbnail if it's a local file (not a YouTube URL).
+    if (row.thumbnail && !/^https?:\/\//i.test(row.thumbnail)) {
+      fs.unlink(path.join(THUMBNAILS_DIR, row.thumbnail), () => {});
+    }
+    await stmts.deleteLecture.run(id, req.user.id);
+    res.json({ ok: true });
+  } catch (err) {
+    next(err);
   }
-  const row = stmts.findLecture.get(id);
-  if (!row) return res.status(404).json({ error: "not found" });
-  if (row.user_id !== req.user.id) {
-    return res.status(403).json({ error: "forbidden" });
-  }
-  if (row.source_type === "file") {
-    fs.unlink(path.join(LECTURES_DIR, row.source), () => {});
-  }
-  // Remove uploaded thumbnail if it's a local file (not a YouTube URL).
-  if (row.thumbnail && !/^https?:\/\//i.test(row.thumbnail)) {
-    fs.unlink(path.join(THUMBNAILS_DIR, row.thumbnail), () => {});
-  }
-  stmts.deleteLecture.run(id, req.user.id);
-  res.json({ ok: true });
 });

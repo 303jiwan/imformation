@@ -479,6 +479,20 @@ html.nav-resizing .nav-collapse {
 .link-button:hover {
   color: #4c1d95;
 }
+.link-button:disabled {
+  color: #aaa;
+  cursor: not-allowed;
+  text-decoration: none;
+}
+.field-code {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.code-resend {
+  align-self: flex-end;
+  font-size: 12px;
+}
 .field-username,
 .field-password,
 .field-email {
