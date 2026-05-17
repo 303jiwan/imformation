@@ -31,12 +31,13 @@ export async function sendMail({ to, subject, text, html }) {
   if (!liveMode) {
     // Dev stub
     const banner = "=".repeat(60);
+    const body = text ?? html ?? "";
     console.log(`\n${banner}\n[mailer] DEV MODE — email not actually sent`);
     console.log(`  From:    ${SMTP_FROM}`);
     console.log(`  To:      ${to}`);
     console.log(`  Subject: ${subject}`);
     console.log(`  Body:`);
-    console.log(text.split("\n").map((l) => "    " + l).join("\n"));
+    console.log(body.split("\n").map((l) => "    " + l).join("\n"));
     console.log(`${banner}\n`);
     return { dev: true };
   }
