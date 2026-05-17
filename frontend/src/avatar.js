@@ -203,18 +203,43 @@ function renderEditor() {
   root.innerHTML = `
     <div class="avatar-page-wrap">
       <div class="avatar-card">
-        <div class="avatar-username" id="avatar-username">me</div>
-        <div class="avatar-stage">
-          <div class="avatar-character" id="avatar-character"></div>
+        <div class="avatar-card__head">
+          <div>
+            <p class="avatar-eyebrow">아바타 에디터</p>
+            <h1 class="avatar-title">나만의 캐릭터 꾸미기</h1>
+          </div>
+          <div class="avatar-username" id="avatar-username">me</div>
         </div>
-        <div class="avatar-tabs avatar-tabs--primary"   id="avatar-primary"></div>
-        <div class="avatar-tabs avatar-tabs--secondary" id="avatar-secondary"></div>
-        <div class="avatar-color-row" id="avatar-color-row"></div>
-        <div class="avatar-grid" id="avatar-grid"></div>
-        <div class="avatar-actions">
-          <button type="button" class="avatar-btn avatar-btn--ghost"   data-action="back">Back</button>
-          <button type="button" class="avatar-btn avatar-btn--primary" data-action="finish">Finish Editing</button>
+
+        <div class="avatar-layout">
+          <aside class="avatar-preview">
+            <div class="avatar-stage">
+              <div class="avatar-stage__glow" aria-hidden="true"></div>
+              <div class="avatar-stage__floor" aria-hidden="true"></div>
+              <div class="avatar-character" id="avatar-character"></div>
+            </div>
+            <div class="avatar-quick">
+              <button type="button" class="avatar-quick__btn" data-action="random" aria-label="랜덤">
+                <span class="avatar-quick__icon">🎲</span><span>랜덤</span>
+              </button>
+              <button type="button" class="avatar-quick__btn" data-action="reset" aria-label="초기화">
+                <span class="avatar-quick__icon">↺</span><span>초기화</span>
+              </button>
+            </div>
+          </aside>
+
+          <div class="avatar-panel">
+            <div class="avatar-tabs avatar-tabs--primary"   id="avatar-primary"></div>
+            <div class="avatar-tabs avatar-tabs--secondary" id="avatar-secondary"></div>
+            <div class="avatar-color-row" id="avatar-color-row"></div>
+            <div class="avatar-grid" id="avatar-grid"></div>
+            <div class="avatar-actions">
+              <button type="button" class="avatar-btn avatar-btn--ghost"   data-action="back">뒤로</button>
+              <button type="button" class="avatar-btn avatar-btn--primary" data-action="finish">저장하기</button>
+            </div>
+          </div>
         </div>
+
         <div class="avatar-toast" id="avatar-toast" role="status" aria-live="polite"></div>
       </div>
     </div>
@@ -234,11 +259,13 @@ function renderEditor() {
 }
 
 function onRootClick(e) {
-  // Check data-action buttons first (Back / Finish Editing)
+  // Check data-action buttons first
   const actionBtn = e.target.closest('[data-action]');
   if (actionBtn) {
     if (actionBtn.dataset.action === 'back')   { onBack();   return; }
     if (actionBtn.dataset.action === 'finish') { onFinish(); return; }
+    if (actionBtn.dataset.action === 'random') { onRandom(); return; }
+    if (actionBtn.dataset.action === 'reset')  { onReset();  return; }
   }
 
   // Primary tab click — identified by data-primary attribute
@@ -491,6 +518,47 @@ function onBack() {
     if (!ok) return;
   }
   location.href = 'index.html';
+}
+
+function pickRandom(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function onRandom() {
+  const skin = pickRandom(SKIN_TONES).id;
+  const hairItems = getByCategory('hair');
+  const topItems = getByCategory('top');
+  const bottomItems = getByCategory('bottom');
+  const hatItems = getByCategory('hat');
+  const glassesItems = getByCategory('glasses');
+  const otherItems = getByCategory('other');
+
+  setSkin(skin);
+  if (hairItems.length)   setHair(pickRandom(hairItems).id);
+  if (topItems.length)    setTop(pickRandom(topItems).id);
+  if (bottomItems.length) setBottom(pickRandom(bottomItems).id);
+  // Accessories: 50% chance of "none"
+  setAccessory('hat',     Math.random() < 0.5 || !hatItems.length     ? null : pickRandom(hatItems).id);
+  setAccessory('glasses', Math.random() < 0.5 || !glassesItems.length ? null : pickRandom(glassesItems).id);
+  setAccessory('other',   Math.random() < 0.5 || !otherItems.length   ? null : pickRandom(otherItems).id);
+
+  // Randomize colors too
+  if (config.body.hair)       config.body.hair.color       = pickRandom(PALETTES.hair);
+  if (config.clothing.top)    config.clothing.top.color    = pickRandom(PALETTES.top);
+  if (config.clothing.bottom) config.clothing.bottom.color = pickRandom(PALETTES.bottom);
+  if (config.accessories.hat)     config.accessories.hat.color     = pickRandom(PALETTES.hat);
+  if (config.accessories.glasses) config.accessories.glasses.color = pickRandom(PALETTES.glasses);
+  if (config.accessories.other)   config.accessories.other.color   = pickRandom(PALETTES.other);
+
+  commitChange();
+  showToast('랜덤 적용', false);
+}
+
+function onReset() {
+  if (!window.confirm('기본 모습으로 되돌릴까요?')) return;
+  config = cloneDefault();
+  commitChange();
+  showToast('기본값으로 초기화', false);
 }
 
 async function onFinish() {
