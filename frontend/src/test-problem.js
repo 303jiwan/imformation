@@ -24,11 +24,58 @@ import { runCMany, submitCMany, normalizeOutput, gradingSample, judgeAvailable }
      swap test-problems.js's `expected` for backend output when ready.
    ===================================================================== */
 
+const API_BASE     = "http://localhost:3000";
 const PROGRESS_KEY = "codenergy:test:progress";
 const ANSWERS_KEY  = "codenergy:test:answers";
 const TIMER_KEY    = "codenergy:test:timer";
 const CONCEPTS_KEY = "codenergy:test:concepts";
 const NEXT_PAGE    = "test-result.html";
+
+/* ---------- Battery reward toast ---------- */
+
+function showBatteryToast(awarded) {
+  if (!awarded || awarded <= 0) return;
+  let toast = document.getElementById("battery-reward-toast");
+  if (!toast) {
+    toast = document.createElement("div");
+    toast.id = "battery-reward-toast";
+    toast.style.cssText = [
+      "position:fixed", "bottom:80px", "left:50%", "transform:translateX(-50%) translateY(20px)",
+      "background:linear-gradient(135deg,#22c55e 0%,#16a34a 100%)",
+      "color:#fff", "font-weight:700", "font-size:15px", "padding:12px 24px",
+      "border-radius:999px", "box-shadow:0 8px 24px rgba(34,197,94,0.45)",
+      "opacity:0", "pointer-events:none",
+      "transition:opacity 220ms ease,transform 220ms cubic-bezier(0.22,1,0.36,1)",
+      "z-index:9999", "white-space:nowrap",
+    ].join(";");
+    document.body.appendChild(toast);
+  }
+  toast.textContent = `+${awarded} 🔋 적립`;
+  // Trigger paint
+  void toast.offsetWidth;
+  toast.style.opacity = "1";
+  toast.style.transform = "translateX(-50%) translateY(0)";
+  setTimeout(() => {
+    toast.style.opacity = "0";
+    toast.style.transform = "translateX(-50%) translateY(20px)";
+  }, 2200);
+}
+
+/* ---------- POST answer to backend (fire-and-forget) ---------- */
+
+async function postAnswerToBackend(problemId, code, verdict) {
+  // 단순 기록. 배터리 적립은 grader 응답에서 처리된다 (showBatteryToast는 submit 흐름에서 호출).
+  try {
+    await fetch(`${API_BASE}/api/test/answer`, {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ problemId, code, verdict }),
+    });
+  } catch (_) {
+    // 백엔드 없어도 무시 (demo mode)
+  }
+}
 
 /* ---------- Storage ---------- */
 
@@ -733,7 +780,7 @@ async function submitTest(reason = "manual") {
         expected: tc.expected,
         hidden: !!tc.hidden,
       }));
-      const result = await submitCMany(code, casesPlan);
+      const result = await submitCMany(code, casesPlan, { problemId: problem.id });
 
       if (result.compile?.ok === false) {
         overlaySub.textContent = "컴파일 오류 — 채점 종료";
@@ -746,6 +793,11 @@ async function submitTest(reason = "manual") {
         } else if (verdict === "correct") {
           overlaySub.textContent = `${result.passed}/${result.total} 모두 통과`;
         }
+      }
+
+      // 배터리 적립 토스트는 grader 응답에서 읽는다 (서버가 verdict 직접 판정).
+      if (result && typeof result.awarded === "number" && result.awarded > 0) {
+        showBatteryToast(result.awarded);
       }
     } catch (err) {
       // 503/네트워크 오류 → ungraded
@@ -785,6 +837,10 @@ async function submitTest(reason = "manual") {
     submittedAt: Date.now(),
     reason,
   });
+
+  // 백엔드에 답안 전송 + 배터리 적립 토스트 (verdict === "correct" → "AC" 로 변환)
+  const backendVerdict = verdict === "correct" ? "AC" : verdict === "wrong" ? "WA" : verdict;
+  postAnswerToBackend(problem.id, code, backendVerdict);
 
   try { sessionStorage.removeItem(TIMER_KEY); } catch (_) {}
   setTimeout(() => {

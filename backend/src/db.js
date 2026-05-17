@@ -334,6 +334,54 @@ function buildStmts(q) {
         WHERE user_id = $1 AND lesson_id = $2 AND ungraded = 0
         ORDER BY problem_id, submitted_at DESC`
     ),
+
+    // --- wallet --------------------------------------------------------------
+    getWallet: makeStmt(q, "SELECT balance, updated_at FROM user_wallet WHERE user_id = $1"),
+    ensureWallet: makeStmt(
+      q,
+      `INSERT INTO user_wallet (user_id, balance) VALUES ($1, 0)
+       ON CONFLICT (user_id) DO NOTHING`
+    ),
+    // 멱등 grant: 첫 AC만 RETURNING.
+    insertProblemAward: makeStmt(
+      q,
+      `INSERT INTO problem_awards (user_id, problem_id, amount)
+       VALUES ($1, $2, $3)
+       ON CONFLICT (user_id, problem_id) DO NOTHING
+       RETURNING amount`
+    ),
+    // 지갑 증가 (grant 직후).
+    incrementWallet: makeStmt(
+      q,
+      `INSERT INTO user_wallet (user_id, balance, updated_at)
+       VALUES ($1, $2, now())
+       ON CONFLICT (user_id) DO UPDATE SET
+         balance = user_wallet.balance + EXCLUDED.balance,
+         updated_at = now()
+       RETURNING balance`
+    ),
+    // 조건부 차감 (구매).
+    decrementWalletIfEnough: makeStmt(
+      q,
+      `UPDATE user_wallet
+          SET balance = balance - $2,
+              updated_at = now()
+        WHERE user_id = $1 AND balance >= $2
+        RETURNING balance`
+    ),
+    // 소유권.
+    listOwned: makeStmt(q, "SELECT item_id FROM user_owned_items WHERE user_id = $1"),
+    findOwnedSubset: makeStmt(
+      q,
+      "SELECT item_id FROM user_owned_items WHERE user_id = $1 AND item_id = ANY($2::text[])"
+    ),
+    insertOwned: makeStmt(
+      q,
+      `INSERT INTO user_owned_items (user_id, item_id)
+       VALUES ($1, $2)
+       ON CONFLICT (user_id, item_id) DO NOTHING
+       RETURNING item_id`
+    ),
   };
 }
 

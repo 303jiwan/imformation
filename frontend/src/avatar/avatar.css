@@ -554,3 +554,163 @@
     font-size: 10px;
   }
 }
+
+/* =============================================================
+   신규 추가 스타일 (Agent D)
+   - .avatar-head-right 헤더 그룹
+   - .avatar-balance 잔액 배지
+   - .avatar-item.is-locked 잠금 아이템
+   - .avatar-item__price 가격 표시
+   - .avatar-buy-modal 구매 확인 모달
+   - .avatar-tab--shop 상점 탭 차별화
+   - .avatar-btn--sm 소형 버튼
+   ============================================================= */
+
+/* ---------- 헤더 우측 그룹 (잔액 + 유저명) ---------- */
+.avatar-head-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+/* ---------- 잔액 배지 ---------- */
+.avatar-balance {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
+  color: #1c1917;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1.5px solid rgba(251, 191, 36, 0.6);
+  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+}
+
+/* ---------- 잠금 아이템 ---------- */
+.avatar-item.is-locked {
+  filter: grayscale(0.55);
+  opacity: 0.8;
+  cursor: pointer;
+}
+.avatar-item.is-locked::before {
+  content: "🔒";
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 13px;
+  line-height: 1;
+  z-index: 2;
+  pointer-events: none;
+}
+.avatar-item.is-locked:hover {
+  filter: grayscale(0.2);
+  opacity: 1;
+}
+
+/* 구매 가능 (잔액 충분) — 연두 테두리 강조 */
+.avatar-item.is-locked.is-affordable {
+  border-color: rgba(34, 197, 94, 0.5);
+}
+.avatar-item.is-locked.is-affordable:hover {
+  border-color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+/* 구매 불가 (잔액 부족) — 빨강 테두리 */
+.avatar-item.is-locked.is-unaffordable {
+  border-color: rgba(239, 68, 68, 0.4);
+}
+.avatar-item.is-locked.is-unaffordable:hover {
+  border-color: #ef4444;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+/* ---------- 아이템 가격 표시 ---------- */
+.avatar-item__price {
+  display: block;
+  font-size: 10px;
+  font-weight: 700;
+  color: #fbbf24;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+/* ---------- 상점 탭 차별화 ---------- */
+.avatar-tabs--primary .avatar-tab--shop {
+  background: rgba(251, 191, 36, 0.08);
+  border-color: rgba(251, 191, 36, 0.2);
+  color: #fde68a;
+}
+.avatar-tabs--primary .avatar-tab--shop:hover {
+  background: rgba(251, 191, 36, 0.18);
+  border-color: rgba(251, 191, 36, 0.5);
+  color: #fbbf24;
+}
+.avatar-tabs--primary .avatar-tab--shop.is-active {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: #1c1917;
+  box-shadow:
+    0 6px 16px rgba(245, 158, 11, 0.5),
+    0 0 0 1px rgba(251, 191, 36, 0.8);
+}
+
+/* ---------- 구매 확인 모달 ---------- */
+.avatar-buy-modal {
+  position: absolute;
+  inset: 0;
+  border-radius: 24px;
+  background: rgba(15, 8, 30, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+}
+.avatar-buy-modal[hidden] {
+  display: none;
+}
+.avatar-buy-modal__inner {
+  background: rgba(42, 28, 80, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 18px;
+  padding: 24px 28px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  min-width: 260px;
+  box-shadow:
+    0 24px 60px rgba(0, 0, 0, 0.6),
+    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+.avatar-buy-modal__title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #f3e8ff;
+  text-align: center;
+}
+.avatar-buy-modal__price {
+  margin: 0;
+  font-size: 13px;
+  color: #fde68a;
+  font-weight: 600;
+  text-align: center;
+}
+.avatar-buy-modal__actions {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+
+/* ---------- 소형 버튼 ---------- */
+.avatar-btn--sm {
+  font-size: 13px;
+  padding: 10px 16px;
+}

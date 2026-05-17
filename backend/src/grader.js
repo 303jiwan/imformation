@@ -13,6 +13,7 @@ import { join } from "node:path";
 import { tmpdir } from "node:os";
 import { randomBytes } from "node:crypto";
 import { loadSession } from "./auth.js";
+import { stmts, withTx } from "./db.js";
 
 // ---------------------------------------------------------------------------
 // 설정
@@ -385,15 +386,50 @@ graderRouter.post("/run", async (req, res) => {
   }
 });
 
-// POST /api/grade/submit — 채점 (expected 비교 + hidden 마스킹)
+// 배터리 보상 규칙: 모든 케이스가 통과한 첫 채점에만 +10.
+// problemId는 알려진 문제 풀(1~MAX_PROBLEM_ID) 내 정수여야 함.
+//
+// 멱등성: problem_awards (user_id, problem_id) PK가 단일 진리.
+// 같은 문제를 다시 통과해도 ON CONFLICT DO NOTHING으로 grant 없음.
+const GRANT_AMOUNT     = 10;
+const MAX_PROBLEM_ID   = 1000;
+
+function normalizeProblemId(raw) {
+  if (raw == null) return null;
+  const s = String(raw);
+  if (!/^[0-9]+$/.test(s)) return null;
+  const n = Number(s);
+  if (!Number.isInteger(n) || n < 1 || n > MAX_PROBLEM_ID) return null;
+  return s;
+}
+
+async function grantBatteryIfFirstAC(userId, problemId) {
+  if (!problemId) return { awarded: 0, balance: null };
+  return await withTx(async (tx) => {
+    await tx.ensureWallet.run(userId);
+    const awardRow = await tx.insertProblemAward.get(userId, problemId, GRANT_AMOUNT);
+    if (awardRow) {
+      const balRow = await tx.incrementWallet.get(userId, GRANT_AMOUNT);
+      return {
+        awarded: GRANT_AMOUNT,
+        balance: balRow ? Number(balRow.balance) : GRANT_AMOUNT,
+      };
+    }
+    const w = await tx.getWallet.get(userId);
+    return { awarded: 0, balance: w ? Number(w.balance) : 0 };
+  });
+}
+
+// POST /api/grade/submit — 채점 (expected 비교 + hidden 마스킹 + 첫 AC grant)
 graderRouter.post("/submit", async (req, res) => {
   const err = validateBody(req.body);
   if (err) return res.status(400).json({ error: err });
 
-  const { source, stdins, expected, hidden, cpuTimeLimit, memoryLimit } = req.body;
+  const { source, stdins, expected, hidden, problemId, cpuTimeLimit, memoryLimit } = req.body;
   void cpuTimeLimit; void memoryLimit;
 
   const hiddenFlags = Array.isArray(hidden) ? hidden : stdins.map(() => false);
+  const validProblemId = normalizeProblemId(problemId);
 
   let acquired = false;
   try {
@@ -423,12 +459,34 @@ graderRouter.post("/submit", async (req, res) => {
       return c;
     });
 
+    // 전 케이스 통과 + 알려진 problemId일 때만 grant 시도.
+    // 실패 시에도 grant 없음 (compile.ok===false면 passed=0이라 자연히 통과).
+    let awarded = 0;
+    let balance = null;
+    if (
+      passed === stdins.length &&
+      stdins.length > 0 &&
+      result.compile?.ok !== false &&
+      validProblemId
+    ) {
+      try {
+        const grant = await grantBatteryIfFirstAC(req.user.id, validProblemId);
+        awarded = grant.awarded;
+        balance = grant.balance;
+      } catch (gErr) {
+        // grant 실패는 채점 결과에 영향 주지 않음. 로그만.
+        console.error("[grader] grant failed", gErr);
+      }
+    }
+
     res.json({
       compile: result.compile,
       passed,
       total: stdins.length,
       firstFail,
       cases: maskedCases,
+      awarded,
+      balance,
     });
   } catch (e) {
     const status = e.status || 500;

@@ -1,20 +1,28 @@
 /* =====================================================================
-   avatar.js — 아바타 에디터 컨트롤러 (새 schema, plan step 6)
+   avatar.js — 아바타 에디터 컨트롤러 (배터리 캐릭터 schema, shop 탭 포함)
 
-   - 3단 탭 (신체/의상/악세사리) × 세컨더리 탭
-   - 4×2 아이템 그리드
-   - 색상 팔레트
-   - Back / Finish Editing 버튼
+   - 4단 탭 (신체/의상/악세사리/상점) × 세컨더리 탭
+   - body.color (BATTERY_COLORS), body.symbol (BODY_SYMBOLS)
+   - 상점 탭: 잠금 배지, 구매 모달, wallet 잔액
+   - Back / 저장하기 버튼
    ===================================================================== */
 
 import './avatar/avatar.css';
+// outfits.js must be imported first to break the circular dependency:
+// outfits.js → character.js (BODY_RECT) → outfits.js (getById).
+// If outfits.js is evaluated first, it triggers character.js evaluation which
+// doesn't access outfits.js at init-time, so BODY_RECT is defined by the time
+// void BODY_RECT runs in outfits.js.
+import { getByCategory, getById } from './avatar/outfits.js';
 import {
   renderCharacter,
   DEFAULT_CONFIG,
   SKIN_TONES,
   normalizeConfig,
+  BATTERY_COLORS,
+  BODY_SYMBOLS,
 } from './avatar/character.js';
-import { getByCategory } from './avatar/outfits.js';
+import { SHOP_CATALOG, isFreeItem, getItemPrice } from './avatar/shop-catalog.js';
 
 const API_BASE           = 'http://localhost:3000';
 const STORAGE_KEY        = 'codenergy:avatar:config';
@@ -30,15 +38,14 @@ const CATEGORIES = {
   body: {
     label: '신체',
     subs: [
-      { id: 'skin', label: '피부', hasColor: false, allowNone: false },
-      { id: 'hair', label: '머리', hasColor: true,  allowNone: false },
+      { id: 'color',  label: '본체색', hasColor: false, allowNone: false },
+      { id: 'symbol', label: '문양',   hasColor: true,  allowNone: false },
     ],
   },
   clothing: {
     label: '의상',
     subs: [
-      { id: 'top',    label: '상의', hasColor: true, allowNone: false },
-      { id: 'bottom', label: '하의', hasColor: true, allowNone: false },
+      { id: 'top', label: '상의', hasColor: true, allowNone: false },
     ],
   },
   accessories: {
@@ -49,16 +56,70 @@ const CATEGORIES = {
       { id: 'other',   label: '기타', hasColor: true, allowNone: true },
     ],
   },
+  shop: {
+    label: '상점',
+    subs: [
+      { id: 'top',     label: '상의' },
+      { id: 'hat',     label: '모자' },
+      { id: 'glasses', label: '안경' },
+      { id: 'other',   label: '기타' },
+      { id: 'symbol',  label: '문양' },
+    ],
+  },
 };
 
+// ---------------------------------------------------------------------------
+// Palettes (색상 칩 — hair/bottom 제거)
+// ---------------------------------------------------------------------------
+
 const PALETTES = {
-  hair:    ['#1f2937','#5b3a1d','#8b5e34','#c9a47a','#e6b34a','#9ca3af','#ef4444','#a855f7','#22c55e'],
+  symbol:  ['#22c55e','#ef4444','#fbbf24','#3b82f6','#a855f7','#f97316','#38bdf8','#94a3b8','#e879f9'],
   top:     ['#ffffff','#1f2937','#a855f7','#3b82f6','#ef4444','#10b981','#fbbf24','#f97316','#22c55e'],
-  bottom:  ['#1e3a8a','#374151','#3b82f6','#92400e','#ffffff','#000000','#a855f7','#ef4444','#10b981'],
   hat:     ['#1f2937','#404040','#cbd5e1','#3b82f6','#a855f7','#ef4444','#fbbf24','#92400e','#10b981'],
   glasses: ['#000000','#374151','#92400e','#ef4444','#3b82f6','#a855f7','#10b981','#fbbf24','#9ca3af'],
   other:   ['#fcd34d','#9ca3af','#ef4444','#3b82f6','#a855f7','#10b981','#fbbf24','#f97316','#000000'],
 };
+
+// ---------------------------------------------------------------------------
+// Wallet state
+// ---------------------------------------------------------------------------
+
+let wallet = {
+  balance: 0,
+  ownedItemIds: new Set(),
+};
+
+async function loadWallet() {
+  // Always treat free items as owned
+  Object.keys(SHOP_CATALOG).forEach((id) => {
+    if (isFreeItem(id)) wallet.ownedItemIds.add(id);
+  });
+  try {
+    const res = await fetch(`${API_BASE}/api/wallet`, { credentials: 'include' });
+    if (!res.ok) return;
+    const json = await res.json().catch(() => null);
+    if (!json) return;
+    if (typeof json.balance === 'number') wallet.balance = json.balance;
+    if (Array.isArray(json.ownedItemIds)) {
+      json.ownedItemIds.forEach((id) => wallet.ownedItemIds.add(id));
+    }
+    // Re-add free items in case server omitted them
+    Object.keys(SHOP_CATALOG).forEach((id) => {
+      if (isFreeItem(id)) wallet.ownedItemIds.add(id);
+    });
+    updateBalanceBadge();
+  } catch (_) {}
+}
+
+function isOwned(itemId) {
+  if (isFreeItem(itemId)) return true;
+  return wallet.ownedItemIds.has(itemId);
+}
+
+function updateBalanceBadge() {
+  const el = document.getElementById('avatar-balance-num');
+  if (el) el.textContent = String(wallet.balance);
+}
 
 // ---------------------------------------------------------------------------
 // Persistence
@@ -143,7 +204,7 @@ const root = document.getElementById('avatar-root');
 
 let config         = loadLocalConfig();
 let activePrimary  = 'body';
-let activeSecondary = 'skin';
+let activeSecondary = 'color';
 let toastTimer     = null;
 let isDirty        = false;
 let rootClickBound = false;
@@ -156,19 +217,15 @@ function renderEmpty() {
   root.innerHTML = '';
   sessionStorage.setItem('codenergy:redirectAfterLogin', 'avatar.html');
 
-  // Open the login modal — try the header button first (registers all main.js state),
-  // then fall back to directly removing hidden in case main.js hasn't registered yet.
   function openLoginModal() {
     const modal = document.getElementById('auth-modal');
     if (!modal) return;
-    if (!modal.hidden) return; // already open
+    if (!modal.hidden) return;
 
     const headerLoginBtn = document.getElementById('login-btn');
     if (headerLoginBtn) {
       headerLoginBtn.click();
     }
-    // Fallback: if click didn't open the modal (e.g. listener not yet attached),
-    // open it directly.
     if (modal.hidden) {
       modal.hidden = false;
     }
@@ -176,14 +233,11 @@ function renderEmpty() {
 
   openLoginModal();
 
-  // Watch for modal close while still logged-out → redirect to index
   const modal = document.getElementById('auth-modal');
   if (modal) {
     const obs = new MutationObserver(() => {
-      if (!modal.hidden) return; // modal still open or just opened
+      if (!modal.hidden) return;
       obs.disconnect();
-      // If a parallel path (codenergy:auth event) already swapped in the editor,
-      // don't re-render — that would re-run all paints unnecessarily.
       if (root.querySelector('.avatar-card')) return;
       if (isLoggedIn()) {
         render();
@@ -208,7 +262,10 @@ function renderEditor() {
             <p class="avatar-eyebrow">아바타 에디터</p>
             <h1 class="avatar-title">나만의 캐릭터 꾸미기</h1>
           </div>
-          <div class="avatar-username" id="avatar-username">me</div>
+          <div class="avatar-head-right">
+            <div class="avatar-balance" id="avatar-balance">🔋 <span id="avatar-balance-num">0</span></div>
+            <div class="avatar-username" id="avatar-username">me</div>
+          </div>
         </div>
 
         <div class="avatar-layout">
@@ -241,6 +298,18 @@ function renderEditor() {
         </div>
 
         <div class="avatar-toast" id="avatar-toast" role="status" aria-live="polite"></div>
+
+        <!-- 구매 확인 모달 -->
+        <div class="avatar-buy-modal" id="avatar-buy-modal" hidden>
+          <div class="avatar-buy-modal__inner">
+            <p class="avatar-buy-modal__title" id="avatar-buy-title">아이템 구매</p>
+            <p class="avatar-buy-modal__price" id="avatar-buy-price"></p>
+            <div class="avatar-buy-modal__actions">
+              <button type="button" class="avatar-btn avatar-btn--ghost avatar-btn--sm" id="avatar-buy-cancel">취소</button>
+              <button type="button" class="avatar-btn avatar-btn--primary avatar-btn--sm" id="avatar-buy-confirm">구매하기</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   `;
@@ -251,6 +320,7 @@ function renderEditor() {
   paintGrid();
   paintColorRow();
   resolveUsername();
+  updateBalanceBadge();
 
   if (!rootClickBound) {
     root.addEventListener('click', onRootClick);
@@ -259,6 +329,12 @@ function renderEditor() {
 }
 
 function onRootClick(e) {
+  // Buy modal buttons
+  const cancelBtn = e.target.closest('#avatar-buy-cancel');
+  if (cancelBtn) { closeBuyModal(); return; }
+  const confirmBtn = e.target.closest('#avatar-buy-confirm');
+  if (confirmBtn) { executePurchase(); return; }
+
   // Check data-action buttons first
   const actionBtn = e.target.closest('[data-action]');
   if (actionBtn) {
@@ -268,7 +344,7 @@ function onRootClick(e) {
     if (actionBtn.dataset.action === 'reset')  { onReset();  return; }
   }
 
-  // Primary tab click — identified by data-primary attribute
+  // Primary tab click
   const primaryTab = e.target.closest('.avatar-tab[data-primary]');
   if (primaryTab) {
     activePrimary  = primaryTab.dataset.primary;
@@ -280,7 +356,7 @@ function onRootClick(e) {
     return;
   }
 
-  // Secondary tab click — identified by data-secondary attribute
+  // Secondary tab click
   const secondaryTab = e.target.closest('.avatar-tab[data-secondary]');
   if (secondaryTab) {
     activeSecondary = secondaryTab.dataset.secondary;
@@ -290,7 +366,7 @@ function onRootClick(e) {
     return;
   }
 
-  // Item grid cell — identified by data-id attribute on .avatar-item
+  // Item grid cell
   const item = e.target.closest('.avatar-item[data-id]');
   if (item) {
     const id = item.dataset.id;
@@ -298,7 +374,7 @@ function onRootClick(e) {
     return;
   }
 
-  // Color chip — identified by data-color attribute on .avatar-color-chip
+  // Color chip
   const chip = e.target.closest('.avatar-color-chip[data-color]');
   if (chip) {
     setColor(activeSecondary, chip.dataset.color);
@@ -322,7 +398,7 @@ function paintPrimaryTabs() {
   if (!el) return;
   el.innerHTML = Object.entries(CATEGORIES).map(([key, cat]) => `
     <button type="button"
-            class="avatar-tab${key === activePrimary ? ' is-active' : ''}"
+            class="avatar-tab${key === activePrimary ? ' is-active' : ''}${key === 'shop' ? ' avatar-tab--shop' : ''}"
             data-primary="${key}">${cat.label}</button>
   `).join('');
 }
@@ -349,22 +425,80 @@ function paintGrid() {
   const sub = getCurrentSubDef();
   const cells = [];
 
-  if (sub.id === 'skin') {
-    // 6 skin tone swatches
-    SKIN_TONES.forEach((tone) => {
-      const equipped = config.body.skinTone === tone.id;
+  if (activePrimary === 'shop') {
+    // Shop tab: 모든 아이템 표시 (소유/미소유 포함)
+    const subId = sub.id;
+    let items;
+    if (subId === 'symbol') {
+      items = BODY_SYMBOLS.map((sym) => ({
+        id: sym.id,
+        name: sym.label,
+        thumbnail: sym.thumbnail,
+        price: getItemPrice(sym.id) ?? 0,
+      }));
+    } else {
+      items = getByCategory(subId).map((item) => ({
+        id: item.id,
+        name: item.name,
+        thumbnail: item.thumbnail,
+        price: getItemPrice(item.id) ?? item.price ?? 0,
+      }));
+    }
+
+    items.forEach((item) => {
+      const owned = isOwned(item.id);
+      const affordable = item.price <= wallet.balance;
+      const equippedId = getEquippedStyleId(subId);
+      const equipped = equippedId === item.id;
+      let cls = 'avatar-item';
+      if (equipped) cls += ' is-equipped';
+      if (!owned) {
+        cls += ' is-locked';
+        if (affordable) cls += ' is-affordable';
+        else cls += ' is-unaffordable';
+      }
+      cells.push(`
+        <button type="button"
+                class="${cls}"
+                data-id="${item.id}"
+                data-price="${item.price}">
+          <span class="avatar-item__thumb">${item.thumbnail || ''}</span>
+          <span>${item.name || ''}</span>
+          ${!owned ? `<span class="avatar-item__price">${item.price} 🔋</span>` : ''}
+        </button>
+      `);
+    });
+  } else if (sub.id === 'color') {
+    // 본체색: BATTERY_COLORS 스와치
+    BATTERY_COLORS.forEach((bc) => {
+      const equipped = config.body.color === bc.base;
       cells.push(`
         <button type="button"
                 class="avatar-item avatar-item--skin${equipped ? ' is-equipped' : ''}"
-                data-id="${tone.id}">
+                data-id="${bc.id}">
           <span class="avatar-item__thumb">
-            <span class="avatar-item__thumb-skin" style="background-color:${tone.base};"></span>
+            <span class="avatar-item__thumb-skin" style="background-color:${bc.base};border-color:${bc.stroke};"></span>
           </span>
-          <span>${tone.label}</span>
+          <span>${bc.label}</span>
+        </button>
+      `);
+    });
+  } else if (sub.id === 'symbol') {
+    // 문양: owned/free만 표시
+    BODY_SYMBOLS.forEach((sym) => {
+      if (!isOwned(sym.id)) return;
+      const equipped = config.body.symbol.id === sym.id;
+      cells.push(`
+        <button type="button"
+                class="avatar-item${equipped ? ' is-equipped' : ''}"
+                data-id="${sym.id}">
+          <span class="avatar-item__thumb">${sym.thumbnail || ''}</span>
+          <span>${sym.label}</span>
         </button>
       `);
     });
   } else {
+    // top / hat / glasses / other: owned/free만 표시
     if (sub.allowNone) {
       const equipped = getEquippedStyleId(sub.id) == null;
       cells.push(`
@@ -376,7 +510,7 @@ function paintGrid() {
         </button>
       `);
     }
-    const items = getByCategory(sub.id);
+    const items = getByCategory(sub.id).filter((item) => isOwned(item.id));
     const equippedId = getEquippedStyleId(sub.id);
     items.forEach((item) => {
       const equipped = equippedId === item.id;
@@ -397,6 +531,13 @@ function paintGrid() {
 function paintColorRow() {
   const el = document.getElementById('avatar-color-row');
   if (!el) return;
+
+  // 상점 탭은 색상 팔레트 없음
+  if (activePrimary === 'shop') {
+    el.innerHTML = '';
+    return;
+  }
+
   const sub = getCurrentSubDef();
 
   if (!sub.hasColor) {
@@ -426,10 +567,9 @@ function paintColorRow() {
 // ---------------------------------------------------------------------------
 
 function getEquippedStyleId(sub) {
-  if (sub === 'skin')    return config.body.skinTone;
-  if (sub === 'hair')    return config.body.hair ? config.body.hair.style : null;
+  if (sub === 'color')   return config.body.color;
+  if (sub === 'symbol')  return config.body.symbol ? config.body.symbol.id : null;
   if (sub === 'top')     return config.clothing.top ? config.clothing.top.style : null;
-  if (sub === 'bottom')  return config.clothing.bottom ? config.clothing.bottom.style : null;
   if (sub === 'hat')     return config.accessories.hat ? config.accessories.hat.style : null;
   if (sub === 'glasses') return config.accessories.glasses ? config.accessories.glasses.style : null;
   if (sub === 'other')   return config.accessories.other ? config.accessories.other.style : null;
@@ -437,32 +577,30 @@ function getEquippedStyleId(sub) {
 }
 
 function getEquippedColor(sub) {
-  if (sub === 'hair')    return config.body.hair ? config.body.hair.color : null;
+  if (sub === 'symbol')  return config.body.symbol ? config.body.symbol.color : null;
   if (sub === 'top')     return config.clothing.top ? config.clothing.top.color : null;
-  if (sub === 'bottom')  return config.clothing.bottom ? config.clothing.bottom.color : null;
   if (sub === 'hat')     return config.accessories.hat ? config.accessories.hat.color : null;
   if (sub === 'glasses') return config.accessories.glasses ? config.accessories.glasses.color : null;
   if (sub === 'other')   return config.accessories.other ? config.accessories.other.color : null;
   return null;
 }
 
-function setSkin(toneId) {
-  config.body.skinTone = toneId;
+function setBodyColor(hex) {
+  // hex is actually a BATTERY_COLORS id like 'bat-white'
+  // If it looks like a battery color id, resolve to hex; otherwise treat as direct hex
+  const found = BATTERY_COLORS.find((bc) => bc.id === hex);
+  config.body.color = found ? found.base : hex;
 }
 
-function setHair(styleId) {
-  const prevColor = (config.body.hair && config.body.hair.color) || PALETTES.hair[0];
-  config.body.hair = { style: styleId || DEFAULT_CONFIG.body.hair.style, color: prevColor };
+function setBodySymbol(id) {
+  const prevColor = (config.body.symbol && config.body.symbol.color) || '#22c55e';
+  const validId = id && BODY_SYMBOLS.some((s) => s.id === id) ? id : 'sym-bolt';
+  config.body.symbol = { id: validId, color: prevColor };
 }
 
 function setTop(styleId) {
   const prevColor = (config.clothing.top && config.clothing.top.color) || PALETTES.top[0];
   config.clothing.top = { style: styleId || DEFAULT_CONFIG.clothing.top.style, color: prevColor };
-}
-
-function setBottom(styleId) {
-  const prevColor = (config.clothing.bottom && config.clothing.bottom.color) || PALETTES.bottom[0];
-  config.clothing.bottom = { style: styleId || DEFAULT_CONFIG.clothing.bottom.style, color: prevColor };
 }
 
 function setAccessory(sub, styleIdOrNull) {
@@ -476,24 +614,131 @@ function setAccessory(sub, styleIdOrNull) {
 }
 
 function setColor(sub, color) {
-  if (sub === 'hair')    { if (config.body.hair)         config.body.hair.color        = color; return; }
+  if (sub === 'symbol')  { if (config.body.symbol) config.body.symbol.color = color; return; }
   if (sub === 'top')     { if (config.clothing.top)      config.clothing.top.color     = color; return; }
-  if (sub === 'bottom')  { if (config.clothing.bottom)   config.clothing.bottom.color  = color; return; }
   if (sub === 'hat')     { if (config.accessories.hat)     config.accessories.hat.color    = color; return; }
   if (sub === 'glasses') { if (config.accessories.glasses) config.accessories.glasses.color = color; return; }
   if (sub === 'other')   { if (config.accessories.other)   config.accessories.other.color  = color; return; }
 }
 
+// ---------------------------------------------------------------------------
+// Buy modal
+// ---------------------------------------------------------------------------
+
+let _pendingPurchaseId = null;
+
+function openBuyModal(itemId) {
+  const price = getItemPrice(itemId) ?? 0;
+  const modal = document.getElementById('avatar-buy-modal');
+  if (!modal) return;
+  const titleEl = document.getElementById('avatar-buy-title');
+  const priceEl = document.getElementById('avatar-buy-price');
+  // Find item name
+  let itemName = itemId;
+  const sym = BODY_SYMBOLS.find((s) => s.id === itemId);
+  if (sym) itemName = sym.label;
+  else {
+    const outfit = (() => {
+      for (const cat of ['top', 'hat', 'glasses', 'other']) {
+        const found = getByCategory(cat).find((i) => i.id === itemId);
+        if (found) return found;
+      }
+      return null;
+    })();
+    if (outfit) itemName = outfit.name;
+  }
+  if (titleEl) titleEl.textContent = `"${itemName}" 구매`;
+  if (priceEl) priceEl.textContent = `가격: ${price} 🔋 (잔액: ${wallet.balance} 🔋)`;
+  _pendingPurchaseId = itemId;
+  modal.hidden = false;
+}
+
+function closeBuyModal() {
+  const modal = document.getElementById('avatar-buy-modal');
+  if (modal) modal.hidden = true;
+  _pendingPurchaseId = null;
+}
+
+async function executePurchase() {
+  const itemId = _pendingPurchaseId;
+  closeBuyModal();
+  if (!itemId) return;
+
+  try {
+    const res = await fetch(`${API_BASE}/api/shop/purchase`, {
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ itemId }),
+    });
+    const json = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      const errMsg = json.error === 'insufficient_battery' ? '배터리 잔액이 부족합니다' :
+                     json.error === 'already_owned' ? '이미 소유한 아이템입니다' :
+                     json.error === 'invalid_item' ? '유효하지 않은 아이템입니다' :
+                     '구매 실패';
+      showToast(errMsg, true);
+      return;
+    }
+    // Success
+    if (typeof json.balance === 'number') wallet.balance = json.balance;
+    if (Array.isArray(json.ownedItemIds)) {
+      json.ownedItemIds.forEach((id) => wallet.ownedItemIds.add(id));
+    } else {
+      wallet.ownedItemIds.add(itemId);
+    }
+    updateBalanceBadge();
+    showToast('구매 완료! 아이템이 장착되었습니다', false);
+
+    // 자동 장착: activeSecondary 카테고리에 설정
+    const cat = (() => {
+      const e = SHOP_CATALOG[itemId];
+      return e ? e.category : null;
+    })();
+    if (cat) {
+      if (cat === 'symbol') setBodySymbol(itemId);
+      else if (cat === 'top') setTop(itemId);
+      else setAccessory(cat, itemId);
+      commitChange();
+    } else {
+      paintGrid(); // refresh lock badges
+    }
+  } catch (_) {
+    showToast('구매 중 오류가 발생했습니다', true);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// Item click
+// ---------------------------------------------------------------------------
+
 function onItemClick(id) {
+  if (activePrimary === 'shop') {
+    // 미소유 premium 클릭 → 구매 모달
+    if (!isOwned(id)) {
+      openBuyModal(id);
+      return;
+    }
+    // 소유 아이템 → 장착
+    const cat = (() => {
+      const e = SHOP_CATALOG[id];
+      return e ? e.category : null;
+    })();
+    if (!cat) return;
+    if (cat === 'symbol') setBodySymbol(id);
+    else if (cat === 'top') setTop(id);
+    else setAccessory(cat, id);
+    commitChange();
+    return;
+  }
+
   const sub = getCurrentSubDef();
-  if (sub.id === 'skin') {
-    setSkin(id);
-  } else if (sub.id === 'hair') {
-    setHair(id === '__none__' ? null : id);
+  if (sub.id === 'color') {
+    setBodyColor(id);
+  } else if (sub.id === 'symbol') {
+    setBodySymbol(id);
   } else if (sub.id === 'top') {
     setTop(id === '__none__' ? null : id);
-  } else if (sub.id === 'bottom') {
-    setBottom(id === '__none__' ? null : id);
   } else {
     setAccessory(sub.id, id === '__none__' ? null : id);
   }
@@ -525,30 +770,37 @@ function pickRandom(arr) {
 }
 
 function onRandom() {
-  const skin = pickRandom(SKIN_TONES).id;
-  const hairItems = getByCategory('hair');
-  const topItems = getByCategory('top');
-  const bottomItems = getByCategory('bottom');
-  const hatItems = getByCategory('hat');
-  const glassesItems = getByCategory('glasses');
-  const otherItems = getByCategory('other');
+  // body.color: BATTERY_COLORS에서 random pick
+  const bodyColor = pickRandom(BATTERY_COLORS);
+  config.body.color = bodyColor.base;
 
-  setSkin(skin);
-  if (hairItems.length)   setHair(pickRandom(hairItems).id);
-  if (topItems.length)    setTop(pickRandom(topItems).id);
-  if (bottomItems.length) setBottom(pickRandom(bottomItems).id);
-  // Accessories: 50% chance of "none"
-  setAccessory('hat',     Math.random() < 0.5 || !hatItems.length     ? null : pickRandom(hatItems).id);
-  setAccessory('glasses', Math.random() < 0.5 || !glassesItems.length ? null : pickRandom(glassesItems).id);
-  setAccessory('other',   Math.random() < 0.5 || !otherItems.length   ? null : pickRandom(otherItems).id);
+  // body.symbol: owned symbols에서 pick
+  const ownedSymbols = BODY_SYMBOLS.filter((s) => isOwned(s.id));
+  if (ownedSymbols.length) {
+    const sym = pickRandom(ownedSymbols);
+    const prevColor = (config.body.symbol && config.body.symbol.color) || '#22c55e';
+    config.body.symbol = { id: sym.id, color: pickRandom(PALETTES.symbol) };
+  }
 
-  // Randomize colors too
-  if (config.body.hair)       config.body.hair.color       = pickRandom(PALETTES.hair);
-  if (config.clothing.top)    config.clothing.top.color    = pickRandom(PALETTES.top);
-  if (config.clothing.bottom) config.clothing.bottom.color = pickRandom(PALETTES.bottom);
-  if (config.accessories.hat)     config.accessories.hat.color     = pickRandom(PALETTES.hat);
-  if (config.accessories.glasses) config.accessories.glasses.color = pickRandom(PALETTES.glasses);
-  if (config.accessories.other)   config.accessories.other.color   = pickRandom(PALETTES.other);
+  // clothing: owned tops
+  const ownedTops = getByCategory('top').filter((i) => isOwned(i.id));
+  if (ownedTops.length) setTop(pickRandom(ownedTops).id);
+
+  // Accessories: 50% chance of "none", owned items only
+  const ownedHats    = getByCategory('hat').filter((i) => isOwned(i.id));
+  const ownedGlasses = getByCategory('glasses').filter((i) => isOwned(i.id));
+  const ownedOther   = getByCategory('other').filter((i) => isOwned(i.id));
+
+  setAccessory('hat',     Math.random() < 0.5 || !ownedHats.length    ? null : pickRandom(ownedHats).id);
+  setAccessory('glasses', Math.random() < 0.5 || !ownedGlasses.length ? null : pickRandom(ownedGlasses).id);
+  setAccessory('other',   Math.random() < 0.5 || !ownedOther.length   ? null : pickRandom(ownedOther).id);
+
+  // Randomize colors
+  if (config.body.symbol)          config.body.symbol.color          = pickRandom(PALETTES.symbol);
+  if (config.clothing.top)         config.clothing.top.color         = pickRandom(PALETTES.top);
+  if (config.accessories.hat)      config.accessories.hat.color      = pickRandom(PALETTES.hat);
+  if (config.accessories.glasses)  config.accessories.glasses.color  = pickRandom(PALETTES.glasses);
+  if (config.accessories.other)    config.accessories.other.color    = pickRandom(PALETTES.other);
 
   commitChange();
   showToast('랜덤 적용', false);
@@ -590,7 +842,6 @@ function resolveUsername() {
   const el = document.getElementById('avatar-username');
   if (!el) return;
 
-  // Immediate: try #my-name in the header
   const myName = document.getElementById('my-name');
   const nameFromHeader = myName ? myName.textContent.trim() : '';
   if (nameFromHeader && nameFromHeader !== '사용자 이름') {
@@ -598,7 +849,6 @@ function resolveUsername() {
     return;
   }
 
-  // Try demo user in localStorage
   try {
     const raw = localStorage.getItem(DEMO_USER_KEY);
     if (raw) {
@@ -610,7 +860,6 @@ function resolveUsername() {
     }
   } catch (_) {}
 
-  // Async: fetch /api/me
   fetch(`${API_BASE}/api/me`, { credentials: 'include' })
     .then((r) => r.ok ? r.json() : null)
     .then((j) => {
@@ -648,6 +897,9 @@ async function resolveAndRender() {
       paintGrid();
       paintColorRow();
     }
+    // Load wallet after config is resolved
+    await loadWallet();
+    paintGrid(); // refresh lock/owned badges after wallet load
   }
 }
 

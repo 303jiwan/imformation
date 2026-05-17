@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codenergy — 트레일</title>
+    <style>
+      .page-fade {
+        position: fixed; inset: 0; background: #fff;
+        z-index: 9999; opacity: 1; pointer-events: auto;
+      }
+    </style>
+    <script type="module" crossorigin src="/assets/trail-DTKP8xc8.js"></script>
+    <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
+    <link rel="modulepreload" crossorigin href="/assets/main-MRu2IMKr.js">
+    <link rel="modulepreload" crossorigin href="/assets/lesson-data-B2CEYwgD.js">
+    <link rel="stylesheet" crossorigin href="/assets/main-d5G1KsKR.css">
+  </head>
+  <body>
+    <div class="page-fade" id="page-fade"></div>
+    <header class="nav">
+      <div class="logo"><a href="index.html">Codenergy ▲</a></div>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-collapse">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-collapse" id="nav-collapse">
+        <nav class="menu" id="menu">
+          <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
+          <a href="lectures.html" data-i18n="nav.lectures">강의</a>
+          <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
+          <a href="index.html" data-action="invite" data-i18n="nav.invite">친구 초대</a>
+          <a href="#" data-action="avatar" data-i18n="nav.avatar">아바타</a>
+        </nav>
+        <div class="actions">
+          <div class="lang-wrap" id="lang-wrap">
+            <button class="ghost" id="lang-btn" type="button">🌐 <span id="lang-current">한국어</span> ▾</button>
+            <div class="lang-menu" id="lang-menu" hidden>
+              <button type="button" class="lang-menu__item" data-lang="ko">한국어</button>
+              <button type="button" class="lang-menu__item" data-lang="en">English</button>
+            </div>
+          </div>
+          <div class="notif-wrap" id="notif-wrap">
+            <button class="icon" id="notif-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="알림">🔔</button>
+            <div class="notif-menu" id="notif-menu" hidden>
+              <div class="notif-menu__header">알림</div>
+              <ul class="notif-menu__list" id="notif-list"></ul>
+              <p class="notif-menu__empty" id="notif-empty" hidden>새 알림이 없어요</p>
+              <p class="notif-menu__signin" id="notif-signin" hidden>로그인 후 확인할 수 있어요</p>
+            </div>
+          </div>
+          <button class="ghost" id="login-btn" data-i18n="action.login">로그인</button>
+          <button class="ghost" id="signup-btn" data-i18n="action.signup">회원가입</button>
+          <div class="my-wrap" id="my-wrap" hidden>
+            <button class="ghost" id="my-btn" data-i18n="action.my">My</button>
+            <div class="my-menu" id="my-menu" hidden>
+              <div class="my-menu__profile">
+                <div class="my-menu__avatar" aria-hidden="true">👤</div>
+                <div class="my-menu__user">
+                  <div class="my-menu__name" id="my-name" data-i18n="my.name">사용자 이름</div>
+                  <div class="my-menu__email" id="my-email">user@example.com</div>
+                </div>
+              </div>
+              <ul class="my-menu__list">
+                <li><button type="button" class="my-menu__item" data-i18n="my.mypage">마이페이지</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.invite">친구 초대</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.settings">설정</button></li>
+              </ul>
+              <div class="my-menu__divider"></div>
+              <button type="button" class="my-menu__item my-menu__logout" id="logout-btn" data-i18n="my.logout">로그아웃</button>
+            </div>
+          </div>
+          <button class="cta" data-i18n="action.cta">학습하기 →</button>
+        </div>
+      </div>
+    </header>
+
+    <div id="auth-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <form class="modal-card" id="auth-form">
+        <h3 id="modal-title" data-i18n="auth.login">로그인</h3>
+        <label class="field-username">
+          <span data-i18n="auth.username">아이디</span>
+          <input name="username" autocomplete="username" required minlength="2" />
+        </label>
+        <label class="field-password">
+          <span data-i18n="auth.password">비밀번호</span>
+          <input name="password" type="password" autocomplete="current-password" required minlength="6" />
+        </label>
+        <label class="field-email" id="email-field" hidden>
+          <span>Gmail</span>
+          <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
+        </label>
+        <p class="modal-info" id="modal-info" hidden></p>
+        <p class="modal-error" id="modal-error" hidden></p>
+        <div class="modal-recovery" id="modal-recovery">
+          <button type="button" class="link-button" id="find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-recovery-alt" id="modal-recovery-alt" hidden>
+          <button type="button" class="link-button" id="alt-find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="alt-find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close data-i18n="action.cancel">취소</button>
+          <button type="submit" class="cta" id="submit-btn" data-i18n="auth.login">로그인</button>
+        </div>
+      </form>
+    </div>
+
+    <main class="trail-page" id="trail-page" data-color="green">
+      <header class="trail-page__topbar">
+        <div class="trail-page__name-wrap">
+          <button type="button" class="trail-page__name" id="trail-name-btn" aria-haspopup="true" aria-expanded="false" aria-controls="trail-name-menu">
+            <span class="trail-page__name-eyebrow" id="trail-eyebrow">Trail 0. Codetree 101</span>
+            <span class="trail-page__name-title" id="trail-title">프로그래밍 시작</span>
+            <span class="trail-page__name-caret" aria-hidden="true">▾</span>
+          </button>
+          <div class="trail-page__name-menu" id="trail-name-menu" role="menu" hidden></div>
+        </div>
+        <div class="trail-page__stats">
+          <div class="trail-stat trail-stat--streak">
+            <span class="trail-stat__icon" aria-hidden="true">▬</span>
+            <div>
+              <div class="trail-stat__value">0</div>
+              <div class="trail-stat__label">Day Streak</div>
+            </div>
+          </div>
+          <div class="trail-stat trail-stat--xp">
+            <div class="trail-stat__row">
+              <span class="trail-stat__label">경험치 목표</span>
+              <span class="trail-stat__chip">열심히</span>
+            </div>
+            <div class="trail-stat__bar"><span style="width: 0%"></span></div>
+            <div class="trail-stat__small">0 / 90 XP</div>
+          </div>
+          <div class="trail-stat trail-stat--points">
+            <div class="trail-stat__row"><span class="trail-stat__dot"></span><strong>4</strong>&nbsp;points</div>
+            <div class="trail-stat__row"><span aria-hidden="true">🎁</span>&nbsp;나의 추천</div>
+          </div>
+        </div>
+      </header>
+
+      <div class="trail-page__body">
+        <aside class="trail-page__chapters" id="trail-chapters" aria-label="챕터 목록"></aside>
+
+        <section class="trail-page__lesson">
+          <div class="trail-gapcheck">
+            <div class="trail-gapcheck__text">
+              <p>정밀 진단을 통해 나에게 딱 맞는<br/>학습 시작점을 찾고 싶나요?</p>
+              <a class="trail-gapcheck__btn" href="survey.html">갭체크 시작하기</a>
+            </div>
+            <div class="trail-gapcheck__art" aria-hidden="true">
+              <span class="g-shape g-shape--orange"></span>
+              <span class="g-shape g-shape--yellow"></span>
+              <span class="g-shape g-shape--green"></span>
+              <span class="g-shape g-shape--blue"></span>
+            </div>
+          </div>
+
+          <div class="trail-lesson">
+            <div class="trail-lesson__head">
+              <div>
+                <div class="trail-lesson__eyebrow">Lesson 1.</div>
+                <h2 class="trail-lesson__title" id="lesson-title">출력 입문</h2>
+                <span class="trail-lesson__tag">Foundation</span>
+              </div>
+              <div class="trail-lesson__progress">
+                <div class="trail-lesson__bar"><span style="width: 0%"></span></div>
+                <span class="trail-lesson__percent">0%</span>
+              </div>
+            </div>
+
+            <table class="trail-lesson__table">
+              <thead>
+                <tr>
+                  <th class="col-step">단계</th>
+                  <th class="col-prob">문제</th>
+                  <th class="col-time">시간</th>
+                  <th class="col-xp">XP</th>
+                  <th class="col-diff">난이도</th>
+                </tr>
+              </thead>
+              <tbody id="lesson-rows"></tbody>
+            </table>
+          </div>
+
+          <button type="button" class="trail-cta" id="lesson-cta">레슨 시작하기 →</button>
+        </section>
+      </div>
+    </main>
+
+  </body>
+</html>

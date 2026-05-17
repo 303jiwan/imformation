@@ -20,15 +20,14 @@ import { test, expect, type Page, type Request } from '@playwright/test';
 const AUTH_HINT_KEY = 'codenergy:auth:hint';
 const DEMO_USER_KEY = 'codenergy:demo:user';
 
-/** New schema DEFAULT_CONFIG (must match character.js) */
+/** New schema DEFAULT_CONFIG (배터리 캐릭터, must match character.js) */
 const DEFAULT_CONFIG = {
   body: {
-    skinTone: 'tone-2',
-    hair: { style: 'hair-short', color: '#1f2937' },
+    color: '#ffffff',
+    symbol: { id: 'sym-bolt', color: '#22c55e' },
   },
   clothing: {
-    top:    { style: 'top-tee',   color: '#2563eb' },
-    bottom: { style: 'bot-jeans', color: '#1f2937' },
+    top: { style: 'top-tee', color: '#2563eb' },
   },
   accessories: {
     hat:     null as null | { style: string; color: string },
@@ -200,12 +199,12 @@ test.describe('아바타 에디터', () => {
     // Live preview SVG visible
     await expect(page.locator('.avatar-character svg')).toBeVisible({ timeout: 5000 });
 
-    // Primary tabs: exactly 3 (신체/의상/악세사리)
+    // Primary tabs: exactly 4 (신체/의상/악세사리/상점)
     const primaryTabs = page.locator('.avatar-tabs--primary .avatar-tab');
     await expect(primaryTabs.first()).toBeVisible({ timeout: 5000 });
-    expect(await primaryTabs.count()).toBe(3);
+    expect(await primaryTabs.count()).toBe(4);
 
-    // Secondary tabs visible (신체 → 피부/머리)
+    // Secondary tabs visible (신체 → 본체색/문양)
     const secondaryTabs = page.locator('.avatar-tabs--secondary .avatar-tab');
     await expect(secondaryTabs.first()).toBeVisible({ timeout: 5000 });
     expect(await secondaryTabs.count()).toBeGreaterThanOrEqual(2);

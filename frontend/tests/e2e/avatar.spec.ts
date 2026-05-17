@@ -4,8 +4,8 @@ import { test, expect } from '@playwright/test';
  * Avatar customization page.
  * Source: frontend/avatar.html + frontend/src/avatar.js (+ src/avatar/*).
  *
- * New schema:
- *   { body: { skinTone, hair }, clothing: { top, bottom }, accessories: { hat, glasses, other } }
+ * New schema (배터리 캐릭터):
+ *   { body: { color, symbol: {id, color} }, clothing: { top }, accessories: { hat, glasses, other } }
  *
  * Auth state is detected by avatar.js via `#my-wrap` not being hidden and/or
  * localStorage demo-user key. Tests inject a demo user before page load.
@@ -13,7 +13,6 @@ import { test, expect } from '@playwright/test';
 
 const DEMO_USER_KEY = 'codenergy:demo:user';
 const STORAGE_KEY   = 'codenergy:avatar:config';
-const DEFAULT_SKIN_BASE = '#fde68a'; // tone-2 base
 
 async function blockBackend(page: import('@playwright/test').Page) {
   await page.route('http://localhost:3000/**', (route) => route.abort());
@@ -59,14 +58,15 @@ test.describe('아바타 페이지', () => {
     await expect(page.locator('.codenergy-character')).toBeVisible({ timeout: 5000 });
     await expect(page.locator('.avatar-stage')).toBeVisible();
 
-    // Primary tabs: 3 (신체 / 의상 / 악세사리)
+    // Primary tabs: 4 (신체 / 의상 / 악세사리 / 상점)
     const primaryTabs = page.locator('.avatar-tabs--primary .avatar-tab');
     await expect(primaryTabs.first()).toBeVisible({ timeout: 5000 });
-    expect(await primaryTabs.count()).toBe(3);
+    expect(await primaryTabs.count()).toBe(4);
 
     await expect(page.locator('.avatar-tabs--primary .avatar-tab[data-primary="body"]')).toBeVisible();
     await expect(page.locator('.avatar-tabs--primary .avatar-tab[data-primary="clothing"]')).toBeVisible();
     await expect(page.locator('.avatar-tabs--primary .avatar-tab[data-primary="accessories"]')).toBeVisible();
+    await expect(page.locator('.avatar-tabs--primary .avatar-tab[data-primary="shop"]')).toBeVisible();
   });
 
   test('상의를 변경하면 캐릭터 SVG에 새 옷 클래스가 반영되고 localStorage에 저장된다', async ({
@@ -111,41 +111,40 @@ test.describe('아바타 페이지', () => {
     expect(parsed.clothing.top.style).toBe(newTopId);
   });
 
-  test('피부톤을 변경하면 캐릭터 머리 fill 색상이 기본값과 달라진다', async ({
+  test('본체색을 변경하면 캐릭터 SVG body rect fill이 바뀐다', async ({
     page,
   }) => {
     await loginAsDemoUser(page);
     await page.goto('/avatar.html');
 
-    // Navigate to 신체 primary tab, then 피부 secondary tab
+    // Navigate to 신체 primary tab, then 본체색 secondary tab
     const bodyTab = page.locator('.avatar-tabs--primary .avatar-tab[data-primary="body"]');
     await expect(bodyTab).toBeVisible({ timeout: 5000 });
     await bodyTab.click();
 
-    const skinTab = page.locator('.avatar-tabs--secondary .avatar-tab[data-secondary="skin"]');
-    await expect(skinTab).toBeVisible({ timeout: 3000 });
-    await skinTab.click();
+    const colorTab = page.locator('.avatar-tabs--secondary .avatar-tab[data-secondary="color"]');
+    await expect(colorTab).toBeVisible({ timeout: 3000 });
+    await colorTab.click();
 
-    // Grid now shows skin tone swatches (6 items)
+    // Grid now shows BATTERY_COLORS swatches (8~10 items)
     const swatches = page.locator('.avatar-grid .avatar-item');
     await expect(swatches.first()).toBeVisible({ timeout: 3000 });
     const swatchCount = await swatches.count();
-    expect(swatchCount).toBeGreaterThanOrEqual(5);
-    expect(swatchCount).toBeLessThanOrEqual(6);
+    expect(swatchCount).toBeGreaterThanOrEqual(8);
+    expect(swatchCount).toBeLessThanOrEqual(10);
 
-    // Click the last swatch (darkest tone)
-    await swatches.last().click();
+    // Click a non-equipped swatch
+    const nonEquipped = page.locator('.avatar-grid .avatar-item:not(.is-equipped)').first();
+    await expect(nonEquipped).toBeVisible({ timeout: 3000 });
+    await nonEquipped.click();
 
-    // Head circle fill should differ from default base
-    const headFill = await page
-      .locator('.codenergy-character g.char-head circle')
+    // SVG should have a rect fill that differs from default (#ffffff)
+    const bodyRect = await page
+      .locator('.codenergy-character rect')
       .first()
       .getAttribute('fill');
 
-    expect(headFill).not.toBeNull();
-    expect((headFill as string).toLowerCase()).not.toBe(
-      DEFAULT_SKIN_BASE.toLowerCase(),
-    );
+    expect(bodyRect).not.toBeNull();
   });
 
   test('헤더 "아바타" 메뉴 → 로그인 모달 → 데모 모드로 → /avatar.html 로 이동', async ({

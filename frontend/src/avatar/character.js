@@ -1,14 +1,13 @@
-// character.js — 새 schema (plan step 4)
+// character.js — 배터리 마스코트 캐릭터 (plan step 4, Agent A 재작성)
 //
 // Schema:
 //   {
 //     body: {
-//       skinTone: 'tone-1'..'tone-6',
-//       hair: { style, color }
+//       color: '#ffffff',              // 본체 fill
+//       symbol: { id, color }          // 배터리 몸통 문양
 //     },
 //     clothing: {
-//       top:    { style, color },
-//       bottom: { style, color }
+//       top: { style, color }
 //     },
 //     accessories: {
 //       hat:     null | { style, color },
@@ -21,27 +20,131 @@
 // root class: codenergy-character
 //
 // Layer z-order (back → front):
-//   다리 → 몸통 → 팔 → 하의 → 상의 → 머리(피부 베이스) → 표정(고정) → 귀걸이(other) → 머리카락 → 안경 → 모자
+//   그림자 → cap → 본체 → top 의상 → 눈 → 동공 → symbol → glasses → hat → other
 
 import { getById, renderOutfitFragment } from './outfits.js';
 
 // ---------------------------------------------------------------------------
-// Skin tones
+// BODY_RECT — Agent B가 outfit 좌표 재산정에 사용
 // ---------------------------------------------------------------------------
 
-export const SKIN_TONES = [
-  { id: 'tone-1', label: '가장 밝은',   base: '#fff5d6', shadow: '#fce8a4' },
-  { id: 'tone-2', label: '밝은 톤',     base: '#fde68a', shadow: '#fbbf24' },
-  { id: 'tone-3', label: '중간 톤',     base: '#f4c084', shadow: '#d97706' },
-  { id: 'tone-4', label: '구릿빛 톤',   base: '#c89878', shadow: '#92622f' },
-  { id: 'tone-5', label: '어두운 톤',   base: '#8b5a3c', shadow: '#5a3a25' },
-  { id: 'tone-6', label: '가장 어두운', base: '#5a3a25', shadow: '#3a2415' },
+export const BODY_RECT = { x: 48, y: 40, width: 144, height: 240, rx: 32 };
+
+// ---------------------------------------------------------------------------
+// SKIN_TONES — deprecated, 빈 배열 유지 (기존 import 호환)
+// ---------------------------------------------------------------------------
+
+/** @deprecated 배터리 캐릭터에서는 사용되지 않음 */
+export const SKIN_TONES = [];
+
+// ---------------------------------------------------------------------------
+// BATTERY_COLORS — 본체 색상 팔레트
+// ---------------------------------------------------------------------------
+
+export const BATTERY_COLORS = [
+  { id: 'bat-white',  label: '클래식',  base: '#ffffff', stroke: '#7c3aed' },
+  { id: 'bat-yellow', label: '노란',    base: '#fbbf24', stroke: '#d97706' },
+  { id: 'bat-blue',   label: '파란',    base: '#60a5fa', stroke: '#1d4ed8' },
+  { id: 'bat-green',  label: '초록',    base: '#4ade80', stroke: '#15803d' },
+  { id: 'bat-pink',   label: '핑크',    base: '#f9a8d4', stroke: '#be185d' },
+  { id: 'bat-orange', label: '오렌지',  base: '#fb923c', stroke: '#c2410c' },
+  { id: 'bat-purple', label: '보라',    base: '#c084fc', stroke: '#7e22ce' },
+  { id: 'bat-teal',   label: '청록',    base: '#2dd4bf', stroke: '#0f766e' },
+  { id: 'bat-red',    label: '빨강',    base: '#f87171', stroke: '#b91c1c' },
+  { id: 'bat-dark',   label: '다크',    base: '#334155', stroke: '#0f172a' },
 ];
 
-function lookupSkinTone(id) {
-  return SKIN_TONES.find((t) => t.id === id)
-    || SKIN_TONES.find((t) => t.id === 'tone-2')
-    || SKIN_TONES[0];
+// ---------------------------------------------------------------------------
+// shade 헬퍼 — BATTERY_COLORS 외 자유 hex 사용 시 stroke 자동 산정
+// ---------------------------------------------------------------------------
+
+function shade(hex, amount = 0.3) {
+  if (typeof hex !== 'string' || !hex.startsWith('#')) return '#7c3aed';
+  let h = hex.length === 4
+    ? '#' + hex.slice(1).split('').map((c) => c + c).join('')
+    : hex;
+  const r = parseInt(h.slice(1, 3), 16);
+  const g = parseInt(h.slice(3, 5), 16);
+  const b = parseInt(h.slice(5, 7), 16);
+  const f = Math.max(0, Math.min(1, 1 - amount));
+  return '#' + [r, g, b].map((v) => Math.round(v * f).toString(16).padStart(2, '0')).join('');
+}
+
+function strokeForBodyColor(color) {
+  const found = BATTERY_COLORS.find((c) => c.base === color);
+  return found ? found.stroke : shade(color, 0.3);
+}
+
+// ---------------------------------------------------------------------------
+// BODY_SYMBOLS — 몸통 문양 카탈로그
+// ---------------------------------------------------------------------------
+
+export const BODY_SYMBOLS = [
+  {
+    id: 'sym-bolt',
+    label: '번개',
+    thumbnail: '⚡',
+    // 200→240 좌표계 변환: 원본 path 중심(cx=100→120), y 오프셋 +30
+    svgFragment: (color = '#22c55e') => `
+      <path d="M 133 178 L 106 220 L 122 220 L 108 254 L 138 208 L 120 208 Z"
+            fill="${color}" stroke="${shade(color, 0.25)}" stroke-width="2.5" stroke-linejoin="round"/>
+    `,
+  },
+  {
+    id: 'sym-heart',
+    label: '하트',
+    thumbnail: '❤️',
+    svgFragment: (color = '#ef4444') => `
+      <path d="M120 248 C120 248 88 228 88 208 C88 196 96 188 108 190 C114 191 120 197 120 197 C120 197 126 191 132 190 C144 188 152 196 152 208 C152 228 120 248 120 248 Z"
+            fill="${color}" stroke="${shade(color, 0.25)}" stroke-width="2"/>
+    `,
+  },
+  {
+    id: 'sym-star',
+    label: '별',
+    thumbnail: '⭐',
+    svgFragment: (color = '#fbbf24') => `
+      <polygon points="120,192 126,210 146,210 130,222 136,240 120,230 104,240 110,222 94,210 114,210"
+               fill="${color}" stroke="${shade(color, 0.25)}" stroke-width="2" stroke-linejoin="round"/>
+    `,
+  },
+  {
+    id: 'sym-cog',
+    label: '톱니바퀴',
+    thumbnail: '⚙️',
+    svgFragment: (color = '#94a3b8') => `
+      <g transform="translate(120,220)">
+        <circle r="14" fill="${color}" stroke="${shade(color, 0.25)}" stroke-width="2"/>
+        <circle r="7"  fill="${shade(color, 0.15)}" stroke="${shade(color, 0.35)}" stroke-width="1.5"/>
+        <rect x="-4" y="-20" width="8" height="10" rx="2" fill="${color}" stroke="${shade(color, 0.25)}" stroke-width="1.5"/>
+        <rect x="-4" y="10"  width="8" height="10" rx="2" fill="${color}" stroke="${shade(color, 0.25)}" stroke-width="1.5"/>
+        <rect x="-20" y="-4" width="10" height="8" rx="2" fill="${color}" stroke="${shade(color, 0.25)}" stroke-width="1.5"/>
+        <rect x="10"  y="-4" width="10" height="8" rx="2" fill="${color}" stroke="${shade(color, 0.25)}" stroke-width="1.5"/>
+      </g>
+    `,
+  },
+  {
+    id: 'sym-flame',
+    label: '불꽃',
+    thumbnail: '🔥',
+    svgFragment: (color = '#f97316') => `
+      <path d="M120 192 C110 202 104 212 108 224 C110 232 116 238 120 240 C124 238 130 232 132 224 C136 212 130 202 120 192 Z M120 208 C118 214 116 220 118 226 C118 228 119 230 120 231 C121 230 122 228 122 226 C124 220 122 214 120 208 Z"
+            fill="${color}" stroke="${shade(color, 0.25)}" stroke-width="1.5" stroke-linejoin="round"/>
+    `,
+  },
+  {
+    id: 'sym-code',
+    label: '코드',
+    thumbnail: '</>',
+    svgFragment: (color = '#38bdf8') => `
+      <text x="120" y="228" text-anchor="middle" font-family="monospace" font-size="26"
+            font-weight="bold" fill="${color}" stroke="${shade(color, 0.25)}" stroke-width="1">&lt;/&gt;</text>
+    `,
+  },
+];
+
+function lookupSymbol(id) {
+  return BODY_SYMBOLS.find((s) => s.id === id) || BODY_SYMBOLS[0];
 }
 
 // ---------------------------------------------------------------------------
@@ -50,12 +153,11 @@ function lookupSkinTone(id) {
 
 export const DEFAULT_CONFIG = {
   body: {
-    skinTone: 'tone-2',
-    hair: { style: 'hair-short', color: '#1f2937' },
+    color: '#ffffff',
+    symbol: { id: 'sym-bolt', color: '#22c55e' },
   },
   clothing: {
-    top:    { style: 'top-tee',   color: '#2563eb' },
-    bottom: { style: 'bot-jeans', color: '#1f2937' },
+    top: { style: 'top-tee', color: '#2563eb' },
   },
   accessories: {
     hat:     null,
@@ -73,29 +175,28 @@ export function normalizeConfig(raw) {
 
   const def = DEFAULT_CONFIG;
 
-  // body
+  // body.color
   const rawBody = raw.body && typeof raw.body === 'object' ? raw.body : {};
-  const skinTone = SKIN_TONES.some((t) => t.id === rawBody.skinTone)
-    ? rawBody.skinTone
-    : def.body.skinTone;
-  const rawHair = rawBody.hair && typeof rawBody.hair === 'object' ? rawBody.hair : {};
-  const hairStyle = typeof rawHair.style === 'string' && rawHair.style
-    ? rawHair.style : def.body.hair.style;
-  const hairColor = typeof rawHair.color === 'string' && rawHair.color
-    ? rawHair.color : def.body.hair.color;
+  const bodyColor = typeof rawBody.color === 'string' && rawBody.color.startsWith('#')
+    ? rawBody.color
+    : def.body.color;
 
-  // clothing
+  // body.symbol
+  const rawSym = rawBody.symbol && typeof rawBody.symbol === 'object' ? rawBody.symbol : {};
+  const symId = BODY_SYMBOLS.some((s) => s.id === rawSym.id)
+    ? rawSym.id
+    : def.body.symbol.id;
+  const symColor = typeof rawSym.color === 'string' && rawSym.color.startsWith('#')
+    ? rawSym.color
+    : def.body.symbol.color;
+
+  // clothing.top (bottom silently dropped)
   const rawClothing = raw.clothing && typeof raw.clothing === 'object' ? raw.clothing : {};
   const rawTop = rawClothing.top && typeof rawClothing.top === 'object' ? rawClothing.top : {};
   const topStyle = typeof rawTop.style === 'string' && rawTop.style
     ? rawTop.style : def.clothing.top.style;
   const topColor = typeof rawTop.color === 'string' && rawTop.color
     ? rawTop.color : def.clothing.top.color;
-  const rawBot = rawClothing.bottom && typeof rawClothing.bottom === 'object' ? rawClothing.bottom : {};
-  const botStyle = typeof rawBot.style === 'string' && rawBot.style
-    ? rawBot.style : def.clothing.bottom.style;
-  const botColor = typeof rawBot.color === 'string' && rawBot.color
-    ? rawBot.color : def.clothing.bottom.color;
 
   // accessories
   const rawAcc = raw.accessories && typeof raw.accessories === 'object' && !Array.isArray(raw.accessories)
@@ -108,12 +209,11 @@ export function normalizeConfig(raw) {
 
   return {
     body: {
-      skinTone,
-      hair: { style: hairStyle, color: hairColor },
+      color: bodyColor,
+      symbol: { id: symId, color: symColor },
     },
     clothing: {
-      top:    { style: topStyle,  color: topColor },
-      bottom: { style: botStyle,  color: botColor },
+      top: { style: topStyle, color: topColor },
     },
     accessories: {
       hat:     normAcc(rawAcc.hat),
@@ -124,63 +224,13 @@ export function normalizeConfig(raw) {
 }
 
 // ---------------------------------------------------------------------------
-// Base SVG fragments (coordinate space: 240×320)
-// ---------------------------------------------------------------------------
-
-const baseLegs = (skin, shadow) => `
-  <g class="char-legs">
-    <rect x="98"  y="212" width="17" height="88" rx="8"  fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
-    <rect x="125" y="212" width="17" height="88" rx="8"  fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
-    <ellipse cx="106" cy="302" rx="14" ry="6" fill="#1f2937"/>
-    <ellipse cx="133" cy="302" rx="14" ry="6" fill="#1f2937"/>
-  </g>
-`;
-
-const baseBody = (skin, shadow) => `
-  <g class="char-body">
-    <rect x="109" y="126" width="22" height="17" rx="5" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
-    <path d="M72 140 Q72 134 80 132 L160 132 Q168 134 168 140 L170 213 L70 213 Z"
-          fill="${skin}" stroke="${shadow}" stroke-width="1.5" stroke-linejoin="round"/>
-  </g>
-`;
-
-const baseArms = (skin, shadow) => `
-  <g class="char-arms">
-    <rect x="51" y="142" width="20" height="74" rx="10" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
-    <rect x="169" y="142" width="20" height="74" rx="10" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
-    <circle cx="61"  cy="220" r="10" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
-    <circle cx="179" cy="220" r="10" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
-  </g>
-`;
-
-const baseHead = (skin, shadow) => `
-  <g class="char-head">
-    <ellipse cx="60"  cy="86" rx="7"  ry="10" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
-    <ellipse cx="180" cy="86" rx="7"  ry="10" fill="${skin}" stroke="${shadow}" stroke-width="1.5"/>
-    <circle  cx="120" cy="82" r="60"  fill="${skin}" stroke="${shadow}" stroke-width="2"/>
-  </g>
-`;
-
-const DEFAULT_FACE = `
-  <g class="char-face char-face--default">
-    <circle cx="104" cy="80" r="4"   fill="#1f2937"/>
-    <circle cx="136" cy="80" r="4"   fill="#1f2937"/>
-    <circle cx="105" cy="79" r="1.2" fill="#ffffff"/>
-    <circle cx="137" cy="79" r="1.2" fill="#ffffff"/>
-    <path d="M108 98 Q120 108 132 98" stroke="#1f2937" stroke-width="2.5"
-          fill="none" stroke-linecap="round"/>
-  </g>
-`;
-
-// ---------------------------------------------------------------------------
 // Fragment helpers
 // ---------------------------------------------------------------------------
 
-function fragmentFor(slot, sub) {
+function fragmentFor(slot) {
   if (!slot || !slot.style) return '';
   const item = getById(slot.style);
   if (!item) return '';
-  // sub may differ from category stored on item (e.g. 'other' mapped to earring IDs)
   return renderOutfitFragment(item, slot.color);
 }
 
@@ -191,30 +241,60 @@ function fragmentFor(slot, sub) {
 export function renderCharacter(input = {}) {
   const cfg = normalizeConfig(input);
 
-  const tone = lookupSkinTone(cfg.body.skinTone);
-  const skin = tone.base;
-  const shadow = tone.shadow;
+  const bodyColor  = cfg.body.color;
+  const bodyStroke = strokeForBodyColor(bodyColor);
+  const capColor   = bodyStroke; // cap은 stroke 색과 동일 (보라 계열)
 
-  const hairFrag    = fragmentFor(cfg.body.hair, 'hair');
-  const topFrag     = fragmentFor(cfg.clothing.top, 'top');
-  const bottomFrag  = fragmentFor(cfg.clothing.bottom, 'bottom');
-  const hatFrag     = fragmentFor(cfg.accessories.hat, 'hat');
-  const glassesFrag = fragmentFor(cfg.accessories.glasses, 'glasses');
-  const otherFrag   = fragmentFor(cfg.accessories.other, 'other');
+  // symbol fragment
+  const sym = lookupSymbol(cfg.body.symbol.id);
+  const symbolFrag = sym.svgFragment(cfg.body.symbol.color);
+
+  // outfit fragments
+  const topFrag     = fragmentFor(cfg.clothing.top);
+  const hatFrag     = fragmentFor(cfg.accessories.hat);
+  const glassesFrag = fragmentFor(cfg.accessories.glasses);
+  const otherFrag   = fragmentFor(cfg.accessories.other);
+  // hair fragment는 배터리 캐릭터에서 사용하지 않음 (폐기)
+
+  const B = BODY_RECT; // { x:48, y:40, width:144, height:240, rx:32 }
+  const cx = B.x + B.width / 2;   // 120
+  const eyeCy = B.y + 80;         // 120 — 눈 중심
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320"
      class="codenergy-character"
      role="img" aria-label="Codenergy 아바타">
-  ${baseLegs(skin, shadow)}
-  ${baseBody(skin, shadow)}
-  ${baseArms(skin, shadow)}
-  ${bottomFrag}
+  <!-- 1. 그림자 -->
+  <ellipse cx="${cx}" cy="310" rx="70" ry="6" fill="#94a3b8" opacity="0.28"/>
+
+  <!-- 2. cap -->
+  <rect x="${cx - 22}" y="22" width="44" height="18" rx="7" fill="${capColor}"/>
+
+  <!-- 3. 본체 -->
+  <rect x="${B.x}" y="${B.y}" width="${B.width}" height="${B.height}" rx="${B.rx}"
+        fill="${bodyColor}" stroke="${bodyStroke}" stroke-width="5"/>
+
+  <!-- 4. top 의상 (Agent B 좌표) -->
   ${topFrag}
-  ${baseHead(skin, shadow)}
-  ${DEFAULT_FACE}
-  ${otherFrag}
-  ${hairFrag}
+
+  <!-- 5. 눈 -->
+  <circle cx="${cx}" cy="${eyeCy}" r="38" fill="#ffffff" stroke="#a855f7" stroke-width="4"/>
+
+  <!-- 6. 동공 -->
+  <g class="char-pupil">
+    <circle cx="${cx}" cy="${eyeCy}" r="20" fill="#3a2a4a"/>
+    <circle cx="${cx + 8}" cy="${eyeCy - 8}" r="6" fill="#ffffff"/>
+  </g>
+
+  <!-- 7. symbol (번개 등) -->
+  ${symbolFrag}
+
+  <!-- 8. glasses -->
   ${glassesFrag}
+
+  <!-- 9. hat -->
   ${hatFrag}
+
+  <!-- 10. other (측면 액세서리) -->
+  ${otherFrag}
 </svg>`.trim();
 }

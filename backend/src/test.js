@@ -4,7 +4,7 @@
 // from the test-login page.
 
 import express from "express";
-import { stmts } from "./db.js";
+import { stmts, withTx } from "./db.js";
 import { requireAuth } from "./auth.js";
 import { sendMail } from "./mailer.js";
 
@@ -27,6 +27,10 @@ testRouter.post("/progress", requireAuth, async (req, res, next) => {
 });
 
 // POST /api/test/answer  { problemId, code, verdict }
+//
+// 단순 기록 endpoint. 배터리 grant는 여기서 하지 않는다 — 클라이언트가 verdict를
+// 위조해 무한 적립할 수 있기 때문. 실제 grant는 서버가 코드 실행 결과를 직접
+// 판정하는 grader 라우트(`/api/grade/submit`)에서 처리한다.
 testRouter.post("/answer", requireAuth, async (req, res, next) => {
   try {
     const { problemId, code, verdict } = req.body || {};

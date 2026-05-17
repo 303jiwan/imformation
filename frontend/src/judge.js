@@ -62,15 +62,19 @@ export async function runCMany(source, stdins, { cpuTimeLimit, memoryLimit } = {
  *
  * @param {string} source
  * @param {{ stdin: string, expected: string, hidden?: boolean }[]} casesPlan
- * @param {{ cpuTimeLimit?: number, memoryLimit?: number }} [opts]
- * @returns {Promise<{ compile, passed, total, firstFail?, cases? }>}
+ * @param {{ cpuTimeLimit?: number, memoryLimit?: number, problemId?: string|number }} [opts]
+ * @returns {Promise<{ compile, passed, total, firstFail?, cases?, awarded?, balance? }>}
+ *
+ * problemId를 전달하면 서버가 전 케이스 통과(첫 AC) 시 배터리를 적립한다.
+ * 응답의 `awarded`/`balance`로 결과를 확인.
  */
-export async function submitCMany(source, casesPlan, { cpuTimeLimit, memoryLimit } = {}) {
+export async function submitCMany(source, casesPlan, { cpuTimeLimit, memoryLimit, problemId } = {}) {
   return await gradeFetch("/api/grade/submit", {
     source,
     stdins:   casesPlan.map((c) => c.stdin),
     expected: casesPlan.map((c) => c.expected),
     hidden:   casesPlan.map((c) => !!c.hidden),
+    problemId,
     cpuTimeLimit,
     memoryLimit,
   });
