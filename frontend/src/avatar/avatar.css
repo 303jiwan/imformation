@@ -1,25 +1,24 @@
 /* =============================================================
-   Codenergy avatar editor — 리디자인
-   - 데스크탑 2컬럼 (preview / panel)
-   - 모바일 단일 컬럼 스택
-   - radial-glow 스테이지
-   - 코너 체크 배지 장착 표시
+   Codenergy avatar editor — 흰/초록/검정/보라 팔레트
    ============================================================= */
 
 :root {
-  --av-bg-top:        #1b1238;
-  --av-bg-bot:        #261845;
-  --av-card:          rgba(42, 28, 80, 0.78);
-  --av-card-border:   rgba(255, 255, 255, 0.06);
-  --av-panel:         rgba(20, 12, 44, 0.55);
-  --av-stage-1:       #5b3aa6;
-  --av-stage-2:       #2a1a55;
-  --av-accent:        #a855f7;
-  --av-accent-strong: #7c3aed;
-  --av-accent-soft:   rgba(168, 85, 247, 0.18);
-  --av-text:          #f3e8ff;
-  --av-text-soft:     #c4b5fd;
-  --av-text-muted:    #8b7ec0;
+  --av-bg:            #ffffff;
+  --av-panel:         #f8fafc;
+  --av-surface:       #ffffff;
+  --av-border:        rgba(0, 0, 0, 0.08);
+  --av-border-strong: rgba(0, 0, 0, 0.16);
+  --av-stage-1:       #f5f3ff;
+  --av-stage-2:       #ede9fe;
+  --av-stage-edge:    #ddd6fe;
+  --av-green:         #22c55e;
+  --av-green-deep:    #16a34a;
+  --av-purple:        #a855f7;
+  --av-purple-deep:   #7c3aed;
+  --av-purple-soft:   rgba(168, 85, 247, 0.10);
+  --av-text:          #0a0a0a;
+  --av-text-soft:     #3f3f46;
+  --av-text-muted:    #6b7280;
 }
 
 /* ---------- Page ---------- */
@@ -29,9 +28,7 @@
   align-items: flex-start;
   justify-content: center;
   padding: 40px 20px 80px;
-  background:
-    radial-gradient(120% 80% at 50% -10%, #3a2670 0%, transparent 60%),
-    linear-gradient(180deg, var(--av-bg-top) 0%, var(--av-bg-bot) 100%);
+  background: var(--av-bg);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Pretendard",
     "Apple SD Gothic Neo", Roboto, sans-serif;
   color: var(--av-text);
@@ -40,15 +37,13 @@
 /* ---------- Card ---------- */
 .avatar-card {
   width: min(960px, 100%);
-  background: var(--av-card);
-  border: 1px solid var(--av-card-border);
+  background: var(--av-surface);
+  border: 1px solid var(--av-border);
   border-radius: 24px;
   padding: 24px 26px 28px;
   box-shadow:
-    0 30px 80px rgba(0, 0, 0, 0.55),
-    inset 0 1px 0 rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(14px);
-  -webkit-backdrop-filter: blur(14px);
+    0 24px 60px rgba(0, 0, 0, 0.08),
+    0 4px 12px rgba(0, 0, 0, 0.04);
   display: flex;
   flex-direction: column;
   gap: 22px;
@@ -70,7 +65,7 @@
   font-weight: 700;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: var(--av-text-muted);
+  color: var(--av-green-deep);
 }
 
 .avatar-title {
@@ -85,9 +80,9 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  background: rgba(0, 0, 0, 0.35);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #e9d5ff;
+  background: #ffffff;
+  border: 1px solid var(--av-border-strong);
+  color: var(--av-text);
   font-size: 13px;
   font-weight: 700;
   padding: 6px 14px;
@@ -99,8 +94,8 @@
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: #22c55e;
-  box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+  background: var(--av-green);
+  box-shadow: 0 0 6px rgba(34, 197, 94, 0.6);
 }
 
 /* ---------- Layout: desktop 2-col / mobile stacked ---------- */
@@ -130,25 +125,23 @@
   border-radius: 20px;
   overflow: hidden;
   background:
-    radial-gradient(80% 60% at 50% 35%, var(--av-stage-1) 0%, var(--av-stage-2) 70%, #170c33 100%);
-  border: 1px solid rgba(255, 255, 255, 0.06);
+    radial-gradient(80% 60% at 50% 35%, var(--av-stage-1) 0%, var(--av-stage-2) 60%, var(--av-stage-edge) 100%);
+  border: 1px solid var(--av-border);
   min-height: 320px;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
-  box-shadow: inset 0 -40px 80px rgba(0, 0, 0, 0.4);
+  box-shadow: inset 0 -30px 60px rgba(168, 85, 247, 0.05);
 }
 
-/* Soft halo behind the character */
 .avatar-stage__glow {
   position: absolute;
   inset: 0;
-  background: radial-gradient(40% 32% at 50% 42%, rgba(255, 255, 255, 0.16) 0%, transparent 70%);
+  background: radial-gradient(40% 32% at 50% 42%, rgba(255, 255, 255, 0.6) 0%, transparent 70%);
   pointer-events: none;
 }
 
-/* Ground shadow ellipse */
 .avatar-stage__floor {
   position: absolute;
   left: 50%;
@@ -156,7 +149,7 @@
   width: 56%;
   height: 24px;
   transform: translateX(-50%);
-  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.55) 0%, transparent 70%);
+  background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0.18) 0%, transparent 70%);
   filter: blur(2px);
   pointer-events: none;
 }
@@ -174,7 +167,7 @@
   width: 100%;
   height: auto;
   display: block;
-  filter: drop-shadow(0 16px 24px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 12px 18px rgba(0, 0, 0, 0.18));
 }
 
 /* ---------- Quick actions (under stage) ---------- */
@@ -190,9 +183,9 @@
   align-items: center;
   justify-content: center;
   gap: 8px;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--av-text-soft);
+  background: #ffffff;
+  border: 1px solid var(--av-border-strong);
+  color: var(--av-text);
   font: inherit;
   font-weight: 600;
   font-size: 13px;
@@ -202,9 +195,9 @@
   transition: background 140ms ease, border-color 140ms ease, color 140ms ease, transform 140ms ease;
 }
 .avatar-quick__btn:hover {
-  background: var(--av-accent-soft);
-  border-color: rgba(168, 85, 247, 0.45);
-  color: #e9d5ff;
+  background: var(--av-purple-soft);
+  border-color: var(--av-purple);
+  color: var(--av-purple-deep);
   transform: translateY(-1px);
 }
 .avatar-quick__btn:active {
@@ -218,7 +211,7 @@
 /* ---------- Panel (right) ---------- */
 .avatar-panel {
   background: var(--av-panel);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--av-border);
   border-radius: 20px;
   padding: 18px 18px 18px;
   display: flex;
@@ -239,10 +232,10 @@
 .avatar-tabs::-webkit-scrollbar { display: none; }
 
 .avatar-tabs--primary {
-  background: rgba(0, 0, 0, 0.25);
+  background: #ffffff;
   padding: 4px;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--av-border);
 }
 
 .avatar-tabs--secondary {
@@ -265,36 +258,38 @@
   transition: background 150ms ease, color 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
 }
 
-/* Primary: segmented control */
+/* Primary: segmented control — green CTA */
 .avatar-tabs--primary .avatar-tab {
   flex: 1 1 0;
   text-align: center;
 }
 .avatar-tabs--primary .avatar-tab:hover {
-  color: #e9d5ff;
+  color: var(--av-text);
+  background: rgba(0, 0, 0, 0.04);
 }
 .avatar-tabs--primary .avatar-tab.is-active {
-  background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+  background: linear-gradient(135deg, var(--av-green) 0%, var(--av-green-deep) 100%);
   color: #ffffff;
-  box-shadow: 0 6px 16px rgba(124, 58, 237, 0.45);
+  box-shadow: 0 6px 14px rgba(34, 197, 94, 0.32);
 }
 
-/* Secondary: chip style */
+/* Secondary: chip style — purple highlight */
 .avatar-tabs--secondary .avatar-tab {
-  background: rgba(255, 255, 255, 0.04);
-  border-color: rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border-color: var(--av-border);
+  color: var(--av-text-soft);
   padding: 6px 14px;
   border-radius: 999px;
   font-size: 12px;
 }
 .avatar-tabs--secondary .avatar-tab:hover {
-  background: var(--av-accent-soft);
-  border-color: rgba(168, 85, 247, 0.35);
-  color: #e9d5ff;
+  background: var(--av-purple-soft);
+  border-color: var(--av-purple);
+  color: var(--av-purple-deep);
 }
 .avatar-tabs--secondary .avatar-tab.is-active {
-  background: rgba(168, 85, 247, 0.3);
-  border-color: var(--av-accent);
+  background: var(--av-purple);
+  border-color: var(--av-purple-deep);
   color: #ffffff;
 }
 
@@ -316,22 +311,22 @@
   width: 28px;
   height: 28px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.18);
+  border: 2px solid var(--av-border-strong);
   cursor: pointer;
   padding: 0;
   transition: transform 140ms ease, box-shadow 140ms ease, border-color 140ms ease;
-  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.06);
 }
 .avatar-color-chip:hover {
   transform: scale(1.15);
-  border-color: #d8b4fe;
+  border-color: var(--av-purple);
 }
 .avatar-color-chip.is-selected {
-  border-color: #ffffff;
+  border-color: var(--av-purple-deep);
   box-shadow:
-    inset 0 1px 2px rgba(0, 0, 0, 0.3),
-    0 0 0 2px var(--av-accent-strong),
-    0 4px 10px rgba(124, 58, 237, 0.55);
+    inset 0 1px 2px rgba(0, 0, 0, 0.06),
+    0 0 0 2px var(--av-purple),
+    0 4px 10px rgba(168, 85, 247, 0.35);
   transform: scale(1.1);
 }
 
@@ -347,8 +342,8 @@
 .avatar-item {
   appearance: none;
   position: relative;
-  background: rgba(255, 255, 255, 0.04);
-  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  background: #ffffff;
+  border: 1.5px solid var(--av-border);
   border-radius: 12px;
   padding: 8px 4px;
   cursor: pointer;
@@ -365,20 +360,19 @@
   transition: border-color 140ms ease, background 140ms ease, transform 140ms ease, box-shadow 140ms ease;
 }
 .avatar-item:hover {
-  border-color: rgba(168, 85, 247, 0.6);
-  background: rgba(167, 139, 250, 0.1);
+  border-color: var(--av-purple);
+  background: var(--av-purple-soft);
   transform: translateY(-2px);
 }
 .avatar-item.is-equipped {
-  border-color: var(--av-accent);
-  background: rgba(124, 58, 237, 0.22);
-  color: #ffffff;
+  border-color: var(--av-purple-deep);
+  background: rgba(168, 85, 247, 0.12);
+  color: var(--av-text);
   box-shadow:
-    0 0 0 1px rgba(168, 85, 247, 0.6),
-    0 6px 14px rgba(124, 58, 237, 0.3);
+    0 0 0 1px var(--av-purple),
+    0 6px 14px rgba(168, 85, 247, 0.18);
 }
 
-/* Corner checkmark badge for equipped item */
 .avatar-item.is-equipped::after {
   content: "✓";
   position: absolute;
@@ -387,14 +381,14 @@
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #a855f7 0%, #7c3aed 100%);
+  background: linear-gradient(135deg, var(--av-purple) 0%, var(--av-purple-deep) 100%);
   color: #ffffff;
   font-size: 11px;
   font-weight: 800;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.5);
+  box-shadow: 0 2px 6px rgba(124, 58, 237, 0.4);
   pointer-events: none;
 }
 
@@ -405,7 +399,7 @@
   align-items: center;
   justify-content: center;
   border-radius: 8px;
-  background: rgba(0, 0, 0, 0.18);
+  background: #f4f4f5;
   font-size: 20px;
   overflow: hidden;
 }
@@ -415,21 +409,19 @@
   display: block;
 }
 
-/* "None" cell */
 .avatar-item--none .avatar-item__thumb {
   font-size: 18px;
-  color: #9ca3af;
+  color: var(--av-text-muted);
   background:
     repeating-linear-gradient(
       45deg,
-      rgba(255, 255, 255, 0.02),
-      rgba(255, 255, 255, 0.02) 6px,
-      rgba(255, 255, 255, 0.06) 6px,
-      rgba(255, 255, 255, 0.06) 8px
+      rgba(0, 0, 0, 0.02),
+      rgba(0, 0, 0, 0.02) 6px,
+      rgba(0, 0, 0, 0.06) 6px,
+      rgba(0, 0, 0, 0.06) 8px
     );
 }
 
-/* Skin swatch cell */
 .avatar-item--skin .avatar-item__thumb {
   background: transparent;
 }
@@ -437,15 +429,15 @@
   width: 44px;
   height: 44px;
   border-radius: 50%;
-  border: 2px solid rgba(255, 255, 255, 0.2);
+  border: 2px solid var(--av-border-strong);
   display: block;
-  box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.2);
+  box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.08);
 }
 .avatar-item--skin.is-equipped .avatar-item__thumb-skin {
-  border-color: #ffffff;
+  border-color: var(--av-purple-deep);
   box-shadow:
-    inset 0 -4px 6px rgba(0, 0, 0, 0.2),
-    0 0 0 2px var(--av-accent-strong);
+    inset 0 -4px 6px rgba(0, 0, 0, 0.08),
+    0 0 0 2px var(--av-purple);
 }
 
 /* ---------- Actions ---------- */
@@ -477,40 +469,39 @@
 }
 
 .avatar-btn--ghost {
-  background: rgba(255, 255, 255, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: var(--av-text-soft);
+  background: #ffffff;
+  border: 1px solid var(--av-border-strong);
+  color: var(--av-text);
   flex: 0 0 auto;
   padding: 13px 22px;
 }
 .avatar-btn--ghost:hover {
-  background: rgba(255, 255, 255, 0.12);
-  color: #e9d5ff;
+  background: #f4f4f5;
 }
 
 .avatar-btn--primary {
-  background: linear-gradient(135deg, #a855f7 0%, #6d28d9 100%);
+  background: linear-gradient(135deg, var(--av-green) 0%, var(--av-green-deep) 100%);
   border: none;
   color: #ffffff;
-  box-shadow: 0 8px 22px rgba(124, 58, 237, 0.5);
+  box-shadow: 0 8px 22px rgba(34, 197, 94, 0.38);
 }
 .avatar-btn--primary:hover {
-  box-shadow: 0 10px 28px rgba(124, 58, 237, 0.65);
+  box-shadow: 0 10px 28px rgba(34, 197, 94, 0.5);
 }
 
-/* ---------- Toast (inside card) ---------- */
+/* ---------- Toast ---------- */
 .avatar-toast {
   position: absolute;
   left: 50%;
   bottom: 24px;
   transform: translateX(-50%) translateY(20px);
-  background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+  background: linear-gradient(135deg, var(--av-green) 0%, var(--av-green-deep) 100%);
   color: #ffffff;
   font-weight: 600;
   font-size: 14px;
   padding: 11px 22px;
   border-radius: 999px;
-  box-shadow: 0 12px 28px -8px rgba(34, 197, 94, 0.55);
+  box-shadow: 0 12px 28px -8px rgba(34, 197, 94, 0.5);
   opacity: 0;
   pointer-events: none;
   transition: opacity 200ms ease, transform 200ms cubic-bezier(0.22, 1, 0.36, 1);
@@ -526,7 +517,7 @@
 }
 .avatar-toast.is-error {
   background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
-  box-shadow: 0 12px 28px -8px rgba(239, 68, 68, 0.55);
+  box-shadow: 0 12px 28px -8px rgba(239, 68, 68, 0.45);
 }
 
 /* ---------- Mobile tweaks ---------- */
@@ -556,17 +547,9 @@
 }
 
 /* =============================================================
-   신규 추가 스타일 (Agent D)
-   - .avatar-head-right 헤더 그룹
-   - .avatar-balance 잔액 배지
-   - .avatar-item.is-locked 잠금 아이템
-   - .avatar-item__price 가격 표시
-   - .avatar-buy-modal 구매 확인 모달
-   - .avatar-tab--shop 상점 탭 차별화
-   - .avatar-btn--sm 소형 버튼
+   상점 / 잔액 / 구매 모달
    ============================================================= */
 
-/* ---------- 헤더 우측 그룹 (잔액 + 유저명) ---------- */
 .avatar-head-right {
   display: flex;
   align-items: center;
@@ -574,27 +557,27 @@
   flex-wrap: wrap;
 }
 
-/* ---------- 잔액 배지 ---------- */
+/* 잔액 배지 — 보라 강조 (배터리 = 보라 통화 톤) */
 .avatar-balance {
   display: inline-flex;
   align-items: center;
   gap: 5px;
-  background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%);
-  color: #1c1917;
+  background: linear-gradient(135deg, var(--av-purple) 0%, var(--av-purple-deep) 100%);
+  color: #ffffff;
   font-size: 13px;
   font-weight: 800;
   padding: 6px 14px;
   border-radius: 999px;
-  border: 1.5px solid rgba(251, 191, 36, 0.6);
-  box-shadow: 0 4px 12px rgba(245, 158, 11, 0.4);
+  border: 1.5px solid var(--av-purple-deep);
+  box-shadow: 0 4px 12px rgba(168, 85, 247, 0.32);
   letter-spacing: 0.01em;
   white-space: nowrap;
 }
 
-/* ---------- 잠금 아이템 ---------- */
+/* 잠금 아이템 */
 .avatar-item.is-locked {
-  filter: grayscale(0.55);
-  opacity: 0.8;
+  filter: grayscale(0.4);
+  opacity: 0.82;
   cursor: pointer;
 }
 .avatar-item.is-locked::before {
@@ -608,63 +591,63 @@
   pointer-events: none;
 }
 .avatar-item.is-locked:hover {
-  filter: grayscale(0.2);
+  filter: grayscale(0.1);
   opacity: 1;
 }
 
-/* 구매 가능 (잔액 충분) — 연두 테두리 강조 */
+/* 구매 가능 — 초록 테두리 */
 .avatar-item.is-locked.is-affordable {
   border-color: rgba(34, 197, 94, 0.5);
 }
 .avatar-item.is-locked.is-affordable:hover {
-  border-color: #22c55e;
-  background: rgba(34, 197, 94, 0.1);
+  border-color: var(--av-green);
+  background: rgba(34, 197, 94, 0.08);
 }
 
-/* 구매 불가 (잔액 부족) — 빨강 테두리 */
+/* 구매 불가 — 검정 테두리 (사이트 톤에 맞춰) */
 .avatar-item.is-locked.is-unaffordable {
-  border-color: rgba(239, 68, 68, 0.4);
+  border-color: rgba(0, 0, 0, 0.25);
 }
 .avatar-item.is-locked.is-unaffordable:hover {
-  border-color: #ef4444;
-  background: rgba(239, 68, 68, 0.08);
+  border-color: #000000;
+  background: rgba(0, 0, 0, 0.04);
 }
 
-/* ---------- 아이템 가격 표시 ---------- */
+/* 아이템 가격 */
 .avatar-item__price {
   display: block;
   font-size: 10px;
   font-weight: 700;
-  color: #fbbf24;
+  color: var(--av-purple-deep);
   line-height: 1.2;
   margin-top: 2px;
 }
 
-/* ---------- 상점 탭 차별화 ---------- */
+/* 상점 탭 — 보라 강조 (다른 1차 탭과 구별) */
 .avatar-tabs--primary .avatar-tab--shop {
-  background: rgba(251, 191, 36, 0.08);
-  border-color: rgba(251, 191, 36, 0.2);
-  color: #fde68a;
+  background: var(--av-purple-soft);
+  border-color: rgba(168, 85, 247, 0.3);
+  color: var(--av-purple-deep);
 }
 .avatar-tabs--primary .avatar-tab--shop:hover {
-  background: rgba(251, 191, 36, 0.18);
-  border-color: rgba(251, 191, 36, 0.5);
-  color: #fbbf24;
+  background: rgba(168, 85, 247, 0.18);
+  border-color: var(--av-purple);
+  color: var(--av-purple-deep);
 }
 .avatar-tabs--primary .avatar-tab--shop.is-active {
-  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
-  color: #1c1917;
+  background: linear-gradient(135deg, var(--av-purple) 0%, var(--av-purple-deep) 100%);
+  color: #ffffff;
   box-shadow:
-    0 6px 16px rgba(245, 158, 11, 0.5),
-    0 0 0 1px rgba(251, 191, 36, 0.8);
+    0 6px 16px rgba(168, 85, 247, 0.4),
+    0 0 0 1px rgba(124, 58, 237, 0.6);
 }
 
-/* ---------- 구매 확인 모달 ---------- */
+/* 구매 확인 모달 */
 .avatar-buy-modal {
   position: absolute;
   inset: 0;
   border-radius: 24px;
-  background: rgba(15, 8, 30, 0.82);
+  background: rgba(255, 255, 255, 0.78);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   display: flex;
@@ -676,8 +659,8 @@
   display: none;
 }
 .avatar-buy-modal__inner {
-  background: rgba(42, 28, 80, 0.95);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: #ffffff;
+  border: 1px solid var(--av-border-strong);
   border-radius: 18px;
   padding: 24px 28px;
   display: flex;
@@ -686,21 +669,21 @@
   gap: 14px;
   min-width: 260px;
   box-shadow:
-    0 24px 60px rgba(0, 0, 0, 0.6),
-    inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    0 24px 60px rgba(0, 0, 0, 0.18),
+    0 4px 12px rgba(0, 0, 0, 0.06);
 }
 .avatar-buy-modal__title {
   margin: 0;
   font-size: 16px;
   font-weight: 800;
-  color: #f3e8ff;
+  color: var(--av-text);
   text-align: center;
 }
 .avatar-buy-modal__price {
   margin: 0;
   font-size: 13px;
-  color: #fde68a;
-  font-weight: 600;
+  color: var(--av-purple-deep);
+  font-weight: 700;
   text-align: center;
 }
 .avatar-buy-modal__actions {
@@ -709,7 +692,6 @@
   width: 100%;
 }
 
-/* ---------- 소형 버튼 ---------- */
 .avatar-btn--sm {
   font-size: 13px;
   padding: 10px 16px;

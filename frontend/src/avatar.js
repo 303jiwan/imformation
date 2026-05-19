@@ -207,6 +207,8 @@ let activeSecondary = 'symbol';
 let toastTimer     = null;
 let isDirty        = false;
 let rootClickBound = false;
+let previewSnapshot = null;
+let previewItemId   = null;
 
 // ---------------------------------------------------------------------------
 // Logged-out view
@@ -330,7 +332,7 @@ function renderEditor() {
 function onRootClick(e) {
   // Buy modal buttons
   const cancelBtn = e.target.closest('#avatar-buy-cancel');
-  if (cancelBtn) { closeBuyModal(); return; }
+  if (cancelBtn) { closeBuyModal(); revertPreview(); return; }
   const confirmBtn = e.target.closest('#avatar-buy-confirm');
   if (confirmBtn) { executePurchase(); return; }
 
@@ -346,6 +348,7 @@ function onRootClick(e) {
   // Primary tab click
   const primaryTab = e.target.closest('.avatar-tab[data-primary]');
   if (primaryTab) {
+    if (previewSnapshot) revertPreview();
     activePrimary  = primaryTab.dataset.primary;
     activeSecondary = CATEGORIES[activePrimary].subs[0].id;
     paintPrimaryTabs();
@@ -358,6 +361,7 @@ function onRootClick(e) {
   // Secondary tab click
   const secondaryTab = e.target.closest('.avatar-tab[data-secondary]');
   if (secondaryTab) {
+    if (previewSnapshot) revertPreview();
     activeSecondary = secondaryTab.dataset.secondary;
     paintSecondaryTabs();
     paintGrid();
@@ -376,6 +380,7 @@ function onRootClick(e) {
   // Color chip
   const chip = e.target.closest('.avatar-color-chip[data-color]');
   if (chip) {
+    if (previewSnapshot) revertPreview();
     setColor(activeSecondary, chip.dataset.color);
     commitChange();
     return;
@@ -678,6 +683,7 @@ async function executePurchase() {
     });
     const json = await res.json().catch(() => ({}));
     if (!res.ok) {
+      revertPreview();
       const errMsg = json.error === 'insufficient_battery' ? '배터리 잔액이 부족합니다' :
                      json.error === 'already_owned' ? '이미 소유한 아이템입니다' :
                      json.error === 'invalid_item' ? '유효하지 않은 아이템입니다' :
@@ -695,22 +701,50 @@ async function executePurchase() {
     updateBalanceBadge();
     showToast('구매 완료! 아이템이 장착되었습니다', false);
 
-    // 자동 장착: activeSecondary 카테고리에 설정
-    const cat = (() => {
-      const e = SHOP_CATALOG[itemId];
-      return e ? e.category : null;
-    })();
-    if (cat) {
-      if (cat === 'symbol') setBodySymbol(itemId);
-      else if (cat === 'top') setTop(itemId);
-      else setAccessory(cat, itemId);
-      commitChange();
-    } else {
-      paintGrid(); // refresh lock badges
+    // Restore snapshot then apply ONLY purchased itemId.
+    // Guards against in-flight preview swap to other unowned items.
+    if (previewSnapshot != null) {
+      config = previewSnapshot;
+      previewSnapshot = null;
+      previewItemId = null;
     }
+    const entry = SHOP_CATALOG[itemId];
+    const cat = entry ? entry.category : null;
+    if (cat === 'symbol') setBodySymbol(itemId);
+    else if (cat === 'top') setTop(itemId);
+    else if (cat) setAccessory(cat, itemId);
+    commitChange();
   } catch (_) {
+    revertPreview();
     showToast('구매 중 오류가 발생했습니다', true);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Preview transaction
+// ---------------------------------------------------------------------------
+
+function applyPreview(itemId) {
+  if (previewSnapshot == null) {
+    previewSnapshot = JSON.parse(JSON.stringify(config));
+  }
+  previewItemId = itemId;
+  const entry = SHOP_CATALOG[itemId];
+  const cat = entry ? entry.category : null;
+  if (cat === 'symbol') setBodySymbol(itemId);
+  else if (cat === 'top') setTop(itemId);
+  else if (cat) setAccessory(cat, itemId);
+  paintCharacter();
+}
+
+function revertPreview() {
+  if (previewSnapshot == null) return;
+  config = previewSnapshot;
+  previewSnapshot = null;
+  previewItemId = null;
+  paintCharacter();
+  paintGrid();
+  paintColorRow();
 }
 
 // ---------------------------------------------------------------------------
@@ -719,12 +753,12 @@ async function executePurchase() {
 
 function onItemClick(id) {
   if (activePrimary === 'shop') {
-    // 미소유 premium 클릭 → 구매 모달
     if (!isOwned(id)) {
+      applyPreview(id);
       openBuyModal(id);
       return;
     }
-    // 소유 아이템 → 장착
+    if (previewSnapshot) revertPreview();
     const cat = (() => {
       const e = SHOP_CATALOG[id];
       return e ? e.category : null;
@@ -737,6 +771,7 @@ function onItemClick(id) {
     return;
   }
 
+  if (previewSnapshot) revertPreview();
   const sub = getCurrentSubDef();
   if (sub.id === 'color') {
     setBodyColor(id);
@@ -751,6 +786,7 @@ function onItemClick(id) {
 }
 
 function commitChange() {
+  if (previewSnapshot) return;
   isDirty = true;
   saveLocalConfig();
   paintCharacter();
@@ -763,6 +799,11 @@ function commitChange() {
 // ---------------------------------------------------------------------------
 
 function onBack() {
+  if (previewSnapshot) {
+    revertPreview();
+    location.href = 'index.html';
+    return;
+  }
   if (isDirty) {
     const ok = window.confirm('저장되지 않은 변경사항이 있어요. 저장하지 않고 나가시겠어요?');
     if (!ok) return;
@@ -775,6 +816,7 @@ function pickRandom(arr) {
 }
 
 function onRandom() {
+  if (previewSnapshot) { revertPreview(); return; }
   // body.symbol: owned symbols에서 pick
   const ownedSymbols = BODY_SYMBOLS.filter((s) => isOwned(s.id));
   if (ownedSymbols.length) {
@@ -808,6 +850,7 @@ function onRandom() {
 }
 
 function onReset() {
+  if (previewSnapshot) { revertPreview(); return; }
   if (!window.confirm('기본 모습으로 되돌릴까요?')) return;
   config = cloneDefault();
   commitChange();
