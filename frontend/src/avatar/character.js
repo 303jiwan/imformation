@@ -31,6 +31,12 @@ import { getById, renderOutfitFragment } from './outfits.js';
 export const BODY_RECT = { x: 48, y: 40, width: 144, height: 240, rx: 32 };
 
 // ---------------------------------------------------------------------------
+// LOCKED_BODY_COLOR — 본체 색상 고정값
+// ---------------------------------------------------------------------------
+
+export const LOCKED_BODY_COLOR = '#ffffff';
+
+// ---------------------------------------------------------------------------
 // SKIN_TONES — deprecated, 빈 배열 유지 (기존 import 호환)
 // ---------------------------------------------------------------------------
 
@@ -153,7 +159,7 @@ function lookupSymbol(id) {
 
 export const DEFAULT_CONFIG = {
   body: {
-    color: '#ffffff',
+    color: LOCKED_BODY_COLOR,
     symbol: { id: 'sym-bolt', color: '#22c55e' },
   },
   clothing: {
@@ -175,11 +181,9 @@ export function normalizeConfig(raw) {
 
   const def = DEFAULT_CONFIG;
 
-  // body.color
+  // body.color — 무조건 LOCKED_BODY_COLOR로 고정
   const rawBody = raw.body && typeof raw.body === 'object' ? raw.body : {};
-  const bodyColor = typeof rawBody.color === 'string' && rawBody.color.startsWith('#')
-    ? rawBody.color
-    : def.body.color;
+  const bodyColor = LOCKED_BODY_COLOR;
 
   // body.symbol
   const rawSym = rawBody.symbol && typeof rawBody.symbol === 'object' ? rawBody.symbol : {};

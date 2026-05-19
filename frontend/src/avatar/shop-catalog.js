@@ -15,8 +15,9 @@ export const SHOP_CATALOG = {
   'top-hoodie':  { category: 'top', price: 30,  tier: 'common'  },
   'top-stripe':  { category: 'top', price: 30,  tier: 'common'  },
   'top-shirt':   { category: 'top', price: 30,  tier: 'common'  },
-  'top-jacket':  { category: 'top', price: 100, tier: 'premium' },
-  'top-polo':    { category: 'top', price: 100, tier: 'premium' },
+  'top-jacket':   { category: 'top', price: 100, tier: 'premium' },
+  'top-polo':     { category: 'top', price: 100, tier: 'premium' },
+  'top-starcape': { category: 'top', price: 100, tier: 'premium' },
 
   // ── hats (7) ──────────────────────────────────────────────────────────────
   'hat-cap':     { category: 'hat', price: 0,   tier: 'free'    },

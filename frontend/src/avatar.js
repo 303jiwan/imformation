@@ -38,8 +38,7 @@ const CATEGORIES = {
   body: {
     label: '신체',
     subs: [
-      { id: 'color',  label: '본체색', hasColor: false, allowNone: false },
-      { id: 'symbol', label: '문양',   hasColor: true,  allowNone: false },
+      { id: 'symbol', label: '문양', hasColor: true, allowNone: false },
     ],
   },
   clothing: {
@@ -204,7 +203,7 @@ const root = document.getElementById('avatar-root');
 
 let config         = loadLocalConfig();
 let activePrimary  = 'body';
-let activeSecondary = 'color';
+let activeSecondary = 'symbol';
 let toastTimer     = null;
 let isDirty        = false;
 let rootClickBound = false;
@@ -545,6 +544,12 @@ function paintColorRow() {
     return;
   }
 
+  // top-starcape: 색상 팔레트 숨김 (하드코딩 색상 전용)
+  if (sub.id === 'top' && getEquippedStyleId('top') === 'top-starcape') {
+    el.innerHTML = '';
+    return;
+  }
+
   // Accessories: hide chips if nothing is equipped
   if (activePrimary === 'accessories' && getEquippedStyleId(sub.id) == null) {
     el.innerHTML = '';
@@ -770,10 +775,6 @@ function pickRandom(arr) {
 }
 
 function onRandom() {
-  // body.color: BATTERY_COLORS에서 random pick
-  const bodyColor = pickRandom(BATTERY_COLORS);
-  config.body.color = bodyColor.base;
-
   // body.symbol: owned symbols에서 pick
   const ownedSymbols = BODY_SYMBOLS.filter((s) => isOwned(s.id));
   if (ownedSymbols.length) {
