@@ -1,5 +1,7 @@
 // Verifies that the server lesson catalog and the frontend display data
 // agree on the set of lesson ids (and per-lesson problem ids).
+// Also checks that example.input / example.output in lesson-data match
+// catalog input / expected (with trailing-newline normalisation for output).
 //
 // Run via `node backend/scripts/check-catalog-sync.mjs` — exits non-zero on
 // any mismatch so it can be wired into CI / npm scripts.
@@ -35,6 +37,7 @@ for (const id of serverIds) {
   if (sv.trail !== fr.trail) errors.push(`lesson ${id}: trail mismatch (server=${sv.trail}, frontend=${fr.trail})`);
   if (sv.ch !== fr.ch)       errors.push(`lesson ${id}: ch mismatch (server=${sv.ch}, frontend=${fr.ch})`);
   if (sv.no !== fr.no)       errors.push(`lesson ${id}: no mismatch (server=${sv.no}, frontend=${fr.no})`);
+
   // Problem ids
   const sPids = new Set(Object.keys(sv.problems ?? {}));
   const fPids = new Set([
@@ -46,6 +49,32 @@ for (const id of serverIds) {
   }
   for (const p of fPids) {
     if (!sPids.has(p)) errors.push(`lesson ${id}: problem ${p} in frontend but missing from server catalog`);
+  }
+
+  // Input / output drift check
+  const allFrontProbs = [
+    ...(fr.problems?.basic    ?? []),
+    ...(fr.problems?.practice ?? []),
+  ];
+  for (const fp of allFrontProbs) {
+    const cp = sv.problems?.[fp.id];
+    if (!cp) continue; // id mismatch already reported above
+
+    // input: exact match
+    if (cp.input !== fp.example.input) {
+      errors.push(
+        `problem ${fp.id}: input mismatch — catalog=${JSON.stringify(cp.input)} frontend=${JSON.stringify(fp.example.input)}`
+      );
+    }
+
+    // expected/output: trailing-newline normalised comparison
+    const normCat   = cp.expected.replace(/\n+$/, "");
+    const normFront = fp.example.output.replace(/\n+$/, "");
+    if (normCat !== normFront) {
+      errors.push(
+        `problem ${fp.id}: output mismatch — catalog=${JSON.stringify(cp.expected)} frontend=${JSON.stringify(fp.example.output)}`
+      );
+    }
   }
 }
 

@@ -196,11 +196,22 @@ export function normalizeConfig(raw) {
 
   // clothing.top (bottom silently dropped)
   const rawClothing = raw.clothing && typeof raw.clothing === 'object' ? raw.clothing : {};
-  const rawTop = rawClothing.top && typeof rawClothing.top === 'object' ? rawClothing.top : {};
-  const topStyle = typeof rawTop.style === 'string' && rawTop.style
-    ? rawTop.style : def.clothing.top.style;
-  const topColor = typeof rawTop.color === 'string' && rawTop.color
-    ? rawTop.color : def.clothing.top.color;
+  let top = null;
+  if (Object.prototype.hasOwnProperty.call(rawClothing, 'top')) {
+    const rawTop = rawClothing.top && typeof rawClothing.top === 'object' ? rawClothing.top : null;
+    if (rawTop) {
+      const requestedTopStyle = typeof rawTop.style === 'string' && rawTop.style
+        ? rawTop.style : def.clothing.top.style;
+      const topStyle = getById(requestedTopStyle)
+        ? requestedTopStyle
+        : def.clothing.top.style;
+      const topColor = typeof rawTop.color === 'string' && rawTop.color
+        ? rawTop.color : def.clothing.top.color;
+      top = { style: topStyle, color: topColor };
+    }
+  } else {
+    top = { ...def.clothing.top };
+  }
 
   // accessories
   const rawAcc = raw.accessories && typeof raw.accessories === 'object' && !Array.isArray(raw.accessories)
@@ -217,7 +228,7 @@ export function normalizeConfig(raw) {
       symbol: { id: symId, color: symColor },
     },
     clothing: {
-      top: { style: topStyle, color: topColor },
+      top,
     },
     accessories: {
       hat:     normAcc(rawAcc.hat),
@@ -262,6 +273,10 @@ export function renderCharacter(input = {}) {
 
   const B = BODY_RECT; // { x:48, y:40, width:144, height:240, rx:32 }
   const cx = B.x + B.width / 2;   // 120
+  const topStyle = cfg.clothing.top?.style || '';
+  const topTransform = topStyle === 'top-starcape'
+    ? 'translate(120 188) scale(0.82 0.97) translate(-120 -160)'
+    : 'translate(120 156) scale(1.08 1.58) translate(-120 -124)';
   const eyeCy = B.y + 80;         // 120 — 눈 중심
 
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 320"
@@ -278,10 +293,8 @@ export function renderCharacter(input = {}) {
         fill="${bodyColor}" stroke="${bodyStroke}" stroke-width="5"/>
 
   <!-- 4. top 의상 (Agent B 좌표) -->
-  ${topFrag}
-
   <!-- 5. 눈 -->
-  <circle cx="${cx}" cy="${eyeCy}" r="38" fill="#ffffff" stroke="#a855f7" stroke-width="4"/>
+  <circle class="char-eye" cx="${cx}" cy="${eyeCy}" r="38" fill="#ffffff" stroke="#a855f7" stroke-width="4"/>
 
   <!-- 6. 동공 -->
   <g class="char-pupil">
@@ -292,13 +305,20 @@ export function renderCharacter(input = {}) {
   <!-- 7. symbol (번개 등) -->
   ${symbolFrag}
 
-  <!-- 8. glasses -->
-  ${glassesFrag}
-
   <!-- 9. hat -->
   ${hatFrag}
 
   <!-- 10. other (측면 액세서리) -->
   ${otherFrag}
+
+  <!-- 11. clothing: larger, lower, and topmost so it naturally covers body details -->
+  <g class="outfit-top-wrap">
+    <g transform="${topTransform}">
+      ${topFrag}
+    </g>
+  </g>
+
+  <!-- 11. glasses: topmost accessory -->
+  ${glassesFrag}
 </svg>`.trim();
 }

@@ -299,11 +299,10 @@
   flex-wrap: wrap;
   gap: 9px;
   padding: 4px 2px 0;
-  min-height: 0;
+  min-height: 36px;
 }
 .avatar-color-row:empty {
-  display: none;
-  padding: 0;
+  visibility: hidden;
 }
 
 .avatar-color-chip {

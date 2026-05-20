@@ -21,6 +21,8 @@ export default defineConfig({
         lectures: resolve(__dirname, 'lectures.html'),
         lessons: resolve(__dirname, 'lessons.html'),
         admin: resolve(__dirname, 'admin.html'),
+        battle: resolve(__dirname, 'battle.html'),
+        battleMatch: resolve(__dirname, 'battle-match.html'),
       },
     },
   },

@@ -11,7 +11,6 @@
 export const SHOP_CATALOG = {
   // ── tops (7) ──────────────────────────────────────────────────────────────
   'top-tee':     { category: 'top', price: 0,   tier: 'free'    },
-  'top-tank':    { category: 'top', price: 0,   tier: 'free'    },
   'top-hoodie':  { category: 'top', price: 30,  tier: 'common'  },
   'top-stripe':  { category: 'top', price: 30,  tier: 'common'  },
   'top-shirt':   { category: 'top', price: 30,  tier: 'common'  },

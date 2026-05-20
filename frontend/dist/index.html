@@ -12,8 +12,8 @@
       .mascot { opacity: 0; }
     </style>
     <script type="module" crossorigin src="/assets/modulepreload-polyfill-B5Qt9EMX.js"></script>
-    <script type="module" crossorigin src="/assets/main-MRu2IMKr.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/main-d5G1KsKR.css">
+    <script type="module" crossorigin src="/assets/main-MQOOgDGO.js"></script>
+    <link rel="stylesheet" crossorigin href="/assets/main-LWxE4RR6.css">
   </head>
   <body>
     <div class="page-fade" id="page-fade"></div>
@@ -29,7 +29,7 @@
           <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
           <a href="lectures.html" data-i18n="nav.lectures">강의</a>
           <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
-          <a href="#" data-action="invite" data-i18n="nav.invite">친구 초대</a>
+          <a href="battle.html" data-i18n="nav.battle">배틀</a>
           <a href="#" data-action="avatar" data-i18n="nav.avatar">아바타</a>
         </nav>
         <div class="actions">
@@ -65,7 +65,7 @@
                 <li><button type="button" class="my-menu__item" data-i18n="my.mypage">마이페이지</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
-                <li><button type="button" class="my-menu__item" data-i18n="my.invite">친구 초대</button></li>
+                <li><button type="button" class="my-menu__item" data-action="battle" data-i18n="my.battle">배틀</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.settings">설정</button></li>
               </ul>
               <div class="my-menu__divider"></div>
@@ -115,50 +115,6 @@
           <button type="submit" class="cta" id="submit-btn" data-i18n="auth.login">로그인</button>
         </div>
       </form>
-    </div>
-
-    <!-- Feature Modals -->
-    <div id="invite-modal" class="modal" hidden>
-      <div class="modal-backdrop" data-close></div>
-      <div class="modal-card invite-modal">
-        <h3 data-i18n="invite.title">🎁 친구 초대하기</h3>
-        <div class="invite-content">
-          <div class="invite-hero">
-            <h4 data-i18n="invite.hero">친구와 함께 성장하세요!</h4>
-            <p data-i18n="invite.heroSub">친구를 초대하면 서로 혜택을 받아요</p>
-          </div>
-          <div class="invite-benefits">
-            <div class="benefit">
-              <div class="benefit-icon">🎁</div>
-              <h5 data-i18n="invite.b1">친구 가입 시</h5>
-              <p data-i18n="invite.b1Desc">1개월 프리미엄 무료 이용권</p>
-            </div>
-            <div class="benefit">
-              <div class="benefit-icon">💰</div>
-              <h5 data-i18n="invite.b2">친구 결제 시</h5>
-              <p data-i18n="invite.b2Desc">₩5,000 포인트 적립</p>
-            </div>
-          </div>
-          <div class="invite-link">
-            <label data-i18n="invite.link">초대 링크</label>
-            <div class="link-input-group">
-              <input type="text" value="https://codenergy.com/invite/your-code" readonly id="invite-link" />
-              <button class="copy-btn" onclick="copyInviteLink()" data-i18n="invite.copy">복사</button>
-            </div>
-          </div>
-          <div class="invite-gmail">
-            <label data-i18n="invite.gmailLabel">친구 Gmail 주소</label>
-            <div class="link-input-group">
-              <input type="email" placeholder="friend@gmail.com" id="friend-gmail" />
-              <button class="copy-btn" onclick="copyGmailAddress()" data-i18n="invite.gmailCopy">주소 복사</button>
-            </div>
-          </div>
-        </div>
-        <div class="modal-actions">
-          <button type="button" class="cta" data-i18n="invite.share">카카오톡으로 공유</button>
-          <button type="button" class="ghost" data-close data-i18n="action.close">닫기</button>
-        </div>
-      </div>
     </div>
 
     <div id="universities-modal" class="modal" hidden>
@@ -232,8 +188,8 @@
           <ellipse cx="100" cy="270" rx="58" ry="6" fill="#94a3b8" opacity="0.28"/>
           <rect x="78" y="2" width="44" height="20" rx="7" fill="#7c3aed"/>
           <rect x="28" y="20" width="144" height="240" rx="32" fill="#ffffff" stroke="#7c3aed" stroke-width="5"/>
-          <circle id="mascot-eye" cx="100" cy="100" r="38" fill="#ffffff" stroke="#a855f7" stroke-width="4"/>
-          <g id="mascot-pupil">
+          <circle id="mascot-eye" class="mascot-eye" cx="100" cy="100" r="38" fill="#ffffff" stroke="#a855f7" stroke-width="4"/>
+          <g id="mascot-pupil" class="mascot-pupil">
             <circle cx="100" cy="100" r="20" fill="#3a2a4a"/>
             <circle cx="108" cy="92" r="6" fill="#ffffff"/>
           </g>

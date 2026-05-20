@@ -24,7 +24,7 @@ function readAuthHint() {
 
 /** Whitelist of pages we allow redirecting to after login. Keeps the
  *  sessionStorage value from being abused as an open-redirect vector. */
-const REDIRECT_TARGETS = new Set(["avatar.html"]);
+const REDIRECT_TARGETS = new Set(["avatar.html", "battle.html"]);
 
 function readRedirectIntent() {
   try {
@@ -81,7 +81,7 @@ const TRANSLATIONS = {
     "nav.codetrail": "Code Trail",
     "nav.lectures": "Lectures",
     "nav.pricing": "Pricing",
-    "nav.invite": "Invite",
+    "nav.battle": "Battle",
     "nav.universities": "Universities",
     "nav.avatar": "Avatar",
     "action.login": "Log in",
@@ -94,7 +94,7 @@ const TRANSLATIONS = {
     "my.mypage": "My Page",
     "my.history": "Learning History",
     "my.subscription": "Billing & Subscription",
-    "my.invite": "Invite Friends",
+    "my.battle": "Battle",
     "my.settings": "Settings",
     "my.logout": "Log out",
     "auth.login": "Log in",
@@ -152,18 +152,18 @@ const TRANSLATIONS = {
     "pricing.proF4": "Career consulting",
     "pricing.proF5": "Priority application alerts",
     "pricing.proBtn": "Start Pro",
-    "invite.title": "🎁 Invite Friends",
-    "invite.hero": "Grow together with friends!",
-    "invite.heroSub": "Invite friends and you both get rewards",
-    "invite.b1": "When your friend signs up",
-    "invite.b1Desc": "1 month free Premium pass",
-    "invite.b2": "When your friend pays",
-    "invite.b2Desc": "Earn 5,000 KRW in points",
-    "invite.link": "Invite link",
-    "invite.copy": "Copy",
-    "invite.gmailLabel": "Friend's Gmail address",
-    "invite.gmailCopy": "Copy address",
-    "invite.share": "Share via KakaoTalk",
+    "battle.title": "Battle",
+    "battle.randomPvp": "Random PvP",
+    "battle.roomEntry": "Enter Room",
+    "battle.createRoom": "Create Room",
+    "battle.joinRoom": "Join Room",
+    "battle.waiting": "Waiting for opponent...",
+    "battle.preparing": "Preparing...",
+    "battle.youWon": "Victory!",
+    "battle.youLost": "Defeat",
+    "battle.batteryReward": "Battery +5",
+    "battle.demoBlocked": "Battle is available for logged-in accounts only.",
+    "battle.opponentLeft": "Opponent left.",
     "uni.title": "🎓 Partner Universities",
     "uni.intro": "We offer special benefits in partnership with these universities:",
     "uni.snuLogo": "SNU",
@@ -214,10 +214,6 @@ const TRANSLATIONS = {
     "cards.c3L3Sub": "+1 -1 Technique",
     "cards.c3L4Sub": "Shortest path from all points to one",
     "alert.codetrail": "🚀 Code Trail is coming soon!\n\nFollow a step-by-step learning path from algorithm practice\nto real coding tests.",
-    "alert.inviteLogin": "Please log in to use the invite friends feature.",
-    "alert.linkCopied": "Invite link copied!",
-    "alert.emailCopied": "Gmail address copied!",
-    "alert.emailEmpty": "Please enter a Gmail address.",
     "lang.label": "English",
   },
 };
@@ -408,7 +404,6 @@ applyLang(currentLang);
 
 // ---------------- Navigation Menu ----------------
 const menuLinks = document.querySelectorAll('.menu a');
-const inviteModal = document.getElementById('invite-modal');
 const universitiesModal = document.getElementById('universities-modal');
 
 menuLinks.forEach(link => {
@@ -421,8 +416,8 @@ menuLinks.forEach(link => {
       case 'codetrail':
         showCodeTrail();
         break;
-      case 'invite':
-        showInvite();
+      case 'battle':
+        navigateToBattle();
         break;
       case 'universities':
         showUniversities();
@@ -509,6 +504,72 @@ function goAvatar() {
   window.addEventListener('codenergy:auth', onAuth);
 }
 
+function navigateToBattle() {
+  const openLoginModal = () => {
+    try {
+      sessionStorage.setItem(REDIRECT_AFTER_LOGIN_KEY, 'battle.html');
+    } catch (_) {}
+    const headerLoginBtn = document.getElementById('login-btn');
+    if (headerLoginBtn && !headerLoginBtn.hidden) {
+      headerLoginBtn.click();
+    }
+  };
+
+  // Demo mode: block battle
+  const myWrapEl = document.getElementById('my-wrap');
+  if (myWrapEl && myWrapEl.dataset.demo === 'true') {
+    alert(t('battle.demoBlocked') || '배틀은 로그인 계정에서만 이용 가능합니다');
+    return;
+  }
+
+  if (lastAuthState === 'logged-in') {
+    navigateToHref('battle.html');
+    return;
+  }
+  if (lastAuthState === 'logged-out') {
+    openLoginModal();
+    return;
+  }
+  // Auth not resolved — use persisted hint
+  const hint = readAuthHint();
+  if (hint === 'logged-in') {
+    navigateToHref('battle.html');
+    return;
+  }
+  if (hint === 'logged-out') {
+    openLoginModal();
+    return;
+  }
+  // Fall back to waiting for codenergy:auth event
+  if (pageFade) pageFade.classList.remove('is-hidden');
+  let settled = false;
+  const onAuth = (e) => {
+    if (settled) return;
+    settled = true;
+    clearTimeout(timer);
+    window.removeEventListener('codenergy:auth', onAuth);
+    if (e && e.detail && e.detail.status === 'logged-in') {
+      setTimeout(() => { window.location.href = 'battle.html'; }, PAGE_FADE_MS);
+    } else {
+      if (pageFade) pageFade.classList.add('is-hidden');
+      openLoginModal();
+    }
+  };
+  const timer = setTimeout(() => {
+    if (settled) return;
+    settled = true;
+    window.removeEventListener('codenergy:auth', onAuth);
+    if (pageFade) pageFade.classList.add('is-hidden');
+    const domLoggedIn = !!(myWrapEl && !myWrapEl.hidden);
+    if (domLoggedIn) {
+      navigateToHref('battle.html');
+    } else {
+      openLoginModal();
+    }
+  }, 2000);
+  window.addEventListener('codenergy:auth', onAuth);
+}
+
 function navigateToHref(href) {
   if (pageFade) pageFade.classList.remove('is-hidden');
   setTimeout(() => {
@@ -589,15 +650,6 @@ if (currentPage === 'results.html') initResultsPage();
 if (currentPage === 'codetrails.html') initCodeTrailsPage();
 if (currentPage === 'index.html' || currentPage === '') initHomePage();
 
-function showInvite() {
-  if (!inviteModal) { window.location.href = 'index.html'; return; }
-  if (!document.getElementById('my-wrap').hidden) {
-    inviteModal.hidden = false;
-  } else {
-    alert(t('alert.inviteLogin') || '로그인 후 친구 초대 기능을 이용할 수 있습니다.');
-  }
-}
-
 function showUniversities() {
   if (!universitiesModal) { window.location.href = 'index.html'; return; }
   universitiesModal.hidden = false;
@@ -611,31 +663,6 @@ document.addEventListener('click', (e) => {
   }
 });
 
-// Copy invite link function
-function copyInviteLink() {
-  const linkInput = document.getElementById('invite-link');
-  linkInput.select();
-  document.execCommand('copy');
-  alert(t('alert.linkCopied') || '초대 링크가 복사되었습니다!');
-}
-
-// Copy Gmail address function
-function copyGmailAddress() {
-  const gmailInput = document.getElementById('friend-gmail');
-  const email = gmailInput.value.trim();
-  if (email) {
-    navigator.clipboard.writeText(email).then(() => {
-      alert(t('alert.emailCopied') || 'Gmail 주소가 복사되었습니다!');
-    }).catch(() => {
-      // Fallback for older browsers
-      gmailInput.select();
-      document.execCommand('copy');
-      alert(t('alert.emailCopied') || 'Gmail 주소가 복사되었습니다!');
-    });
-  } else {
-    alert(t('alert.emailEmpty') || 'Gmail 주소를 입력해주세요.');
-  }
-}
 const loginBtn = document.getElementById("login-btn");
 const signupBtn = document.getElementById("signup-btn");
 const myWrap = document.getElementById("my-wrap");
@@ -721,6 +748,22 @@ function setLoggedIn(user) {
 myBtn.addEventListener("click", (e) => {
   e.stopPropagation();
   myMenu.hidden = !myMenu.hidden;
+});
+
+// Handle data-action buttons inside my-menu
+myMenu.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-action]");
+  if (!btn) return;
+  const action = btn.dataset.action;
+  myMenu.hidden = true;
+  switch (action) {
+    case 'battle':
+      navigateToBattle();
+      break;
+    case 'avatar':
+      goAvatar();
+      break;
+  }
 });
 document.addEventListener("click", (e) => {
   if (myMenu.hidden) return;
@@ -1204,9 +1247,10 @@ fetch(`${API_BASE}/api/me`, { credentials: "include" })
   });
 
 // ---------------- Mascot eye tracking ----------------
-const eye = document.getElementById("mascot-eye");
-const pupil = document.getElementById("mascot-pupil");
-if (eye && pupil) {
+document.querySelectorAll(".mascot-eye").forEach((eye) => {
+  const pupil = eye.parentElement?.querySelector(".mascot-pupil");
+  if (!pupil) return;
+
   const EYE_SVG_RADIUS = 38;
   const PUPIL_SVG_RADIUS = 20;
   const MAX_OFFSET_SVG = EYE_SVG_RADIUS - PUPIL_SVG_RADIUS - 2;
@@ -1298,7 +1342,7 @@ if (eye && pupil) {
     requestAnimationFrame(animate);
   }
   requestAnimationFrame(animate);
-}
+});
 
 // ---------------- Notification dropdown ----------------
 const notifBtn = document.getElementById("notif-btn");

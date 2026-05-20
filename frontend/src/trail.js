@@ -1,5 +1,5 @@
 // Codenergy 트레일 페이지 (trail.html) — 7개 트레일을 ?trail=0..6 으로 분기.
-// 좌측 챕터/노드 트리, 우측 갭체크 + Lesson 1 표 + CTA 를 동적으로 채운다.
+// 좌측 챕터/노드 트리, 우측 코딩 테스트 + Lesson 1 표 + CTA 를 동적으로 채운다.
 // 각 트레일의 챕터/노드 이름은 codetrails.html 카드에 노출된 태그 + 첨부 시안에
 // 보이는 챕터 라벨을 합쳐 만든 정적 데이터. 실제 학습 콘텐츠는 후속 작업.
 
@@ -36,6 +36,12 @@ const TRAILS = [
     chapters: [
       { name: "Ch 1. 출력",   nodes: ["기본 출력", "변수와 자료형", "출력 형식", "소수점 맞춰 출력", "변수 값 변경", "다른 변수로부터 값 변경", "두 변수 값을 교환", "변수값 동시에 복사"] },
       { name: "Ch 2. 입출력", nodes: ["정수 입력", "실수 입력", "공백을 사이에 두고 입력", "2개씩 줄에 실수 입력", "문자, 문자열 입력", "특정 문자를 사이에 두고 입력"] },
+      { name: "Ch 3. 연산자",      nodes: ["산술 연산자", "관계 연산자", "논리 연산자", "비트 연산자"] },
+      { name: "Ch 4. 단순 반복문", nodes: ["for 입문", "while 입문", "for vs while", "do-while"] },
+      { name: "Ch 5. 다중 반복문", nodes: ["중첩 for", "별 찍기", "구구단"] },
+      { name: "Ch 6. 1차원 배열",  nodes: ["배열 선언", "배열 입출력", "배열 합계", "최대/최소"] },
+      { name: "Ch 7. 2차원 배열",  nodes: ["2차원 배열 선언", "2차원 입출력", "행렬 전치"] },
+      { name: "Ch 8. 문자열",      nodes: ["문자열 입력", "strlen", "strcpy/strcmp", "문자열 뒤집기"] },
     ],
     lesson: {
       title: "기본 출력",
@@ -60,6 +66,10 @@ const TRAILS = [
       { name: "Ch 2. 재귀함수", nodes: ["값을 반환하지 않는 재귀함수", "값을 반환하는 재귀함수"] },
       { name: "Ch 3. 정렬",     nodes: ["일반 정렬", "객체", "객체 정렬"] },
       { name: "Ch 4. 시뮬레이션 I", nodes: [] },
+      { name: "Ch 5. 포인터",      nodes: ["포인터 입문", "주소와 역참조", "함수 인자 포인터", "포인터와 배열"] },
+      { name: "Ch 6. 구조체",      nodes: ["struct 입문", "typedef", "구조체 배열", "구조체 포인터"] },
+      { name: "Ch 7. 동적 메모리", nodes: ["malloc 입문", "calloc/realloc", "free와 메모리 누수", "동적 배열"] },
+      { name: "Ch 8. 파일 입출력", nodes: ["fopen/fclose", "fprintf/fscanf", "fread/fwrite", "파일 모드"] },
     ],
     lesson: {
       title: "값을 반환하지 않는 함수",
@@ -96,7 +106,7 @@ const TRAILS = [
     chapters: [
       { name: "Ch 1. Simulation", nodes: ["격자 안에서 완전탐색", "격자 안에서 밀고 당기기", "격자 안에서 터지고 떨어지는 경우", "격자 안에서 단일 객체로 이동", "격자 안에서 여러 객체로 이동"] },
       { name: "Ch 2. Backtracking", nodes: ["K개 중 하나를 N번 선택하기(Simple)", "K개 중 하나를 N번 선택하기(Conditional)", "N개 중에 M개 고르기(Simple)", "순열 만들기"] },
-      { name: "Ch 3. DFS", nodes: [] },
+      { name: "Ch 3. DFS", nodes: ["DFS 기본", "DFS와 백트래킹", "DFS vs BFS"] },
     ],
     lesson: {
       title: "격자 안에서 완전탐색",
@@ -141,7 +151,7 @@ const TRAILS = [
       { name: "Ch 1. Tree", nodes: ["트리", "이진 트리와 탐색", "Tree DP", "LCA"] },
       { name: "Ch 2. MST",  nodes: ["Disjoint Set (Union Find)", "Kruskal", "Prim"] },
       { name: "Ch 3. 위상정렬", nodes: ["Topological Sort", "Graph DP"] },
-      { name: "Ch 4. String", nodes: [] },
+      { name: "Ch 4. String", nodes: ["문자열 매칭 기본", "KMP", "Trie"] },
     ],
     lesson: {
       title: "트리",

@@ -10,10 +10,10 @@
         z-index: 9999; opacity: 1; pointer-events: auto;
       }
     </style>
-    <script type="module" crossorigin src="/assets/results-B1uPB21r.js"></script>
+    <script type="module" crossorigin src="/assets/results-CTckbmnM.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-    <link rel="modulepreload" crossorigin href="/assets/main-MRu2IMKr.js">
-    <link rel="stylesheet" crossorigin href="/assets/main-d5G1KsKR.css">
+    <link rel="modulepreload" crossorigin href="/assets/main-MQOOgDGO.js">
+    <link rel="stylesheet" crossorigin href="/assets/main-LWxE4RR6.css">
   </head>
   <body>
     <div class="page-fade" id="page-fade"></div>
@@ -29,7 +29,7 @@
           <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
           <a href="lectures.html" data-i18n="nav.lectures">강의</a>
           <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
-          <a href="index.html" data-action="invite" data-i18n="nav.invite">친구 초대</a>
+          <a href="battle.html" data-i18n="nav.battle">배틀</a>
           <a href="#" data-action="avatar" data-i18n="nav.avatar">아바타</a>
         </nav>
         <div class="actions">
@@ -65,7 +65,7 @@
                 <li><button type="button" class="my-menu__item" data-i18n="my.mypage">마이페이지</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
-                <li><button type="button" class="my-menu__item" data-i18n="my.invite">친구 초대</button></li>
+                <li><button type="button" class="my-menu__item" data-action="battle" data-i18n="my.battle">배틀</button></li>
                 <li><button type="button" class="my-menu__item" data-i18n="my.settings">설정</button></li>
               </ul>
               <div class="my-menu__divider"></div>
@@ -136,15 +136,24 @@
             평균 30분 소요
           </span>
           <span class="result-badge result-badge--purple">어디서 시작할지 막막하다면?</span>
-          <span class="result-eyebrow result-eyebrow--purple">지피지기면 백전백승, 갭체크</span>
+          <span class="result-eyebrow result-eyebrow--purple">지피지기면 백전백승, 코딩 테스트</span>
           <span class="result-title">맞춤 진단하고<br/>챕터 무료로 받기</span>
           <svg class="result-scene result-scene--game" viewBox="0 0 720 130" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
             <rect x="0" y="100" width="300" height="30" fill="#5e5854"/>
             <path d="M0 100 L20 84 L40 100 L60 84 L80 100 L100 84 L120 100 L140 84 L160 100 L180 84 L200 100 L220 84 L240 100 L260 84 L280 100 L300 84 L300 100 Z" fill="#22c55e"/>
             <rect x="420" y="100" width="300" height="30" fill="#5e5854"/>
             <path d="M420 100 L440 84 L460 100 L480 84 L500 100 L520 84 L540 100 L560 84 L580 100 L600 84 L620 100 L640 84 L660 100 L680 84 L700 100 L720 84 L720 100 Z" fill="#22c55e"/>
-            <g transform="rotate(20 348 70)">
-              <rect x="324" y="50" width="48" height="36" rx="6" fill="#ef6f4f" stroke="#b14a2f" stroke-width="2"/>
+            <g class="result-mascot" transform="translate(348 70) rotate(20) scale(0.18) translate(-100 -140)">
+              <ellipse cx="100" cy="270" rx="58" ry="6" fill="#94a3b8" opacity="0.28"/>
+              <rect x="78" y="2" width="44" height="20" rx="7" fill="#7c3aed"/>
+              <rect x="28" y="20" width="144" height="240" rx="32" fill="#ffffff" stroke="#7c3aed" stroke-width="5"/>
+              <circle class="mascot-eye" cx="100" cy="100" r="38" fill="#ffffff" stroke="#a855f7" stroke-width="4"/>
+              <g class="mascot-pupil">
+                <circle cx="100" cy="100" r="20" fill="#3a2a4a"/>
+                <circle cx="108" cy="92" r="6" fill="#ffffff"/>
+              </g>
+              <path d="M 113 158 L 86 200 L 102 200 L 88 234 L 118 188 L 100 188 Z"
+                    fill="#22c55e" stroke="#16a34a" stroke-width="2.5" stroke-linejoin="round"/>
             </g>
             <g transform="translate(298 38)">
               <path d="M0 0 L-6 -10 M0 0 L0 -12 M0 0 L6 -10" stroke="#111" stroke-width="2" stroke-linecap="round"/>
@@ -162,6 +171,6 @@
         <a class="results-skip__link" href="codetrails.html">직접 둘러볼게요 →</a>
       </div>
     </section>
-
+
   </body>
 </html>

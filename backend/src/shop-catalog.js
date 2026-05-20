@@ -3,7 +3,6 @@
 
 export const SHOP_CATALOG = {
   'top-tee':     { category: 'top', price: 0,   tier: 'free' },
-  'top-tank':    { category: 'top', price: 0,   tier: 'free' },
   'top-hoodie':  { category: 'top', price: 30,  tier: 'common' },
   'top-stripe':  { category: 'top', price: 30,  tier: 'common' },
   'top-shirt':   { category: 'top', price: 30,  tier: 'common' },

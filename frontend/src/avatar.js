@@ -13,7 +13,7 @@ import './avatar/avatar.css';
 // If outfits.js is evaluated first, it triggers character.js evaluation which
 // doesn't access outfits.js at init-time, so BODY_RECT is defined by the time
 // void BODY_RECT runs in outfits.js.
-import { getByCategory, getById } from './avatar/outfits.js';
+import { getByCategory, getById, renderOutfitFragment } from './avatar/outfits.js';
 import {
   renderCharacter,
   DEFAULT_CONFIG,
@@ -44,7 +44,7 @@ const CATEGORIES = {
   clothing: {
     label: '의상',
     subs: [
-      { id: 'top', label: '상의', hasColor: true, allowNone: false },
+      { id: 'top', label: '상의', hasColor: true, allowNone: true },
     ],
   },
   accessories: {
@@ -327,6 +327,7 @@ function renderEditor() {
     root.addEventListener('click', onRootClick);
     rootClickBound = true;
   }
+  setupEyeTracking();
 }
 
 function onRootClick(e) {
@@ -466,7 +467,7 @@ function paintGrid() {
                 class="${cls}"
                 data-id="${item.id}"
                 data-price="${item.price}">
-          <span class="avatar-item__thumb">${item.thumbnail || ''}</span>
+          <span class="avatar-item__thumb">${renderItemThumbnail(item, subId)}</span>
           <span>${item.name || ''}</span>
           ${!owned ? `<span class="avatar-item__price">${item.price} 🔋</span>` : ''}
         </button>
@@ -522,7 +523,7 @@ function paintGrid() {
         <button type="button"
                 class="avatar-item${equipped ? ' is-equipped' : ''}"
                 data-id="${item.id}">
-          <span class="avatar-item__thumb">${item.thumbnail || ''}</span>
+          <span class="avatar-item__thumb">${renderItemThumbnail(item, sub.id)}</span>
           <span>${item.name || ''}</span>
         </button>
       `);
@@ -555,8 +556,8 @@ function paintColorRow() {
     return;
   }
 
-  // Accessories: hide chips if nothing is equipped
-  if (activePrimary === 'accessories' && getEquippedStyleId(sub.id) == null) {
+  // Hide color chips when the active slot has no equipped item.
+  if (sub.allowNone && getEquippedStyleId(sub.id) == null) {
     el.innerHTML = '';
     return;
   }
@@ -595,6 +596,23 @@ function getEquippedColor(sub) {
   return null;
 }
 
+function renderItemThumbnail(item, category) {
+  if (!item) return '';
+  if (category === 'top') {
+    const color = item.id === 'top-starcape'
+      ? null
+      : (getEquippedColor('top') || '#7c3aed');
+    return `
+      <svg viewBox="0 0 240 320" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <g transform="translate(120 160) scale(0.82) translate(-120 -160)">
+          ${renderOutfitFragment(item, color)}
+        </g>
+      </svg>
+    `;
+  }
+  return item.thumbnail || '';
+}
+
 function setBodyColor(hex) {
   // hex is actually a BATTERY_COLORS id like 'bat-white'
   // If it looks like a battery color id, resolve to hex; otherwise treat as direct hex
@@ -610,7 +628,9 @@ function setBodySymbol(id) {
 
 function setTop(styleId) {
   const prevColor = (config.clothing.top && config.clothing.top.color) || PALETTES.top[0];
-  config.clothing.top = { style: styleId || DEFAULT_CONFIG.clothing.top.style, color: prevColor };
+  config.clothing.top = styleId == null
+    ? null
+    : { style: styleId, color: prevColor };
 }
 
 function setAccessory(sub, styleIdOrNull) {
@@ -799,11 +819,7 @@ function commitChange() {
 // ---------------------------------------------------------------------------
 
 function onBack() {
-  if (previewSnapshot) {
-    revertPreview();
-    location.href = 'index.html';
-    return;
-  }
+  if (previewSnapshot) revertPreview();
   if (isDirty) {
     const ok = window.confirm('저장되지 않은 변경사항이 있어요. 저장하지 않고 나가시겠어요?');
     if (!ok) return;
@@ -825,9 +841,9 @@ function onRandom() {
     config.body.symbol = { id: sym.id, color: pickRandom(PALETTES.symbol) };
   }
 
-  // clothing: owned tops
+  // clothing: 50% chance of "none", owned tops only
   const ownedTops = getByCategory('top').filter((i) => isOwned(i.id));
-  if (ownedTops.length) setTop(pickRandom(ownedTops).id);
+  setTop(Math.random() < 0.5 || !ownedTops.length ? null : pickRandom(ownedTops).id);
 
   // Accessories: 50% chance of "none", owned items only
   const ownedHats    = getByCategory('hat').filter((i) => isOwned(i.id));
@@ -913,6 +929,84 @@ function resolveUsername() {
       }
     })
     .catch(() => {});
+}
+
+// ---------------------------------------------------------------------------
+// Eye tracking
+// ---------------------------------------------------------------------------
+
+let eyeTrackBound = false;
+
+function setupEyeTracking() {
+  if (eyeTrackBound) return;
+  eyeTrackBound = true;
+  document.addEventListener('mousemove', onAvatarEyeMove);
+  requestAnimationFrame(animateAvatarEye);
+}
+
+const EYE_SVG_RADIUS  = 38;
+const PUPIL_SVG_RADIUS = 20;
+const MAX_OFFSET_SVG   = EYE_SVG_RADIUS - PUPIL_SVG_RADIUS - 2;
+const STIFFNESS        = 0.07;
+const DAMPING          = 0.78;
+const MAX_SPEED        = 2.4;
+const SHAKE_REVERSALS  = 4;
+const SHAKE_WINDOW_MS  = 400;
+
+let _eyeTargetX = 0, _eyeTargetY = 0;
+let _eyePosX    = 0, _eyePosY    = 0;
+let _eyeVelX    = 0, _eyeVelY    = 0;
+let _lastMouseX = null, _lastDxSign = 0;
+const _eyeReversals = [];
+let _eyeShaking = false;
+
+function onAvatarEyeMove(e) {
+  const eye = document.querySelector('#avatar-character .char-eye');
+  if (!eye) return;
+  const now = performance.now();
+  if (_lastMouseX !== null) {
+    const sign = Math.sign(e.clientX - _lastMouseX);
+    if (sign !== 0) {
+      if (_lastDxSign !== 0 && sign !== _lastDxSign) _eyeReversals.push(now);
+      _lastDxSign = sign;
+    }
+  }
+  _lastMouseX = e.clientX;
+  while (_eyeReversals.length && now - _eyeReversals[0] > SHAKE_WINDOW_MS) _eyeReversals.shift();
+  const wasShaking = _eyeShaking;
+  _eyeShaking = _eyeReversals.length >= SHAKE_REVERSALS;
+  if (_eyeShaking) {
+    if (!wasShaking) { _eyeTargetX = _eyePosX; _eyeTargetY = _eyePosY; _eyeVelX = _eyeVelY = 0; }
+    return;
+  }
+  const rect = eye.getBoundingClientRect();
+  if (!rect.width) return;
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top  + rect.height / 2;
+  const scale = rect.width / (EYE_SVG_RADIUS * 2);
+  const dx = (e.clientX - cx) / scale;
+  const dy = (e.clientY - cy) / scale;
+  const dist  = Math.hypot(dx, dy);
+  const ratio = dist > MAX_OFFSET_SVG ? MAX_OFFSET_SVG / dist : 1;
+  _eyeTargetX = dx * ratio;
+  _eyeTargetY = dy * ratio;
+}
+
+function animateAvatarEye() {
+  const pupil = document.querySelector('#avatar-character .char-pupil');
+  if (!pupil) { requestAnimationFrame(animateAvatarEye); return; }
+  const ax = (_eyeTargetX - _eyePosX) * STIFFNESS;
+  const ay = (_eyeTargetY - _eyePosY) * STIFFNESS;
+  _eyeVelX = (_eyeVelX + ax) * DAMPING;
+  _eyeVelY = (_eyeVelY + ay) * DAMPING;
+  const speed = Math.hypot(_eyeVelX, _eyeVelY);
+  if (speed > MAX_SPEED) { _eyeVelX = (_eyeVelX / speed) * MAX_SPEED; _eyeVelY = (_eyeVelY / speed) * MAX_SPEED; }
+  _eyePosX += _eyeVelX;
+  _eyePosY += _eyeVelY;
+  const r = Math.hypot(_eyePosX, _eyePosY);
+  if (r > MAX_OFFSET_SVG) { _eyePosX = (_eyePosX / r) * MAX_OFFSET_SVG; _eyePosY = (_eyePosY / r) * MAX_OFFSET_SVG; _eyeVelX = _eyeVelY = 0; }
+  pupil.setAttribute('transform', `translate(${_eyePosX.toFixed(2)} ${_eyePosY.toFixed(2)})`);
+  requestAnimationFrame(animateAvatarEye);
 }
 
 // ---------------------------------------------------------------------------

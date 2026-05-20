@@ -81,6 +81,24 @@ CATALOG["t0-ch2-4"] = {
   },
 };
 
+// --- Ch 3. 조건문 1 ---
+
+CATALOG["t0-ch3-1"] = {
+  trail: 0, ch: 3, no: 1, prereq: "t0-ch2-4",
+  problems: {
+    "t0-ch3-1-b1": { kind: "basic",    expected: "positive\n", input: "5\n",  judge0Lang: "c" },
+    "t0-ch3-1-p1": { kind: "practice", expected: "even\n",     input: "4\n",  judge0Lang: "c" },
+  },
+};
+
+CATALOG["t0-ch3-2"] = {
+  trail: 0, ch: 3, no: 2, prereq: "t0-ch3-1",
+  problems: {
+    "t0-ch3-2-b1": { kind: "basic",    expected: "positive\n", input: "3\n",   judge0Lang: "c" },
+    "t0-ch3-2-p1": { kind: "practice", expected: "7\n",        input: "3 7\n", judge0Lang: "c" },
+  },
+};
+
 // === END Trail 0 ===
 
 // ===== Trail 1 (Novice Low — 프로그래밍 기초) =====
@@ -198,7 +216,785 @@ CATALOG["t1-ch2-6"] = {
   },
 };
 
+// --- Ch 3. 연산자 ---
+
+CATALOG["t1-ch3-1"] = {
+  trail: 1, ch: 3, no: 1, prereq: "t1-ch2-6",
+  problems: {
+    "t1-ch3-1-b1": { kind: "basic",    expected: "8\n",  input: "3 5",  judge0Lang: "c" },
+    "t1-ch3-1-p1": { kind: "practice", expected: "1\n",  input: "10 3", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch3-2"] = {
+  trail: 1, ch: 3, no: 2, prereq: "t1-ch3-1",
+  problems: {
+    "t1-ch3-2-b1": { kind: "basic",    expected: "1\n", input: "3 5", judge0Lang: "c" },
+    "t1-ch3-2-p1": { kind: "practice", expected: "1\n", input: "4 4", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch3-3"] = {
+  trail: 1, ch: 3, no: 3, prereq: "t1-ch3-2",
+  problems: {
+    "t1-ch3-3-b1": { kind: "basic",    expected: "0\n", input: "1 0", judge0Lang: "c" },
+    "t1-ch3-3-p1": { kind: "practice", expected: "1\n", input: "0 1", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch3-4"] = {
+  trail: 1, ch: 3, no: 4, prereq: "t1-ch3-3",
+  problems: {
+    "t1-ch3-4-b1": { kind: "basic",    expected: "1\n7\n", input: "5 3", judge0Lang: "c" },
+    "t1-ch3-4-p1": { kind: "practice", expected: "6\n",    input: "5 3", judge0Lang: "c" },
+  },
+};
+
+// --- Ch 4. 단순 반복문 ---
+
+CATALOG["t1-ch4-1"] = {
+  trail: 1, ch: 4, no: 1, prereq: "t1-ch3-4",
+  problems: {
+    "t1-ch4-1-b1": { kind: "basic",    expected: "15\n",      input: "5", judge0Lang: "c" },
+    "t1-ch4-1-p1": { kind: "practice", expected: "1\n2\n3\n", input: "3", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch4-2"] = {
+  trail: 1, ch: 4, no: 2, prereq: "t1-ch4-1",
+  problems: {
+    "t1-ch4-2-b1": { kind: "basic",    expected: "10\n",      input: "4", judge0Lang: "c" },
+    "t1-ch4-2-p1": { kind: "practice", expected: "3\n2\n1\n", input: "3", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch4-3"] = {
+  trail: 1, ch: 4, no: 3, prereq: "t1-ch4-2",
+  problems: {
+    "t1-ch4-3-b1": { kind: "basic",    expected: "12\n", input: "6", judge0Lang: "c" },
+    "t1-ch4-3-p1": { kind: "practice", expected: "12\n", input: "6", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch4-4"] = {
+  trail: 1, ch: 4, no: 4, prereq: "t1-ch4-3",
+  problems: {
+    "t1-ch4-4-b1": { kind: "basic",    expected: "7\n",      input: "7", judge0Lang: "c" },
+    "t1-ch4-4-p1": { kind: "practice", expected: "3\n2\n1\n", input: "3", judge0Lang: "c" },
+  },
+};
+
+// --- Ch 5. 다중 반복문 ---
+
+CATALOG["t1-ch5-1"] = {
+  trail: 1, ch: 5, no: 1, prereq: "t1-ch4-4",
+  problems: {
+    "t1-ch5-1-b1": { kind: "basic",    expected: "1 1\n1 2\n2 1\n2 2\n", input: "2 2", judge0Lang: "c" },
+    "t1-ch5-1-p1": { kind: "practice", expected: "1\n2\n3\n2\n4\n6\n",   input: "2 3", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch5-2"] = {
+  trail: 1, ch: 5, no: 2, prereq: "t1-ch5-1",
+  problems: {
+    "t1-ch5-2-b1": { kind: "basic",    expected: "*\n**\n***\n",   input: "3", judge0Lang: "c" },
+    "t1-ch5-2-p1": { kind: "practice", expected: "***\n**\n*\n",   input: "3", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch5-3"] = {
+  trail: 1, ch: 5, no: 3, prereq: "t1-ch5-2",
+  problems: {
+    "t1-ch5-3-b1": { kind: "basic",    expected: "2 * 1 = 2\n2 * 2 = 4\n2 * 3 = 6\n2 * 4 = 8\n2 * 5 = 10\n2 * 6 = 12\n2 * 7 = 14\n2 * 8 = 16\n2 * 9 = 18\n", input: "2", judge0Lang: "c" },
+    "t1-ch5-3-p1": { kind: "practice", expected: "2 * 1 = 2\n2 * 2 = 4\n2 * 3 = 6\n2 * 4 = 8\n2 * 5 = 10\n2 * 6 = 12\n2 * 7 = 14\n2 * 8 = 16\n2 * 9 = 18\n3 * 1 = 3\n3 * 2 = 6\n3 * 3 = 9\n3 * 4 = 12\n3 * 5 = 15\n3 * 6 = 18\n3 * 7 = 21\n3 * 8 = 24\n3 * 9 = 27\n", input: "3", judge0Lang: "c" },
+  },
+};
+
+// --- Ch 6. 1차원 배열 ---
+
+CATALOG["t1-ch6-1"] = {
+  trail: 1, ch: 6, no: 1, prereq: "t1-ch5-3",
+  problems: {
+    "t1-ch6-1-b1": { kind: "basic",    expected: "10\n", input: "10 20 30 40 50", judge0Lang: "c" },
+    "t1-ch6-1-p1": { kind: "practice", expected: "50\n", input: "10 20 30 40 50", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch6-2"] = {
+  trail: 1, ch: 6, no: 2, prereq: "t1-ch6-1",
+  problems: {
+    "t1-ch6-2-b1": { kind: "basic",    expected: "4\n3\n2\n1\n", input: "4\n1 2 3 4", judge0Lang: "c" },
+    "t1-ch6-2-p1": { kind: "practice", expected: "7\n2\n5\n",    input: "3\n7 2 5",   judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch6-3"] = {
+  trail: 1, ch: 6, no: 3, prereq: "t1-ch6-2",
+  problems: {
+    "t1-ch6-3-b1": { kind: "basic",    expected: "15\n", input: "5\n1 2 3 4 5", judge0Lang: "c" },
+    "t1-ch6-3-p1": { kind: "practice", expected: "9\n",  input: "5\n1 2 3 4 5", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch6-4"] = {
+  trail: 1, ch: 6, no: 4, prereq: "t1-ch6-3",
+  problems: {
+    "t1-ch6-4-b1": { kind: "basic",    expected: "5 1\n", input: "5\n3 1 4 1 5", judge0Lang: "c" },
+    "t1-ch6-4-p1": { kind: "practice", expected: "2\n",   input: "5\n3 1 5 2 5", judge0Lang: "c" },
+  },
+};
+
+// --- Ch 7. 2차원 배열 ---
+
+CATALOG["t1-ch7-1"] = {
+  trail: 1, ch: 7, no: 1, prereq: "t1-ch6-4",
+  problems: {
+    "t1-ch7-1-b1": { kind: "basic",    expected: "4\n", input: "1 2\n3 4", judge0Lang: "c" },
+    "t1-ch7-1-p1": { kind: "practice", expected: "5\n", input: "1 2\n3 4", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch7-2"] = {
+  trail: 1, ch: 7, no: 2, prereq: "t1-ch7-1",
+  problems: {
+    "t1-ch7-2-b1": { kind: "basic",    expected: "21\n",          input: "1 2 3\n4 5 6", judge0Lang: "c" },
+    "t1-ch7-2-p1": { kind: "practice", expected: "1 2 3\n4 5 6\n", input: "1 2 3\n4 5 6", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch7-3"] = {
+  trail: 1, ch: 7, no: 3, prereq: "t1-ch7-2",
+  problems: {
+    "t1-ch7-3-b1": { kind: "basic",    expected: "1 3\n2 4\n",         input: "1 2\n3 4",       judge0Lang: "c" },
+    "t1-ch7-3-p1": { kind: "practice", expected: "1 4 7\n2 5 8\n3 6 9\n", input: "1 2 3\n4 5 6\n7 8 9", judge0Lang: "c" },
+  },
+};
+
+// --- Ch 8. 문자열 ---
+
+CATALOG["t1-ch8-1"] = {
+  trail: 1, ch: 8, no: 1, prereq: "t1-ch7-3",
+  problems: {
+    "t1-ch8-1-b1": { kind: "basic",    expected: "hello\n",    input: "hello", judge0Lang: "c" },
+    "t1-ch8-1-p1": { kind: "practice", expected: "hi\nhi\n",   input: "hi",    judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch8-2"] = {
+  trail: 1, ch: 8, no: 2, prereq: "t1-ch8-1",
+  problems: {
+    "t1-ch8-2-b1": { kind: "basic",    expected: "5\n", input: "hello",        judge0Lang: "c" },
+    "t1-ch8-2-p1": { kind: "practice", expected: "5\n", input: "hi\nhello",    judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch8-3"] = {
+  trail: 1, ch: 8, no: 3, prereq: "t1-ch8-2",
+  problems: {
+    "t1-ch8-3-b1": { kind: "basic",    expected: "same\n", input: "abc\nabc", judge0Lang: "c" },
+    "t1-ch8-3-p1": { kind: "practice", expected: "diff\n", input: "abc\ndef", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t1-ch8-4"] = {
+  trail: 1, ch: 8, no: 4, prereq: "t1-ch8-3",
+  problems: {
+    "t1-ch8-4-b1": { kind: "basic",    expected: "olleh\n", input: "hello",   judge0Lang: "c" },
+    "t1-ch8-4-p1": { kind: "practice", expected: "yes\n",   input: "racecar", judge0Lang: "c" },
+  },
+};
+
 // === END Trail 1 ===
+
+// ===== Trail 2 (Novice Mid — 프로그래밍 연습) =====
+
+// --- Ch 1. 함수 ---
+
+CATALOG["t2-ch1-1"] = {
+  trail: 2, ch: 1, no: 1, prereq: null,
+  problems: {
+    "t2-ch1-1-b1": { kind: "basic",    expected: "Hi\nHi\n",             input: "",  judge0Lang: "c" },
+    "t2-ch1-1-p1": { kind: "practice", expected: "----\n----\n----\n",   input: "",  judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch1-2"] = {
+  trail: 2, ch: 1, no: 2, prereq: "t2-ch1-1",
+  problems: {
+    "t2-ch1-2-b1": { kind: "basic",    expected: "7\n",  input: "-7\n", judge0Lang: "c" },
+    "t2-ch1-2-p1": { kind: "practice", expected: "3\n",  input: "3 8\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch1-3"] = {
+  trail: 2, ch: 1, no: 3, prereq: "t2-ch1-2",
+  problems: {
+    "t2-ch1-3-b1": { kind: "basic",    expected: "12\n", input: "6\n",  judge0Lang: "c" },
+    "t2-ch1-3-p1": { kind: "practice", expected: "7 3\n", input: "3 7\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch1-4"] = {
+  trail: 2, ch: 1, no: 4, prereq: "t2-ch1-3",
+  problems: {
+    "t2-ch1-4-b1": { kind: "basic",    expected: "42\n", input: "",  judge0Lang: "c" },
+    "t2-ch1-4-p1": { kind: "practice", expected: "15\n", input: "",  judge0Lang: "c" },
+  },
+};
+
+// --- Ch 2. 재귀함수 ---
+
+CATALOG["t2-ch2-1"] = {
+  trail: 2, ch: 2, no: 1, prereq: "t2-ch1-4",
+  problems: {
+    "t2-ch2-1-b1": { kind: "basic",    expected: "3\n2\n1\n",     input: "3\n", judge0Lang: "c" },
+    "t2-ch2-1-p1": { kind: "practice", expected: "1\n2\n3\n4\n",  input: "4\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch2-2"] = {
+  trail: 2, ch: 2, no: 2, prereq: "t2-ch2-1",
+  problems: {
+    "t2-ch2-2-b1": { kind: "basic",    expected: "120\n", input: "5\n", judge0Lang: "c" },
+    "t2-ch2-2-p1": { kind: "practice", expected: "15\n",  input: "5\n", judge0Lang: "c" },
+  },
+};
+
+// --- Ch 3. 정렬 ---
+
+CATALOG["t2-ch3-1"] = {
+  trail: 2, ch: 3, no: 1, prereq: "t2-ch2-2",
+  problems: {
+    "t2-ch3-1-b1": { kind: "basic",    expected: "1 2 3 4 5\n", input: "5 3 1 4 2\n", judge0Lang: "c" },
+    "t2-ch3-1-p1": { kind: "practice", expected: "5 4 3 2 1\n", input: "5 3 1 4 2\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch3-2"] = {
+  trail: 2, ch: 3, no: 2, prereq: "t2-ch3-1",
+  problems: {
+    "t2-ch3-2-b1": { kind: "basic",    expected: "3 7\n",    input: "3 7\n",    judge0Lang: "c" },
+    "t2-ch3-2-p1": { kind: "practice", expected: "Alice 95\n", input: "Alice 95\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch3-3"] = {
+  trail: 2, ch: 3, no: 3, prereq: "t2-ch3-2",
+  problems: {
+    "t2-ch3-3-b1": { kind: "basic",    expected: "2 50\n1 80\n3 90\n", input: "3\n1 80\n2 50\n3 90\n", judge0Lang: "c" },
+    "t2-ch3-3-p1": { kind: "practice", expected: "3 90\n1 80\n2 50\n", input: "3\n1 80\n2 50\n3 90\n", judge0Lang: "c" },
+  },
+};
+
+// --- Ch 5. 포인터 ---
+
+CATALOG["t2-ch5-1"] = {
+  trail: 2, ch: 5, no: 1, prereq: "t2-ch3-3",
+  problems: {
+    "t2-ch5-1-b1": { kind: "basic",    expected: "7 3\n",  input: "3 7\n", judge0Lang: "c" },
+    "t2-ch5-1-p1": { kind: "practice", expected: "2\n",    input: "5 2 8\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch5-2"] = {
+  trail: 2, ch: 5, no: 2, prereq: "t2-ch5-1",
+  problems: {
+    "t2-ch5-2-b1": { kind: "basic",    expected: "10\n", input: "5\n",   judge0Lang: "c" },
+    "t2-ch5-2-p1": { kind: "practice", expected: "10\n", input: "4 6\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch5-3"] = {
+  trail: 2, ch: 5, no: 3, prereq: "t2-ch5-2",
+  problems: {
+    "t2-ch5-3-b1": { kind: "basic",    expected: "20 10\n", input: "10 20\n", judge0Lang: "c" },
+    "t2-ch5-3-p1": { kind: "practice", expected: "7\n",     input: "3 4\n",   judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch5-4"] = {
+  trail: 2, ch: 5, no: 4, prereq: "t2-ch5-3",
+  problems: {
+    "t2-ch5-4-b1": { kind: "basic",    expected: "1\n2\n3\n4\n5\n", input: "1 2 3 4 5\n", judge0Lang: "c" },
+    "t2-ch5-4-p1": { kind: "practice", expected: "5\n4\n3\n2\n1\n", input: "1 2 3 4 5\n", judge0Lang: "c" },
+  },
+};
+
+// --- Ch 6. 구조체 ---
+
+CATALOG["t2-ch6-1"] = {
+  trail: 2, ch: 6, no: 1, prereq: "t2-ch5-4",
+  problems: {
+    "t2-ch6-1-b1": { kind: "basic",    expected: "7\n",  input: "3 4\n", judge0Lang: "c" },
+    "t2-ch6-1-p1": { kind: "practice", expected: "15\n", input: "5 3\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch6-2"] = {
+  trail: 2, ch: 6, no: 2, prereq: "t2-ch6-1",
+  problems: {
+    "t2-ch6-2-b1": { kind: "basic",    expected: "8\n",  input: "6 2\n", judge0Lang: "c" },
+    "t2-ch6-2-p1": { kind: "practice", expected: "90\n", input: "1 90\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch6-3"] = {
+  trail: 2, ch: 6, no: 3, prereq: "t2-ch6-2",
+  problems: {
+    "t2-ch6-3-b1": { kind: "basic",    expected: "240\n", input: "3\n1 80\n2 70\n3 90\n", judge0Lang: "c" },
+    "t2-ch6-3-p1": { kind: "practice", expected: "2\n",   input: "3\n1 80\n2 95\n3 70\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch6-4"] = {
+  trail: 2, ch: 6, no: 4, prereq: "t2-ch6-3",
+  problems: {
+    "t2-ch6-4-b1": { kind: "basic",    expected: "42\n", input: "42\n",  judge0Lang: "c" },
+    "t2-ch6-4-p1": { kind: "practice", expected: "15\n", input: "7 8\n", judge0Lang: "c" },
+  },
+};
+
+// --- Ch 7. 동적 메모리 ---
+
+CATALOG["t2-ch7-1"] = {
+  trail: 2, ch: 7, no: 1, prereq: "t2-ch6-4",
+  problems: {
+    "t2-ch7-1-b1": { kind: "basic",    expected: "42\n", input: "42\n",  judge0Lang: "c" },
+    "t2-ch7-1-p1": { kind: "practice", expected: "8\n",  input: "5 3\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch7-2"] = {
+  trail: 2, ch: 7, no: 2, prereq: "t2-ch7-1",
+  problems: {
+    "t2-ch7-2-b1": { kind: "basic",    expected: "6\n", input: "3\n1 2 3\n",    judge0Lang: "c" },
+    "t2-ch7-2-p1": { kind: "practice", expected: "0\n", input: "3\n10 20 30\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch7-3"] = {
+  trail: 2, ch: 7, no: 3, prereq: "t2-ch7-2",
+  problems: {
+    "t2-ch7-3-b1": { kind: "basic",    expected: "7\nok\n",     input: "7\n",        judge0Lang: "c" },
+    "t2-ch7-3-p1": { kind: "practice", expected: "6\nfreed\n",  input: "3\n1 2 3\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch7-4"] = {
+  trail: 2, ch: 7, no: 4, prereq: "t2-ch7-3",
+  problems: {
+    "t2-ch7-4-b1": { kind: "basic",    expected: "10\n", input: "4\n1 2 3 4\n",  judge0Lang: "c" },
+    "t2-ch7-4-p1": { kind: "practice", expected: "4\n",  input: "4\n3 1 4 2\n",  judge0Lang: "c" },
+  },
+};
+
+// --- Ch 8. 파일 입출력 ---
+
+CATALOG["t2-ch8-1"] = {
+  trail: 2, ch: 8, no: 1, prereq: "t2-ch7-4",
+  problems: {
+    "t2-ch8-1-b1": { kind: "basic",    expected: "10\n", input: "5\n", judge0Lang: "c" },
+    "t2-ch8-1-p1": { kind: "practice", expected: "12\n", input: "4\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch8-2"] = {
+  trail: 2, ch: 8, no: 2, prereq: "t2-ch8-1",
+  problems: {
+    "t2-ch8-2-b1": { kind: "basic",    expected: "7\n",  input: "3 4\n", judge0Lang: "c" },
+    "t2-ch8-2-p1": { kind: "practice", expected: "12\n", input: "3 4\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch8-3"] = {
+  trail: 2, ch: 8, no: 3, prereq: "t2-ch8-2",
+  problems: {
+    "t2-ch8-3-b1": { kind: "basic",    expected: "3\n", input: "3\nabc", judge0Lang: "c" },
+    "t2-ch8-3-p1": { kind: "practice", expected: "5\n", input: "Hello123\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t2-ch8-4"] = {
+  trail: 2, ch: 8, no: 4, prereq: "t2-ch8-3",
+  problems: {
+    "t2-ch8-4-b1": { kind: "basic",    expected: "write\n",       input: "w\n", judge0Lang: "c" },
+    "t2-ch8-4-p1": { kind: "practice", expected: "append-only\n", input: "a\n", judge0Lang: "c" },
+  },
+};
+
+// === END Trail 2 ===
+
+// ===== Trail 3 (자료구조 알고리즘) =====
+
+// --- Ch 1. 시간, 공간복잡도 ---
+
+CATALOG["t3-ch1-1"] = {
+  trail: 3, ch: 1, no: 1, prereq: null,
+  problems: {
+    "t3-ch1-1-b1": { kind: "basic",    expected: "15\n", input: "5\n", judge0Lang: "c" },
+    "t3-ch1-1-p1": { kind: "practice", expected: "24\n", input: "4\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t3-ch1-2"] = {
+  trail: 3, ch: 1, no: 2, prereq: "t3-ch1-1",
+  problems: {
+    "t3-ch1-2-b1": { kind: "basic",    expected: "1000\n1000000\n", input: "1000\n",   judge0Lang: "c" },
+    "t3-ch1-2-p1": { kind: "practice", expected: "faster\n",        input: "100 200\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t3-ch1-3"] = {
+  trail: 3, ch: 1, no: 3, prereq: "t3-ch1-2",
+  problems: {
+    "t3-ch1-3-b1": { kind: "basic",    expected: "7\n", input: "7\n", judge0Lang: "c" },
+    "t3-ch1-3-p1": { kind: "practice", expected: "9\n", input: "3\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t3-ch1-4"] = {
+  trail: 3, ch: 1, no: 4, prereq: "t3-ch1-3",
+  problems: {
+    "t3-ch1-4-b1": { kind: "basic",    expected: "4\n",  input: "8\n", judge0Lang: "c" },
+    "t3-ch1-4-p1": { kind: "practice", expected: "12\n", input: "2\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t3-ch1-5"] = {
+  trail: 3, ch: 1, no: 5, prereq: "t3-ch1-4",
+  problems: {
+    "t3-ch1-5-b1": { kind: "basic",    expected: "4\n3\n2\n1\n", input: "4\n", judge0Lang: "c" },
+    "t3-ch1-5-p1": { kind: "practice", expected: "8\n",           input: "6\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t3-ch1-6"] = {
+  trail: 3, ch: 1, no: 6, prereq: "t3-ch1-5",
+  problems: {
+    "t3-ch1-6-b1": { kind: "basic",    expected: "10\n", input: "4\n1 2 3 4\n",   judge0Lang: "c" },
+    "t3-ch1-6-p1": { kind: "practice", expected: "9\n",  input: "5\n3 7 1 9 4\n", judge0Lang: "c" },
+  },
+};
+
+// --- Ch 2. 배열, 연결 리스트 ---
+
+CATALOG["t3-ch2-1"] = {
+  trail: 3, ch: 2, no: 1, prereq: "t3-ch1-6",
+  problems: {
+    "t3-ch2-1-b1": { kind: "basic",    expected: "5 4 3 2 1\n", input: "5\n1 2 3 4 5\n",  judge0Lang: "c" },
+    "t3-ch2-1-p1": { kind: "practice", expected: "25\n",         input: "4\n10 20 30 40\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t3-ch2-2"] = {
+  trail: 3, ch: 2, no: 2, prereq: "t3-ch2-1",
+  problems: {
+    "t3-ch2-2-b1": { kind: "basic",    expected: "60\n", input: "3\n10 20 30\n",   judge0Lang: "c" },
+    "t3-ch2-2-p1": { kind: "practice", expected: "1\n",  input: "5\n4 2 7 1 9\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t3-ch2-3"] = {
+  trail: 3, ch: 2, no: 3, prereq: "t3-ch2-2",
+  problems: {
+    "t3-ch2-3-b1": { kind: "basic",    expected: "40\n",  input: "4\n10 20 30 40\n", judge0Lang: "c" },
+    "t3-ch2-3-p1": { kind: "practice", expected: "100\n", input: "4\n10 20 30 40\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t3-ch2-4"] = {
+  trail: 3, ch: 2, no: 4, prereq: "t3-ch2-3",
+  problems: {
+    "t3-ch2-4-b1": { kind: "basic",    expected: "3\n2\n1\n", input: "3\n1 2 3\n", judge0Lang: "c" },
+    "t3-ch2-4-p1": { kind: "practice", expected: "6\n6\n",    input: "3\n1 2 3\n", judge0Lang: "c" },
+  },
+};
+
+// === END Trail 3 ===
+
+// ===== Trail 4 (알고리즘 입문) =====
+
+CATALOG["t4-ch1-1"] = {
+  trail: 4, ch: 1, no: 1, prereq: null,
+  problems: {
+    "t4-ch1-1-b1": { kind: "basic",    expected: "45\n",  input: "3\n1 2 3\n4 5 6\n7 8 9\n", judge0Lang: "c" },
+    "t4-ch1-1-p1": { kind: "practice", expected: "2 2\n", input: "3\n1 2 3\n4 9 6\n7 8 5\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t4-ch1-2"] = {
+  trail: 4, ch: 1, no: 2, prereq: "t4-ch1-1",
+  problems: {
+    "t4-ch1-2-b1": { kind: "basic",    expected: "0 1 2 3 4\n", input: "5\n1 2 3 4 5\n", judge0Lang: "c" },
+    "t4-ch1-2-p1": { kind: "practice", expected: "2 3 4 5 0\n", input: "5\n1 2 3 4 5\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t4-ch1-3"] = {
+  trail: 4, ch: 1, no: 3, prereq: "t4-ch1-2",
+  problems: {
+    "t4-ch1-3-b1": { kind: "basic",    expected: "0 0 0 3 1 2\n", input: "6\n3 0 1 0 2 0\n",   judge0Lang: "c" },
+    "t4-ch1-3-p1": { kind: "practice", expected: "0 0 0 1 3 4\n", input: "6 2\n1 2 3 2 4 2\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t4-ch1-4"] = {
+  trail: 4, ch: 1, no: 4, prereq: "t4-ch1-3",
+  problems: {
+    "t4-ch1-4-b1": { kind: "basic",    expected: "2 1\n", input: "5 3\nD R D\n", judge0Lang: "c" },
+    "t4-ch1-4-p1": { kind: "practice", expected: "3\n",   input: "5 4\nD R U L\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t4-ch1-5"] = {
+  trail: 4, ch: 1, no: 5, prereq: "t4-ch1-4",
+  problems: {
+    "t4-ch1-5-b1": { kind: "basic",    expected: "1 1\n4 4\n", input: "5 2\n0 0\n4 4\n2\nD R\n", judge0Lang: "c" },
+    "t4-ch1-5-p1": { kind: "practice", expected: "1\n",        input: "5 2\n0 0\n0 1\n1\nR\n",   judge0Lang: "c" },
+  },
+};
+
+CATALOG["t4-ch2-1"] = {
+  trail: 4, ch: 2, no: 1, prereq: "t4-ch1-5",
+  problems: {
+    "t4-ch2-1-b1": { kind: "basic",    expected: "9\n", input: "2 3\n",     judge0Lang: "c" },
+    "t4-ch2-1-p1": { kind: "practice", expected: "3\n", input: "2 3 4\n",   judge0Lang: "c" },
+  },
+};
+
+CATALOG["t4-ch2-2"] = {
+  trail: 4, ch: 2, no: 2, prereq: "t4-ch2-1",
+  problems: {
+    "t4-ch2-2-b1": { kind: "basic",    expected: "6\n", input: "2 3 4\n", judge0Lang: "c" },
+    "t4-ch2-2-p1": { kind: "practice", expected: "4\n", input: "2 4\n",   judge0Lang: "c" },
+  },
+};
+
+CATALOG["t4-ch2-3"] = {
+  trail: 4, ch: 2, no: 3, prereq: "t4-ch2-2",
+  problems: {
+    "t4-ch2-3-b1": { kind: "basic",    expected: "6\n", input: "4 2\n",   judge0Lang: "c" },
+    "t4-ch2-3-p1": { kind: "practice", expected: "2\n", input: "4 2 5\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t4-ch2-4"] = {
+  trail: 4, ch: 2, no: 4, prereq: "t4-ch2-3",
+  problems: {
+    "t4-ch2-4-b1": { kind: "basic",    expected: "6\n", input: "3\n",   judge0Lang: "c" },
+    "t4-ch2-4-p1": { kind: "practice", expected: "2\n", input: "3 2\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t4-ch3-1"] = {
+  trail: 4, ch: 3, no: 1, prereq: "t4-ch2-4",
+  problems: {
+    "t4-ch3-1-b1": { kind: "basic",    expected: "4\n", input: "4 3\n0 1\n1 2\n2 3\n",   judge0Lang: "c" },
+    "t4-ch3-1-p1": { kind: "practice", expected: "3\n", input: "5 2\n0 1\n2 3\n",         judge0Lang: "c" },
+  },
+};
+
+CATALOG["t4-ch3-2"] = {
+  trail: 4, ch: 3, no: 2, prereq: "t4-ch3-1",
+  problems: {
+    "t4-ch3-2-b1": { kind: "basic",    expected: "2\n", input: "4 4\n0 1\n0 2\n1 3\n2 3\n0 3\n",   judge0Lang: "c" },
+    "t4-ch3-2-p1": { kind: "practice", expected: "2\n", input: "4 4\n0 1\n0 2\n1 3\n2 3\n0 3 2\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t4-ch3-3"] = {
+  trail: 4, ch: 3, no: 3, prereq: "t4-ch3-2",
+  problems: {
+    "t4-ch3-3-b1": { kind: "basic",    expected: "4\n", input: "4 3\n0 1\n1 2\n2 3\n",         judge0Lang: "c" },
+    "t4-ch3-3-p1": { kind: "practice", expected: "3\n", input: "4 3\n0 1\n1 2\n2 3\n0 3\n",   judge0Lang: "c" },
+  },
+};
+
+// === END Trail 4 ===
+
+// ===== Trail 5 (알고리즘 기본) =====
+
+CATALOG["t5-ch1-1"] = {
+  trail: 5, ch: 1, no: 1, prereq: null,
+  problems: {
+    "t5-ch1-1-b1": { kind: "basic",    expected: "7\n",  input: "3\napple 3\nbanana 7\ncherry 2\nbanana\n", judge0Lang: "c" },
+    "t5-ch1-1-p1": { kind: "practice", expected: "5\n",  input: "3\napple 3\nbanana 7\ncherry 2\n2\napple\ncherry\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t5-ch1-2"] = {
+  trail: 5, ch: 1, no: 2, prereq: "t5-ch1-1",
+  problems: {
+    "t5-ch1-2-b1": { kind: "basic",    expected: "3\n",  input: "3\nbanana 7\napple 3\ncherry 2\napple\n", judge0Lang: "c" },
+    "t5-ch1-2-p1": { kind: "practice", expected: "3\n",  input: "3\nbanana 7\napple 3\ncherry 2\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t5-ch1-3"] = {
+  trail: 5, ch: 1, no: 3, prereq: "t5-ch1-2",
+  problems: {
+    "t5-ch1-3-b1": { kind: "basic",    expected: "1\n",  input: "3\napple\nbanana\ncherry\nbanana\n", judge0Lang: "c" },
+    "t5-ch1-3-p1": { kind: "practice", expected: "3\n",  input: "5\napple\nbanana\napple\ncherry\nbanana\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t5-ch1-4"] = {
+  trail: 5, ch: 1, no: 4, prereq: "t5-ch1-3",
+  problems: {
+    "t5-ch1-4-b1": { kind: "basic",    expected: "1\n",  input: "3\nbanana\napple\ncherry\napple\n", judge0Lang: "c" },
+    "t5-ch1-4-p1": { kind: "practice", expected: "apple\n", input: "4\ncherry\napple\ndate\nbanana\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t5-ch1-5"] = {
+  trail: 5, ch: 1, no: 5, prereq: "t5-ch1-4",
+  problems: {
+    "t5-ch1-5-b1": { kind: "basic",    expected: "7\n",  input: "5 3\n4 1 7 2 9\n", judge0Lang: "c" },
+    "t5-ch1-5-p1": { kind: "practice", expected: "2\n",  input: "5 2\n4 1 7 2 9\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t5-ch1-6"] = {
+  trail: 5, ch: 1, no: 6, prereq: "t5-ch1-5",
+  problems: {
+    "t5-ch1-6-b1": { kind: "basic",    expected: "1 2 3 4\n", input: "4\n1 2 3 4\n", judge0Lang: "c" },
+    "t5-ch1-6-p1": { kind: "practice", expected: "4 3 2 1\n", input: "4\n1 2 3 4\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t5-ch2-1"] = {
+  trail: 5, ch: 2, no: 1, prereq: "t5-ch1-6",
+  problems: {
+    "t5-ch2-1-b1": { kind: "basic",    expected: "9\n",     input: "5\n1 2 3 4 5\n2 4\n", judge0Lang: "c" },
+    "t5-ch2-1-p1": { kind: "practice", expected: "6\n14\n", input: "5\n1 2 3 4 5\n2\n1 3\n2 5\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t5-ch2-2"] = {
+  trail: 5, ch: 2, no: 2, prereq: "t5-ch2-1",
+  problems: {
+    "t5-ch2-2-b1": { kind: "basic",    expected: "4\n",         input: "6\n10 20 10 30 20 40\n", judge0Lang: "c" },
+    "t5-ch2-2-p1": { kind: "practice", expected: "2 0 1 0 2\n", input: "5\n30 10 20 10 30\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t5-ch2-3"] = {
+  trail: 5, ch: 2, no: 3, prereq: "t5-ch2-2",
+  problems: {
+    "t5-ch2-3-b1": { kind: "basic",    expected: "9 8 7 6\n", input: "4\n1 2 3 4\n", judge0Lang: "c" },
+    "t5-ch2-3-p1": { kind: "practice", expected: "0\n",        input: "4\n1 2 3 4\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t5-ch2-4"] = {
+  trail: 5, ch: 2, no: 4, prereq: "t5-ch2-3",
+  problems: {
+    "t5-ch2-4-b1": { kind: "basic",    expected: "7\n",           input: "5 2\n1 3\n2 5\n", judge0Lang: "c" },
+    "t5-ch2-4-p1": { kind: "practice", expected: "2 5 5 3 0\n",   input: "5 2\n1 3 2\n2 4 3\n", judge0Lang: "c" },
+  },
+};
+
+// === END Trail 5 ===
+
+// ===== Trail 6 (알고리즘 실전) =====
+
+CATALOG["t6-ch1-1"] = {
+  trail: 6, ch: 1, no: 1, prereq: null,
+  problems: {
+    "t6-ch1-1-b1": { kind: "basic",    expected: "2\n", input: "5\n1 2\n1 3\n3 4\n3 5\n", judge0Lang: "c" },
+    "t6-ch1-1-p1": { kind: "practice", expected: "2\n", input: "5 1\n1 2\n1 3\n3 4\n3 5\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t6-ch1-2"] = {
+  trail: 6, ch: 1, no: 2, prereq: "t6-ch1-1",
+  problems: {
+    "t6-ch1-2-b1": { kind: "basic",    expected: "2 1 3\n", input: "3\n1 2 3\n2 0 0\n3 0 0\n", judge0Lang: "c" },
+    "t6-ch1-2-p1": { kind: "practice", expected: "2\n",     input: "3\n1 2 3\n2 0 0\n3 0 0\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t6-ch1-3"] = {
+  trail: 6, ch: 1, no: 3, prereq: "t6-ch1-2",
+  problems: {
+    "t6-ch1-3-b1": { kind: "basic",    expected: "10\n", input: "4\n1 2 3 4\n1 2\n1 3\n3 4\n", judge0Lang: "c" },
+    "t6-ch1-3-p1": { kind: "practice", expected: "10\n", input: "4\n1 2 3 4\n1 2\n1 3\n3 4\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t6-ch1-4"] = {
+  trail: 6, ch: 1, no: 4, prereq: "t6-ch1-3",
+  problems: {
+    "t6-ch1-4-b1": { kind: "basic",    expected: "3\n", input: "5\n1 2\n1 3\n3 4\n3 5\n4 5\n", judge0Lang: "c" },
+    "t6-ch1-4-p1": { kind: "practice", expected: "1\n", input: "5\n1 2\n1 3\n3 4\n3 5\n4 5\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t6-ch2-1"] = {
+  trail: 6, ch: 2, no: 1, prereq: "t6-ch1-4",
+  problems: {
+    "t6-ch2-1-b1": { kind: "basic",    expected: "3\n",  input: "5 2\n1 2\n3 4\n", judge0Lang: "c" },
+    "t6-ch2-1-p1": { kind: "practice", expected: "no\n", input: "5 2\n1 2\n3 4\n1 3\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t6-ch2-2"] = {
+  trail: 6, ch: 2, no: 2, prereq: "t6-ch2-1",
+  problems: {
+    "t6-ch2-2-b1": { kind: "basic",    expected: "5\n", input: "4 5\n1 2 1\n1 3 3\n2 3 2\n2 4 4\n3 4 2\n", judge0Lang: "c" },
+    "t6-ch2-2-p1": { kind: "practice", expected: "3\n", input: "4 5\n1 2 1\n1 3 3\n2 3 2\n2 4 4\n3 4 2\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t6-ch2-3"] = {
+  trail: 6, ch: 2, no: 3, prereq: "t6-ch2-2",
+  problems: {
+    "t6-ch2-3-b1": { kind: "basic",    expected: "5\n", input: "4 5\n1 2 1\n1 3 3\n2 3 2\n2 4 4\n3 4 2\n", judge0Lang: "c" },
+    "t6-ch2-3-p1": { kind: "practice", expected: "2\n", input: "4 5\n1 2 1\n1 3 3\n2 3 2\n2 4 4\n3 4 2\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t6-ch3-1"] = {
+  trail: 6, ch: 3, no: 1, prereq: "t6-ch2-3",
+  problems: {
+    "t6-ch3-1-b1": { kind: "basic",    expected: "1 2 3 4\n", input: "4 3\n1 2\n1 3\n2 4\n", judge0Lang: "c" },
+    "t6-ch3-1-p1": { kind: "practice", expected: "4\n",       input: "4 3\n1 2\n1 3\n2 4\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t6-ch3-2"] = {
+  trail: 6, ch: 3, no: 2, prereq: "t6-ch3-1",
+  problems: {
+    "t6-ch3-2-b1": { kind: "basic",    expected: "2\n", input: "4 3\n1 2\n2 3\n2 4\n", judge0Lang: "c" },
+    "t6-ch3-2-p1": { kind: "practice", expected: "1\n", input: "4 3\n1 2\n2 3\n2 4\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t6-ch4-1"] = {
+  trail: 6, ch: 4, no: 1, prereq: "t6-ch3-2",
+  problems: {
+    "t6-ch4-1-b1": { kind: "basic",    expected: "4\n", input: "abababab\nab\n", judge0Lang: "c" },
+    "t6-ch4-1-p1": { kind: "practice", expected: "0\n", input: "abababab\naba\n", judge0Lang: "c" },
+  },
+};
+
+CATALOG["t6-ch4-2"] = {
+  trail: 6, ch: 4, no: 2, prereq: "t6-ch4-1",
+  problems: {
+    "t6-ch4-2-b1": { kind: "basic",    expected: "2\n", input: "aabaab\naab\n",  judge0Lang: "c" },
+    "t6-ch4-2-p1": { kind: "practice", expected: "3\n", input: "aabaab\n",       judge0Lang: "c" },
+  },
+};
+
+CATALOG["t6-ch4-3"] = {
+  trail: 6, ch: 4, no: 3, prereq: "t6-ch4-2",
+  problems: {
+    "t6-ch4-3-b1": { kind: "basic",    expected: "yes\nno\n", input: "3\napple\napp\nban\n2\napp\ncat\n", judge0Lang: "c" },
+    "t6-ch4-3-p1": { kind: "practice", expected: "2\n",       input: "3\napple\napp\nban\nap\n",          judge0Lang: "c" },
+  },
+};
+
+// === END Trail 6 ===
 
 /** Returns the lesson definition for `lessonId`, or null if unknown. */
 export function getLesson(lessonId) {

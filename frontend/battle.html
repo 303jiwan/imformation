@@ -1,0 +1,192 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Codenergy — 배틀</title>
+    <style>
+      .page-fade {
+        position: fixed; inset: 0; background: #fff;
+        z-index: 9999; opacity: 1; pointer-events: auto;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="page-fade" id="page-fade"></div>
+
+    <header class="nav">
+      <div class="logo"><a href="index.html">Codenergy ▲</a></div>
+      <button class="hamburger" id="hamburger" aria-label="메뉴 열기" aria-expanded="false" aria-controls="nav-collapse">
+        <span></span>
+        <span></span>
+        <span></span>
+      </button>
+      <div class="nav-collapse" id="nav-collapse">
+        <nav class="menu" id="menu">
+          <a href="codetrails.html" data-i18n="nav.codetrail">코드트레일</a>
+          <a href="lectures.html" data-i18n="nav.lectures">강의</a>
+          <a href="pricing.html" data-i18n="nav.pricing">요금제</a>
+          <a href="battle.html" data-i18n="nav.battle">배틀</a>
+          <a href="#" data-action="avatar" data-i18n="nav.avatar">아바타</a>
+        </nav>
+        <div class="actions">
+          <div class="lang-wrap" id="lang-wrap">
+            <button class="ghost" id="lang-btn" type="button">🌐 <span id="lang-current">한국어</span> ▾</button>
+            <div class="lang-menu" id="lang-menu" hidden>
+              <button type="button" class="lang-menu__item" data-lang="ko">한국어</button>
+              <button type="button" class="lang-menu__item" data-lang="en">English</button>
+            </div>
+          </div>
+          <div class="notif-wrap" id="notif-wrap">
+            <button class="icon" id="notif-btn" type="button" aria-haspopup="true" aria-expanded="false" aria-label="알림">🔔</button>
+            <div class="notif-menu" id="notif-menu" hidden>
+              <div class="notif-menu__header">알림</div>
+              <ul class="notif-menu__list" id="notif-list"></ul>
+              <p class="notif-menu__empty" id="notif-empty" hidden>새 알림이 없어요</p>
+              <p class="notif-menu__signin" id="notif-signin" hidden>로그인 후 확인할 수 있어요</p>
+            </div>
+          </div>
+          <button class="ghost" id="login-btn" data-i18n="action.login">로그인</button>
+          <button class="ghost" id="signup-btn" data-i18n="action.signup">회원가입</button>
+          <div class="my-wrap" id="my-wrap" hidden>
+            <button class="ghost" id="my-btn" data-i18n="action.my">My</button>
+            <div class="my-menu" id="my-menu" hidden>
+              <div class="my-menu__profile">
+                <div class="my-menu__avatar" aria-hidden="true">👤</div>
+                <div class="my-menu__user">
+                  <div class="my-menu__name" id="my-name" data-i18n="my.name">사용자 이름</div>
+                  <div class="my-menu__email" id="my-email">user@example.com</div>
+                </div>
+              </div>
+              <ul class="my-menu__list">
+                <li><button type="button" class="my-menu__item" data-i18n="my.mypage">마이페이지</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.history">학습 기록</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.subscription">결제/구독 관리</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.battle">배틀</button></li>
+                <li><button type="button" class="my-menu__item" data-i18n="my.settings">설정</button></li>
+              </ul>
+              <div class="my-menu__divider"></div>
+              <button type="button" class="my-menu__item my-menu__logout" id="logout-btn" data-i18n="my.logout">로그아웃</button>
+            </div>
+          </div>
+          <button id="home-cta-btn" class="cta" data-i18n="action.cta">학습하기 →</button>
+        </div>
+      </div>
+    </header>
+
+    <div id="auth-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <form class="modal-card" id="auth-form">
+        <h3 id="modal-title" data-i18n="auth.login">로그인</h3>
+        <label class="field-username">
+          <span data-i18n="auth.username">아이디</span>
+          <input name="username" autocomplete="username" required minlength="2" />
+        </label>
+        <label class="field-password">
+          <span data-i18n="auth.password">비밀번호</span>
+          <input name="password" type="password" autocomplete="current-password" required minlength="6" />
+        </label>
+        <label class="field-email" id="email-field" hidden>
+          <span>Gmail</span>
+          <input name="email" type="email" autocomplete="email" placeholder="example@gmail.com" />
+        </label>
+        <div class="field-code" id="code-field" hidden>
+          <label>
+            <span>인증코드</span>
+            <input name="code" type="text" inputmode="numeric" pattern="[0-9]{6}" maxlength="6" placeholder="인증코드 6자리" autocomplete="one-time-code" />
+          </label>
+          <button type="button" class="link-button code-resend" id="resend-code-btn">재전송</button>
+        </div>
+        <p class="modal-info" id="modal-info" hidden></p>
+        <p class="modal-error" id="modal-error" hidden></p>
+        <div class="modal-recovery" id="modal-recovery">
+          <button type="button" class="link-button" id="find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-recovery-alt" id="modal-recovery-alt" hidden>
+          <button type="button" class="link-button" id="alt-find-id-btn" data-i18n="auth.findId">아이디 찾기</button>
+          <button type="button" class="link-button" id="alt-find-password-btn" data-i18n="auth.findPw">비밀번호 찾기</button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close data-i18n="action.cancel">취소</button>
+          <button type="submit" class="cta" id="submit-btn" data-i18n="auth.login">로그인</button>
+        </div>
+      </form>
+    </div>
+
+    <main class="battle-page">
+      <section class="battle-stage">
+        <h1>배틀</h1>
+        <p>5문제 중 3문제를 먼저 맞춰 배터리를 차지하세요!</p>
+        <div class="battle-actions">
+          <button id="btn-random-pvp" class="cta battle-action-btn">랜덤 PvP</button>
+          <button id="btn-room-entry" class="ghost battle-action-btn">방 입력</button>
+        </div>
+      </section>
+    </main>
+
+    <!-- 방 선택 모달 -->
+    <div id="battle-room-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card">
+        <h3>방 선택</h3>
+        <div class="modal-actions">
+          <button id="btn-create-room" class="cta">방 생성</button>
+          <button id="btn-join-room" class="ghost">방 들어가기</button>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close>닫기</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 방 생성됨 모달 -->
+    <div id="battle-create-modal" class="modal" hidden>
+      <div class="modal-backdrop"></div>
+      <div class="modal-card">
+        <h3>방이 생성되었습니다</h3>
+        <div class="battle-code-display">
+          <span id="battle-room-code">------</span>
+        </div>
+        <p>상대방이 들어오기를 기다리는 중...</p>
+        <div class="battle-spinner" aria-hidden="true"></div>
+        <div class="modal-actions">
+          <button type="button" class="ghost" id="btn-create-cancel">취소</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 방 코드 입력 모달 -->
+    <div id="battle-join-modal" class="modal" hidden>
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card">
+        <h3>방 코드 입력</h3>
+        <label>
+          <span>방 코드</span>
+          <input id="battle-join-code" placeholder="ABC123" maxlength="6" autocomplete="off" />
+        </label>
+        <p class="modal-error" id="battle-join-error" hidden></p>
+        <div class="modal-actions">
+          <button type="button" class="ghost" data-close>취소</button>
+          <button type="button" class="cta" id="btn-join-confirm">확인</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 매칭 중 모달 -->
+    <div id="battle-queue-modal" class="modal" hidden>
+      <div class="modal-backdrop"></div>
+      <div class="modal-card">
+        <h3>매칭 중...</h3>
+        <div class="battle-spinner" aria-hidden="true"></div>
+        <p>잠시만 기다려주세요</p>
+        <div class="modal-actions">
+          <button type="button" class="ghost" id="btn-queue-cancel">취소</button>
+        </div>
+      </div>
+    </div>
+
+    <script type="module" src="/src/main.js"></script>
+    <script type="module" src="/src/battle.js"></script>
+  </body>
+</html>

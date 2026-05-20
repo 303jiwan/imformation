@@ -195,7 +195,7 @@ const overlaySub      = $("grading-sub");
 
 /* ---------- Render problem ---------- */
 
-featureLabel.textContent = `Gap Check · ${progress.current}/${progress.total}`;
+featureLabel.textContent = `코딩 테스트 · ${progress.current}/${progress.total}`;
 headingEl.textContent = problem.title;
 descEl.innerHTML = problem.description;
 inBodyEl.innerHTML = `<p>${problem.inputDesc}</p>`;
@@ -869,7 +869,7 @@ skipBtn.addEventListener("click", () => {
 });
 
 exitBtn.addEventListener("click", () => {
-  if (!confirm("정말 갭체크를 종료할까요? 진행 상황이 사라집니다.")) return;
+  if (!confirm("정말 코딩 테스트를 종료할까요? 진행 상황이 사라집니다.")) return;
   for (const k of [PROGRESS_KEY, ANSWERS_KEY, TIMER_KEY, QUEUE_KEY]) {
     try { sessionStorage.removeItem(k); } catch (_) {}
   }

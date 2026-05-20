@@ -17,6 +17,7 @@ import { adminRouter } from "./admin.js";
 import { learnRouter } from "./learn.js";
 import { graderRouter } from "./grader.js";
 import { walletRouter } from "./wallet.js";
+import { battleRouter } from "./battle.js";
 
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
@@ -59,6 +60,7 @@ app.use("/api/admin", adminRouter);
 app.use("/api/learn", learnRouter);
 app.use("/api/grade", graderRouter);
 app.use("/api", walletRouter);
+app.use("/api/battle", battleRouter);
 
 // Serve uploaded lecture files. Marked Cross-Origin-Resource-Policy so the
 // frontend on a different origin (Vite dev server) can <video src=...> them.
