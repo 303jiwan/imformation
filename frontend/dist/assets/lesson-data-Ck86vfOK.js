@@ -80,7 +80,188 @@ int main() {
   return 0;
 }`},{type:"h3",text:"if-else if-else"},{type:"list",items:["if — 첫 번째 조건 검사","else if — 이전 조건이 거짓일 때 다음 조건 검사","else — 모든 조건이 거짓일 때 실행"]},{type:"callout",text:"조건은 위에서 아래로 순서대로 검사되며, 처음 참이 되는 블록만 실행됩니다."}]},problems:{basic:[{id:"t0-ch3-2-b1",title:"양수/음수/영 판별",diff:"Easy",xp:10,time:"3m",desc:"정수 한 개를 입력받아 양수이면 'positive', 음수이면 'negative', 0이면 'zero' 를 출력하세요.",example:{input:`3
 `,output:"positive"}}],practice:[{id:"t0-ch3-2-p1",title:"두 수 중 최댓값",diff:"Easy",xp:10,time:"3m",desc:"정수 두 개를 입력받아 더 큰 값을 출력하세요. 같으면 그 값을 출력합니다.",example:{input:`3 7
-`,output:"7"}}]}};t["t1-ch1-1"]={trail:1,ch:1,no:1,title:"기본 출력",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"C 프로그램의 기본 골격을 익히고, printf 함수로 화면에 글자를 출력하는 방법을 배웁니다."},{type:"h3",text:"기본 골격"},{type:"code",text:`#include <stdio.h>
+`,output:"7"}}]}};t["t0-ch3-3"]={trail:0,ch:3,no:3,title:"if/else",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"if-else 로 두 갈래(참/거짓)를 나눠 실행하는 방법을 배웁니다."},{type:"code",text:`#include <stdio.h>
+
+int main() {
+  int x;
+  scanf("%d", &x);
+  if (x > 0) {
+    printf("positive\\n");
+  } else {
+    printf("negative\\n");
+  }
+  return 0;
+}`},{type:"h3",text:"if-else 구조"},{type:"list",items:["if (조건) { … } — 조건이 참이면 실행","else { … } — 조건이 거짓이면 실행","둘 중 하나만 반드시 실행됨"]},{type:"callout",text:"함정: 비교는 == (등호 두 개), 대입은 = (등호 하나). 혼동하면 의도치 않은 결과가 납니다."}]},problems:{basic:[{id:"t0-ch3-3-b1",title:"양수/음수/영 판별",diff:"Easy",xp:10,time:"3m",desc:"정수 한 개를 입력받아 양수이면 'positive', 음수이면 'negative', 0이면 'zero'를 출력하세요.",example:{input:`5
+`,output:"positive"}}],practice:[{id:"t0-ch3-3-p1",title:"합격/불합격 판별",diff:"Easy",xp:10,time:"3m",desc:"점수 한 개를 입력받아 60점 이상이면 'pass', 미만이면 'fail'을 출력하세요.",example:{input:`75
+`,output:"pass"}}]}};t["t0-ch3-4"]={trail:0,ch:3,no:4,title:"switch",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"정수 값에 따라 여러 case 중 하나를 선택해 실행하는 switch 문을 배웁니다."},{type:"code",text:`#include <stdio.h>
+
+int main() {
+  int d;
+  scanf("%d", &d);
+  switch (d) {
+    case 1: printf("Mon\\n"); break;
+    case 2: printf("Tue\\n"); break;
+    default: printf("Other\\n");
+  }
+  return 0;
+}`},{type:"h3",text:"switch 핵심 규칙"},{type:"list",items:["case 값: — 해당 값이면 여기서 실행 시작","break; — 빠져나옴. 빠뜨리면 다음 case 까지 흘러내림(fall-through)","default: — 어떤 case 도 해당 없을 때 실행"]},{type:"callout",text:"break 를 빠뜨리는 것이 가장 흔한 실수입니다. 각 case 끝에 반드시 break 를 넣으세요."}]},problems:{basic:[{id:"t0-ch3-4-b1",title:"요일 출력",diff:"Easy",xp:10,time:"3m",desc:"1~7 사이의 정수를 입력받아 해당 요일 약자(Mon/Tue/Wed/Thu/Fri/Sat/Sun)를 출력하세요.",example:{input:`3
+`,output:"Wed"}}],practice:[{id:"t0-ch3-4-p1",title:"등급 출력",diff:"Easy",xp:10,time:"3m",desc:"1~5 사이의 정수를 입력받아 1=A, 2=B, 3=C, 4=D, 5=F 를 출력하세요.",example:{input:`2
+`,output:"B"}}]}};t["t0-ch4-1"]={trail:0,ch:4,no:1,title:"for 입문",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"for 문으로 정해진 횟수만큼 코드를 반복 실행하는 방법을 배웁니다."},{type:"code",text:`#include <stdio.h>
+
+int main() {
+  int n, sum = 0;
+  scanf("%d", &n);
+  for (int i = 1; i <= n; i++) {
+    sum += i;
+  }
+  printf("%d\\n", sum);
+  return 0;
+}`},{type:"h3",text:"for 문 구조"},{type:"list",items:["for (초기화; 조건; 증감) { … }","초기화: 루프 시작 전 한 번 실행","조건: 매 반복 전에 검사 — 거짓이면 종료","증감: 매 반복 후 실행"]},{type:"callout",text:"함정: 세미콜론(;) 빠뜨리기, i <= n 인지 i < n 인지 헷갈리는 off-by-one 오류."}]},problems:{basic:[{id:"t0-ch4-1-b1",title:"1부터 N까지 합",diff:"Easy",xp:10,time:"3m",desc:"정수 N을 입력받아 1부터 N까지의 합을 출력하세요.",example:{input:`5
+`,output:"15"}}],practice:[{id:"t0-ch4-1-p1",title:"1부터 N까지 출력",diff:"Easy",xp:10,time:"3m",desc:"정수 N을 입력받아 1부터 N까지 한 줄에 하나씩 출력하세요.",example:{input:`3
+`,output:`1
+2
+3`}}]}};t["t0-ch4-2"]={trail:0,ch:4,no:2,title:"while",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"조건이 참인 동안 반복하는 while 문을 배웁니다."},{type:"code",text:`#include <stdio.h>
+
+int main() {
+  int n, i = 1, sum = 0;
+  scanf("%d", &n);
+  while (i <= n) {
+    sum += i;
+    i++;
+  }
+  printf("%d\\n", sum);
+  return 0;
+}`},{type:"h3",text:"while 구조"},{type:"list",items:["while (조건) { … } — 조건이 참인 동안 반복","조건이 처음부터 거짓이면 한 번도 실행 안 됨","루프 안에서 조건 변수를 바꾸지 않으면 무한 루프"]},{type:"callout",text:"무한 루프 함정: 조건 변수를 반드시 루프 안에서 갱신하세요."}]},problems:{basic:[{id:"t0-ch4-2-b1",title:"1부터 N까지 합 (while)",diff:"Easy",xp:10,time:"3m",desc:"정수 N을 입력받아 while 문으로 1부터 N까지의 합을 출력하세요.",example:{input:`4
+`,output:"10"}}],practice:[{id:"t0-ch4-2-p1",title:"N부터 1까지 출력",diff:"Easy",xp:10,time:"3m",desc:"정수 N을 입력받아 N부터 1까지 한 줄에 하나씩 출력하세요.",example:{input:`3
+`,output:`3
+2
+1`}}]}};t["t0-ch4-3"]={trail:0,ch:4,no:3,title:"do-while",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"본문을 먼저 실행하고 조건을 나중에 검사하는 do-while 문을 배웁니다."},{type:"code",text:`#include <stdio.h>
+
+int main() {
+  int n;
+  scanf("%d", &n);
+  do {
+    printf("%d\\n", n);
+    n--;
+  } while (n > 0);
+  return 0;
+}`},{type:"h3",text:"do-while 특징"},{type:"list",items:["do { … } while (조건);  ← 세미콜론 필수","본문을 먼저 실행한 뒤 조건 검사","조건이 처음부터 거짓이어도 최소 1회는 실행"]},{type:"callout",text:"while 끝에 세미콜론(;)을 꼭 붙이세요. 빠뜨리면 컴파일 오류."}]},problems:{basic:[{id:"t0-ch4-3-b1",title:"첫 입력값 그대로 출력",diff:"Easy",xp:10,time:"3m",desc:"정수 N을 입력받아 do-while 문으로 N을 출력하세요. (조건과 무관하게 1회 실행 확인)",example:{input:`7
+`,output:"7"}}],practice:[{id:"t0-ch4-3-p1",title:"카운트다운 후 GO",diff:"Easy",xp:10,time:"3m",desc:"정수 N을 입력받아 N부터 1까지 한 줄씩 출력하고, 마지막에 'GO'를 출력하세요.",example:{input:`3
+`,output:`3
+2
+1
+GO`}}]}};t["t0-ch4-4"]={trail:0,ch:4,no:4,title:"중첩 반복",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"반복문 안에 또 다른 반복문을 넣어 2차원 패턴을 출력하는 방법을 배웁니다."},{type:"code",text:`#include <stdio.h>
+
+int main() {
+  int n;
+  scanf("%d", &n);
+  for (int i = 1; i <= n; i++) {
+    for (int j = 1; j <= i; j++)
+      printf("*");
+    printf("\\n");
+  }
+  return 0;
+}`},{type:"h3",text:"중첩 for 구조"},{type:"list",items:["바깥 루프: 행(row) 제어","안쪽 루프: 각 행에 출력할 열(column) 제어",'안쪽 루프가 끝나면 printf("\\n") 으로 줄바꿈']},{type:"callout",text:"바깥 변수 i 와 안쪽 변수 j 를 이름이 겹치지 않게 구분하세요."}]},problems:{basic:[{id:"t0-ch4-4-b1",title:"직각삼각형 별 찍기",diff:"Easy",xp:10,time:"4m",desc:"정수 N을 입력받아 N행의 직각삼각형 별 패턴을 출력하세요. i행에는 별이 i개.",example:{input:`4
+`,output:`*
+**
+***
+****`}}],practice:[{id:"t0-ch4-4-p1",title:"역직각삼각형 별 찍기",diff:"Easy",xp:10,time:"4m",desc:"정수 N을 입력받아 역방향 직각삼각형 별 패턴을 출력하세요. 첫 행에 별이 N개, 마지막 행에 1개.",example:{input:`4
+`,output:`****
+***
+**
+*`}}]}};t["t0-ch5-1"]={trail:0,ch:5,no:1,title:"배열 선언",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"여러 값을 하나의 이름으로 묶어 관리하는 배열의 선언과 초기화를 배웁니다."},{type:"code",text:`#include <stdio.h>
+
+int main() {
+  int arr[5] = {10, 20, 30, 40, 50};
+  printf("%d\\n", arr[0]); // 첫 번째 요소
+  return 0;
+}`},{type:"h3",text:"배열 기본"},{type:"list",items:["int arr[5]; — 정수 5개를 담는 배열 선언","인덱스는 0부터 시작: arr[0] ~ arr[4]","초기화: int arr[5] = {1, 2, 3, 4, 5};"]},{type:"callout",text:"인덱스 범위를 넘으면 메모리 오류가 납니다. arr[5]는 존재하지 않습니다."}]},problems:{basic:[{id:"t0-ch5-1-b1",title:"첫 번째 요소 출력",diff:"Easy",xp:10,time:"3m",desc:"공백으로 구분된 정수 5개를 입력받아 첫 번째 값을 출력하세요.",example:{input:`10 20 30 40 50
+`,output:"10"}}],practice:[{id:"t0-ch5-1-p1",title:"마지막 요소 출력",diff:"Easy",xp:10,time:"3m",desc:"공백으로 구분된 정수 5개를 입력받아 마지막 값을 출력하세요.",example:{input:`10 20 30 40 50
+`,output:"50"}}]}};t["t0-ch5-2"]={trail:0,ch:5,no:2,title:"배열 입출력",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"for 루프로 배열 요소를 차례로 입력받고 출력하는 방법을 배웁니다."},{type:"code",text:`#include <stdio.h>
+
+int main() {
+  int arr[5];
+  for (int i = 0; i < 5; i++)
+    scanf("%d", &arr[i]);
+  for (int i = 0; i < 5; i++)
+    printf("%d\\n", arr[i]);
+  return 0;
+}`},{type:"h3",text:"루프로 배열 다루기"},{type:"list",items:["scanf 루프: i = 0 ~ 4 반복하며 각 요소를 입력받음","printf 루프: 같은 방식으로 출력","역순 출력: i = 4 ~ 0 으로 내려가며 출력"]},{type:"callout",text:"배열 입력 시 &arr[i] 처럼 반드시 & 를 붙여야 합니다."}]},problems:{basic:[{id:"t0-ch5-2-b1",title:"배열 순서대로 출력",diff:"Easy",xp:10,time:"3m",desc:"공백으로 구분된 정수 5개를 입력받아 한 줄에 하나씩 순서대로 출력하세요.",example:{input:`1 2 3 4 5
+`,output:`1
+2
+3
+4
+5`}}],practice:[{id:"t0-ch5-2-p1",title:"배열 역순 출력",diff:"Easy",xp:10,time:"3m",desc:"공백으로 구분된 정수 5개를 입력받아 역순으로 한 줄에 하나씩 출력하세요.",example:{input:`1 2 3 4 5
+`,output:`5
+4
+3
+2
+1`}}]}};t["t0-ch5-3"]={trail:0,ch:5,no:3,title:"2차원 배열",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"행과 열로 이루어진 2차원 배열을 선언하고 이중 for 루프로 접근하는 방법을 배웁니다."},{type:"code",text:`#include <stdio.h>
+
+int main() {
+  int m[2][2];
+  for (int i = 0; i < 2; i++)
+    for (int j = 0; j < 2; j++)
+      scanf("%d", &m[i][j]);
+  printf("%d\\n", m[0][0] + m[0][1] + m[1][0] + m[1][1]);
+  return 0;
+}`},{type:"h3",text:"2차원 배열 구조"},{type:"list",items:["int m[행][열]; 로 선언","m[i][j] — i번째 행, j번째 열","이중 for 로 전체 순회"]},{type:"callout",text:"2차원 배열도 인덱스는 0부터 시작합니다. m[2][2] 에서 유효한 인덱스는 0, 1 뿐."}]},problems:{basic:[{id:"t0-ch5-3-b1",title:"2×2 배열 합",diff:"Easy",xp:10,time:"4m",desc:"공백으로 구분된 정수 4개(2×2 행렬 행 우선)를 입력받아 모든 요소의 합을 출력하세요.",example:{input:`1 2 3 4
+`,output:"10"}}],practice:[{id:"t0-ch5-3-p1",title:"대각선 합",diff:"Easy",xp:10,time:"4m",desc:"공백으로 구분된 정수 4개(2×2 행렬 행 우선)를 입력받아 주대각선(m[0][0]+m[1][1])의 합을 출력하세요.",example:{input:`1 2 3 4
+`,output:"5"}}]}};t["t0-ch5-4"]={trail:0,ch:5,no:4,title:"배열 순회",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"배열을 순회하며 합계, 최댓값, 평균 등을 구하는 패턴을 배웁니다."},{type:"code",text:`#include <stdio.h>
+
+int main() {
+  int arr[5], max;
+  for (int i = 0; i < 5; i++) scanf("%d", &arr[i]);
+  max = arr[0];
+  for (int i = 1; i < 5; i++)
+    if (arr[i] > max) max = arr[i];
+  printf("%d\\n", max);
+  return 0;
+}`},{type:"h3",text:"누적 변수 패턴"},{type:"list",items:["합계: sum = 0; 후 루프에서 sum += arr[i]","최댓값: max = arr[0]; 후 루프에서 갱신","평균: 합계 / 개수 (정수 나누기 주의)"]},{type:"callout",text:"최댓값 변수는 배열 첫 요소로 초기화하세요. 0으로 초기화하면 음수 배열에서 틀립니다."}]},problems:{basic:[{id:"t0-ch5-4-b1",title:"최댓값 구하기",diff:"Easy",xp:10,time:"3m",desc:"공백으로 구분된 정수 5개를 입력받아 가장 큰 값을 출력하세요.",example:{input:`3 7 1 9 5
+`,output:"9"}}],practice:[{id:"t0-ch5-4-p1",title:"평균 구하기",diff:"Easy",xp:10,time:"3m",desc:"공백으로 구분된 정수 5개를 입력받아 평균을 정수로 출력하세요.",example:{input:`10 20 30 40 50
+`,output:"30"}}]}};t["t0-ch6-1"]={trail:0,ch:6,no:1,title:"char 배열",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"문자 하나(char) 와 문자 배열(문자열)을 선언하고 입출력하는 방법을 배웁니다."},{type:"code",text:`#include <stdio.h>
+
+int main() {
+  char s[20];
+  scanf("%s", s);
+  printf("%s\\n", s);
+  return 0;
+}`},{type:"h3",text:"char 배열과 null 종단자"},{type:"list",items:["char s[20]; — 최대 19글자 + '\\0' 저장 가능",'scanf("%s", s) — & 없이 배열 이름만 전달',"'\\0' (null 종단자): 문자열 끝을 알리는 특수 문자"]},{type:"callout",text:"배열 크기는 저장할 문자 수보다 최소 1 이상 크게 선언하세요 (null 종단자 공간)."}]},problems:{basic:[{id:"t0-ch6-1-b1",title:"문자 그대로 출력",diff:"Easy",xp:10,time:"2m",desc:"문자 한 개를 입력받아 그대로 출력하세요.",example:{input:`A
+`,output:"A"}}],practice:[{id:"t0-ch6-1-p1",title:"단어 그대로 출력",diff:"Easy",xp:10,time:"2m",desc:"단어 한 개를 입력받아 그대로 출력하세요.",example:{input:`hello
+`,output:"hello"}}]}};t["t0-ch6-2"]={trail:0,ch:6,no:2,title:"문자열 출력",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"scanf 로 입력받은 문자 배열을 printf %s 형식으로 출력하고, 여러 단어를 다양한 형태로 조합하는 방법을 배웁니다."},{type:"code",text:`#include <stdio.h>
+
+int main() {
+  char a[50], b[50];
+  scanf("%s %s", a, b);
+  printf("%s%s\\n", a, b);
+  return 0;
+}`},{type:"h3",text:"printf 문자열 출력"},{type:"list",items:["%s — char 배열을 '\\0' 전까지 출력","여러 %s 를 한 줄에 이어 쓰면 단어가 붙어 출력됨","줄바꿈을 원하면 printf 끝에 \\n 추가"]},{type:"callout",text:'scanf("%s", s) 는 공백 전까지만 한 단어를 읽습니다. 두 단어는 두 번 scanf 하거나 "%s %s" 형식으로 한 번에 받으세요.'}]},problems:{basic:[{id:"t0-ch6-2-b1",title:"두 단어 붙여 출력",diff:"Easy",xp:10,time:"3m",desc:"공백으로 구분된 두 단어를 입력받아 공백 없이 붙여서 한 줄에 출력하세요.",example:{input:`hi bye
+`,output:"hibye"}}],practice:[{id:"t0-ch6-2-p1",title:"단어 두 줄 출력",diff:"Easy",xp:10,time:"3m",desc:"단어 한 개를 입력받아 같은 단어를 두 줄에 걸쳐 출력하세요.",example:{input:`hi
+`,output:`hi
+hi`}}]}};t["t0-ch6-3"]={trail:0,ch:6,no:3,title:"문자열 길이",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"문자열의 길이를 구하는 strlen 함수 사용법을 배웁니다."},{type:"code",text:`#include <stdio.h>
+#include <string.h>
+
+int main() {
+  char s[100];
+  scanf("%s", s);
+  printf("%lu\\n", strlen(s));
+  return 0;
+}`},{type:"h3",text:"strlen 특징"},{type:"list",items:["#include <string.h> 필요","strlen(s) — '\\0' 전까지의 문자 수 반환","결과 자료형은 size_t (unsigned). %lu 또는 %d 로 출력"]},{type:"callout",text:`strlen 은 '\\0' 자체는 길이에 포함하지 않습니다. "hello" 의 길이는 5.`}]},problems:{basic:[{id:"t0-ch6-3-b1",title:"단어 길이 출력",diff:"Easy",xp:10,time:"3m",desc:"단어 한 개를 입력받아 그 길이를 출력하세요.",example:{input:`hello
+`,output:"5"}}],practice:[{id:"t0-ch6-3-p1",title:"두 단어 길이 합",diff:"Easy",xp:10,time:"3m",desc:"공백으로 구분된 두 단어를 입력받아 두 단어 길이의 합을 출력하세요.",example:{input:`hi bye
+`,output:"5"}}]}};t["t0-ch6-4"]={trail:0,ch:6,no:4,title:"문자열 비교",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"두 문자열이 같은지 비교하는 strcmp 함수 사용법을 배웁니다."},{type:"code",text:`#include <stdio.h>
+#include <string.h>
+
+int main() {
+  char a[50], b[50];
+  scanf("%s %s", a, b);
+  if (strcmp(a, b) == 0)
+    printf("same\\n");
+  else
+    printf("diff\\n");
+  return 0;
+}`},{type:"h3",text:"strcmp 반환값"},{type:"list",items:["0 — 두 문자열이 같음","양수 — a 가 사전순으로 b 보다 뒤","음수 — a 가 사전순으로 b 보다 앞"]},{type:"callout",text:"문자열 비교에 == 연산자를 쓰면 주소를 비교하게 됩니다. 반드시 strcmp 를 쓰세요."}]},problems:{basic:[{id:"t0-ch6-4-b1",title:"두 단어 같은지 비교",diff:"Easy",xp:10,time:"3m",desc:"공백으로 구분된 두 단어를 입력받아 같으면 'same', 다르면 'diff'를 출력하세요.",example:{input:`hi hi
+`,output:"same"}}],practice:[{id:"t0-ch6-4-p1",title:"특정 단어 일치 확인",diff:"Easy",xp:10,time:"3m",desc:"단어 한 개를 입력받아 'hello' 와 같으면 'yes', 다르면 'no'를 출력하세요.",example:{input:`hello
+`,output:"yes"}}]}};t["t1-ch1-1"]={trail:1,ch:1,no:1,title:"기본 출력",concept:{sections:[{type:"h",text:"강의 목표"},{type:"p",text:"C 프로그램의 기본 골격을 익히고, printf 함수로 화면에 글자를 출력하는 방법을 배웁니다."},{type:"h3",text:"기본 골격"},{type:"code",text:`#include <stdio.h>
 
 int main() {
   printf("hello");

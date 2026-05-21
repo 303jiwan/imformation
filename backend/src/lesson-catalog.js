@@ -99,6 +99,350 @@ CATALOG["t0-ch3-2"] = {
   },
 };
 
+// --- Ch 3 (continued). if/else, switch ---
+
+CATALOG["t0-ch3-3"] = {
+  trail: 0, ch: 3, no: 3, prereq: "t0-ch3-2",
+  problems: {
+    "t0-ch3-3-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "positive\n", input: "5\n",
+      cases: [
+        { input: "5\n",  expected: "positive\n", public: true  },
+        { input: "-3\n", expected: "negative\n", public: false },
+        { input: "0\n",  expected: "zero\n",     public: false },
+      ],
+    },
+    "t0-ch3-3-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "pass\n", input: "75\n",
+      cases: [
+        { input: "75\n", expected: "pass\n", public: true  },
+        { input: "59\n", expected: "fail\n", public: false },
+        { input: "60\n", expected: "pass\n", public: false },
+      ],
+    },
+  },
+};
+
+CATALOG["t0-ch3-4"] = {
+  trail: 0, ch: 3, no: 4, prereq: "t0-ch3-3",
+  problems: {
+    "t0-ch3-4-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "Wed\n", input: "3\n",
+      cases: [
+        { input: "3\n", expected: "Wed\n", public: true  },
+        { input: "1\n", expected: "Mon\n", public: false },
+        { input: "7\n", expected: "Sun\n", public: false },
+      ],
+    },
+    "t0-ch3-4-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "B\n", input: "2\n",
+      cases: [
+        { input: "2\n", expected: "B\n", public: true  },
+        { input: "1\n", expected: "A\n", public: false },
+        { input: "5\n", expected: "F\n", public: false },
+      ],
+    },
+  },
+};
+
+// --- Ch 4. 반복문 ---
+
+CATALOG["t0-ch4-1"] = {
+  trail: 0, ch: 4, no: 1, prereq: "t0-ch3-4",
+  problems: {
+    "t0-ch4-1-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "15\n", input: "5\n",
+      cases: [
+        { input: "5\n",  expected: "15\n", public: true  },
+        { input: "1\n",  expected: "1\n",  public: false },
+        { input: "10\n", expected: "55\n", public: false },
+      ],
+    },
+    "t0-ch4-1-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "1\n2\n3\n", input: "3\n",
+      cases: [
+        { input: "3\n", expected: "1\n2\n3\n",         public: true  },
+        { input: "1\n", expected: "1\n",                public: false },
+        { input: "5\n", expected: "1\n2\n3\n4\n5\n",   public: false },
+      ],
+    },
+  },
+};
+
+CATALOG["t0-ch4-2"] = {
+  trail: 0, ch: 4, no: 2, prereq: "t0-ch4-1",
+  problems: {
+    "t0-ch4-2-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "10\n", input: "4\n",
+      cases: [
+        { input: "4\n",   expected: "10\n",   public: true  },
+        { input: "1\n",   expected: "1\n",    public: false },
+        { input: "100\n", expected: "5050\n", public: false },
+      ],
+    },
+    "t0-ch4-2-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "3\n2\n1\n", input: "3\n",
+      cases: [
+        { input: "3\n", expected: "3\n2\n1\n",         public: true  },
+        { input: "1\n", expected: "1\n",                public: false },
+        { input: "5\n", expected: "5\n4\n3\n2\n1\n",   public: false },
+      ],
+    },
+  },
+};
+
+CATALOG["t0-ch4-3"] = {
+  trail: 0, ch: 4, no: 3, prereq: "t0-ch4-2",
+  problems: {
+    "t0-ch4-3-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "7\n", input: "7\n",
+      cases: [
+        { input: "7\n",  expected: "7\n",  public: true  },
+        { input: "1\n",  expected: "1\n",  public: false },
+        { input: "42\n", expected: "42\n", public: false },
+      ],
+    },
+    "t0-ch4-3-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "3\n2\n1\nGO\n", input: "3\n",
+      cases: [
+        { input: "3\n", expected: "3\n2\n1\nGO\n",         public: true  },
+        { input: "1\n", expected: "1\nGO\n",                public: false },
+        { input: "5\n", expected: "5\n4\n3\n2\n1\nGO\n",   public: false },
+      ],
+    },
+  },
+};
+
+CATALOG["t0-ch4-4"] = {
+  trail: 0, ch: 4, no: 4, prereq: "t0-ch4-3",
+  problems: {
+    "t0-ch4-4-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "*\n**\n***\n****\n", input: "4\n",
+      cases: [
+        { input: "4\n", expected: "*\n**\n***\n****\n",                    public: true  },
+        { input: "1\n", expected: "*\n",                                    public: false },
+        { input: "6\n", expected: "*\n**\n***\n****\n*****\n******\n",     public: false },
+      ],
+    },
+    "t0-ch4-4-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "****\n***\n**\n*\n", input: "4\n",
+      cases: [
+        { input: "4\n", expected: "****\n***\n**\n*\n",             public: true  },
+        { input: "1\n", expected: "*\n",                             public: false },
+        { input: "5\n", expected: "*****\n****\n***\n**\n*\n",      public: false },
+      ],
+    },
+  },
+};
+
+// --- Ch 5. 배열 ---
+
+CATALOG["t0-ch5-1"] = {
+  trail: 0, ch: 5, no: 1, prereq: "t0-ch4-4",
+  problems: {
+    "t0-ch5-1-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "10\n", input: "10 20 30 40 50\n",
+      cases: [
+        { input: "10 20 30 40 50\n",  expected: "10\n",  public: true  },
+        { input: "7 8 9 1 2\n",       expected: "7\n",   public: false },
+        { input: "100 0 0 0 0\n",     expected: "100\n", public: false },
+      ],
+    },
+    "t0-ch5-1-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "50\n", input: "10 20 30 40 50\n",
+      cases: [
+        { input: "10 20 30 40 50\n", expected: "50\n", public: true  },
+        { input: "1 2 3 4 99\n",     expected: "99\n", public: false },
+        { input: "5 4 3 2 1\n",      expected: "1\n",  public: false },
+      ],
+    },
+  },
+};
+
+CATALOG["t0-ch5-2"] = {
+  trail: 0, ch: 5, no: 2, prereq: "t0-ch5-1",
+  problems: {
+    "t0-ch5-2-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "1\n2\n3\n4\n5\n", input: "1 2 3 4 5\n",
+      cases: [
+        { input: "1 2 3 4 5\n",   expected: "1\n2\n3\n4\n5\n",   public: true  },
+        { input: "10 9 8 7 6\n",  expected: "10\n9\n8\n7\n6\n",  public: false },
+        { input: "0 0 0 0 0\n",   expected: "0\n0\n0\n0\n0\n",   public: false },
+      ],
+    },
+    "t0-ch5-2-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "5\n4\n3\n2\n1\n", input: "1 2 3 4 5\n",
+      cases: [
+        { input: "1 2 3 4 5\n",   expected: "5\n4\n3\n2\n1\n",   public: true  },
+        { input: "10 9 8 7 6\n",  expected: "6\n7\n8\n9\n10\n",  public: false },
+        { input: "1 1 2 2 3\n",   expected: "3\n2\n2\n1\n1\n",   public: false },
+      ],
+    },
+  },
+};
+
+CATALOG["t0-ch5-3"] = {
+  trail: 0, ch: 5, no: 3, prereq: "t0-ch5-2",
+  problems: {
+    "t0-ch5-3-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "10\n", input: "1 2 3 4\n",
+      cases: [
+        { input: "1 2 3 4\n",  expected: "10\n", public: true  },
+        { input: "0 0 0 0\n",  expected: "0\n",  public: false },
+        { input: "5 5 5 5\n",  expected: "20\n", public: false },
+      ],
+    },
+    "t0-ch5-3-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "5\n", input: "1 2 3 4\n",
+      cases: [
+        { input: "1 2 3 4\n",   expected: "5\n",  public: true  },
+        { input: "10 0 0 10\n", expected: "20\n", public: false },
+        { input: "3 7 5 9\n",   expected: "12\n", public: false },
+      ],
+    },
+  },
+};
+
+CATALOG["t0-ch5-4"] = {
+  trail: 0, ch: 5, no: 4, prereq: "t0-ch5-3",
+  problems: {
+    "t0-ch5-4-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "9\n", input: "3 7 1 9 5\n",
+      cases: [
+        { input: "3 7 1 9 5\n",    expected: "9\n",  public: true  },
+        { input: "1 1 1 1 1\n",    expected: "1\n",  public: false },
+        { input: "10 20 30 5 25\n", expected: "30\n", public: false },
+      ],
+    },
+    "t0-ch5-4-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "30\n", input: "10 20 30 40 50\n",
+      cases: [
+        { input: "10 20 30 40 50\n", expected: "30\n", public: true  },
+        { input: "1 2 3 4 5\n",      expected: "3\n",  public: false },
+        { input: "0 0 0 0 100\n",    expected: "20\n", public: false },
+      ],
+    },
+  },
+};
+
+// --- Ch 6. 문자/문자열 ---
+
+CATALOG["t0-ch6-1"] = {
+  trail: 0, ch: 6, no: 1, prereq: "t0-ch5-4",
+  problems: {
+    "t0-ch6-1-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "A\n", input: "A\n",
+      cases: [
+        { input: "A\n", expected: "A\n", public: true  },
+        { input: "z\n", expected: "z\n", public: false },
+        { input: "!\n", expected: "!\n", public: false },
+      ],
+    },
+    "t0-ch6-1-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "hello\n", input: "hello\n",
+      cases: [
+        { input: "hello\n", expected: "hello\n", public: true  },
+        { input: "world\n", expected: "world\n", public: false },
+        { input: "C\n",     expected: "C\n",     public: false },
+      ],
+    },
+  },
+};
+
+CATALOG["t0-ch6-2"] = {
+  trail: 0, ch: 6, no: 2, prereq: "t0-ch6-1",
+  problems: {
+    "t0-ch6-2-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "hibye\n", input: "hi bye\n",
+      cases: [
+        { input: "hi bye\n",      expected: "hibye\n",      public: true  },
+        { input: "hello world\n", expected: "helloworld\n", public: false },
+        { input: "a b\n",         expected: "ab\n",         public: false },
+      ],
+    },
+    "t0-ch6-2-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "hi\nhi\n", input: "hi\n",
+      cases: [
+        { input: "hi\n",    expected: "hi\nhi\n",       public: true  },
+        { input: "hello\n", expected: "hello\nhello\n", public: false },
+        { input: "C\n",     expected: "C\nC\n",         public: false },
+      ],
+    },
+  },
+};
+
+CATALOG["t0-ch6-3"] = {
+  trail: 0, ch: 6, no: 3, prereq: "t0-ch6-2",
+  problems: {
+    "t0-ch6-3-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "5\n", input: "hello\n",
+      cases: [
+        { input: "hello\n",     expected: "5\n", public: true  },
+        { input: "hi\n",        expected: "2\n", public: false },
+        { input: "codenergy\n", expected: "9\n", public: false },
+      ],
+    },
+    "t0-ch6-3-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "5\n", input: "hi bye\n",
+      cases: [
+        { input: "hi bye\n",      expected: "5\n",  public: true  },
+        { input: "a b\n",         expected: "2\n",  public: false },
+        { input: "hello world\n", expected: "10\n", public: false },
+      ],
+    },
+  },
+};
+
+CATALOG["t0-ch6-4"] = {
+  trail: 0, ch: 6, no: 4, prereq: "t0-ch6-3",
+  problems: {
+    "t0-ch6-4-b1": {
+      kind: "basic", judge0Lang: "c",
+      expected: "same\n", input: "hi hi\n",
+      cases: [
+        { input: "hi hi\n",  expected: "same\n", public: true  },
+        { input: "hi bye\n", expected: "diff\n", public: false },
+        { input: "C C\n",    expected: "same\n", public: false },
+      ],
+    },
+    "t0-ch6-4-p1": {
+      kind: "practice", judge0Lang: "c",
+      expected: "yes\n", input: "hello\n",
+      cases: [
+        { input: "hello\n", expected: "yes\n", public: true  },
+        { input: "world\n", expected: "no\n",  public: false },
+        { input: "Hello\n", expected: "no\n",  public: false },
+      ],
+    },
+  },
+};
+
 // === END Trail 0 ===
 
 // ===== Trail 1 (Novice Low — 프로그래밍 기초) =====

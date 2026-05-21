@@ -1,4 +1,4 @@
-import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-BcjvKVtr.js";import{b as E,T as S,s as _}from"./test-problems-DTQSoVo9.js";const l=[{id:"vars",name:"변수와 자료형",tag:"기초",desc:"int, float, char, 형변환 등 기본 자료형",detail:{summary:"변수는 데이터를 저장하는 이름 붙은 메모리 공간입니다. C는 자료형에 따라 메모리 크기와 저장 범위가 달라지므로, 데이터 성격에 맞는 자료형을 선택하는 습관이 중요합니다. 형변환(cast)을 이용하면 자료형 간 값 변환도 가능합니다.",example:`#include <stdio.h>
+import"./modulepreload-polyfill-B5Qt9EMX.js";import"./main-DfJuubAV.js";import{b as E,T as S,s as _}from"./test-problems-DTQSoVo9.js";const l=[{id:"vars",name:"변수와 자료형",tag:"기초",desc:"int, float, char, 형변환 등 기본 자료형",detail:{summary:"변수는 데이터를 저장하는 이름 붙은 메모리 공간입니다. C는 자료형에 따라 메모리 크기와 저장 범위가 달라지므로, 데이터 성격에 맞는 자료형을 선택하는 습관이 중요합니다. 형변환(cast)을 이용하면 자료형 간 값 변환도 가능합니다.",example:`#include <stdio.h>
 
 int main(void) {
     int    나이   = 20;          /* 정수 */

@@ -111,7 +111,17 @@ btnCreateRoom.addEventListener('click', async () => {
       headers: { 'Content-Type': 'application/json' },
     });
     if (!res.ok) {
-      alert('방 생성에 실패했습니다.');
+      let detail = '';
+      try {
+        const errBody = await res.json();
+        detail = errBody.error || '';
+      } catch (_) {}
+      if (res.status === 401) {
+        alert('로그인이 필요합니다.');
+        window.location.href = 'test-login.html';
+        return;
+      }
+      alert(`방 생성에 실패했습니다. (${res.status}) ${detail}`);
       return;
     }
     const body = await res.json().catch(() => ({}));

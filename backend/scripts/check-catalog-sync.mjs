@@ -78,6 +78,17 @@ for (const id of serverIds) {
   }
 }
 
+// Hidden-case check: any problem with a `cases` field must have >= 1 hidden case.
+for (const [lessonId, lesson] of Object.entries(CATALOG)) {
+  for (const [probId, prob] of Object.entries(lesson.problems ?? {})) {
+    if (!Array.isArray(prob.cases)) continue; // legacy problems without cases — skip
+    const hiddenCount = prob.cases.filter((c) => c.public === false).length;
+    if (hiddenCount < 1) {
+      errors.push(`problem ${probId} (lesson ${lessonId}): has \`cases\` but no hidden case (public: false)`);
+    }
+  }
+}
+
 if (errors.length) {
   console.error("[catalog-sync] FAIL:");
   for (const e of errors) console.error("  - " + e);

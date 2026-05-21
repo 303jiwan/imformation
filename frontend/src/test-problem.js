@@ -248,7 +248,14 @@ function renderResultBody() {
       verdictEl.textContent = "맞았습니다";
     } else {
       verdictEl.className = "problem-verdict is-fail";
-      verdictEl.textContent = "틀렸습니다";
+      const labelByVerdict = {
+        compile:      "컴파일 오류",
+        tle:          "시간 초과",
+        runtime:      "런타임 오류",
+        output_limit: "출력 초과",
+        system:       "시스템 오류",
+      };
+      verdictEl.textContent = labelByVerdict[c.verdict] || "틀렸습니다";
     }
   } else {
     caseActualEl.innerHTML = `<span class="problem-io__placeholder">— 실행 결과가 여기 표시됩니다 —</span>`;

@@ -10,10 +10,10 @@
         z-index: 9999; opacity: 1; pointer-events: auto;
       }
     </style>
-    <script type="module" crossorigin src="/assets/battle-DSM0Ua3Q.js"></script>
+    <script type="module" crossorigin src="/assets/battle-Dz-Z8lmv.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-    <link rel="modulepreload" crossorigin href="/assets/main-BcjvKVtr.js">
-    <link rel="stylesheet" crossorigin href="/assets/main-Cgxa36ng.css">
+    <link rel="modulepreload" crossorigin href="/assets/main-DfJuubAV.js">
+    <link rel="stylesheet" crossorigin href="/assets/main-Dk49v0aG.css">
   </head>
   <body>
     <div class="page-fade" id="page-fade"></div>
@@ -118,13 +118,83 @@
       </form>
     </div>
 
-    <main class="battle-page">
+    <main class="battle-page battle-page--game">
+      <div class="battle-grid-bg" aria-hidden="true"></div>
+
+      <header class="battle-board">
+        <div class="battle-board__side battle-board__side--left">
+          <div class="battle-board__badge battle-board__badge--mission">
+            <div class="battle-board__mascot" aria-hidden="true">🐻</div>
+            <div class="battle-board__badge-text">
+              <span class="battle-board__badge-eyebrow">MISSION</span>
+              <span class="battle-board__badge-value">PvP</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="battle-board__center">
+          <div class="battle-board__round" aria-label="라운드 진행">
+            <span class="battle-board__round-dot is-active"></span>
+            <span class="battle-board__round-dot is-active"></span>
+            <span class="battle-board__round-dot"></span>
+            <span class="battle-board__round-dot"></span>
+            <span class="battle-board__round-dot"></span>
+          </div>
+          <div class="battle-board__title-wrap">
+            <span class="battle-board__title">코딩 배틀</span>
+          </div>
+          <div class="battle-board__bar">
+            <span class="battle-board__bar-fill" style="width: 40%"></span>
+          </div>
+          <div class="battle-board__sub">5문제 중 3문제 먼저 맞히기</div>
+        </div>
+
+        <div class="battle-board__side battle-board__side--right">
+          <div class="battle-board__badge battle-board__badge--chain">
+            <div class="battle-board__chain-icon" aria-hidden="true">🔔</div>
+            <div class="battle-board__badge-text">
+              <span class="battle-board__badge-eyebrow">CHAIN</span>
+              <span class="battle-board__badge-value">0</span>
+            </div>
+          </div>
+        </div>
+      </header>
+
       <section class="battle-stage">
+        <span class="battle-stage__pill">⚔ READY</span>
         <h1>배틀</h1>
         <p>5문제 중 3문제를 먼저 맞춰 배터리를 차지하세요!</p>
         <div class="battle-actions">
           <button id="btn-random-pvp" class="cta battle-action-btn">랜덤 PvP</button>
           <button id="btn-room-entry" class="ghost battle-action-btn">방 입력</button>
+        </div>
+      </section>
+
+      <section class="battle-slots" aria-label="플레이어 슬롯">
+        <div class="battle-slot">
+          <div class="battle-slot__avatar">🧑‍💻</div>
+          <div class="battle-slot__name">나</div>
+          <div class="battle-slot__score">0</div>
+        </div>
+        <div class="battle-slot battle-slot--empty">
+          <div class="battle-slot__avatar">👤</div>
+          <div class="battle-slot__name">대기 중</div>
+          <div class="battle-slot__score">—</div>
+        </div>
+        <div class="battle-slot battle-slot--empty">
+          <div class="battle-slot__avatar">👤</div>
+          <div class="battle-slot__name">대기 중</div>
+          <div class="battle-slot__score">—</div>
+        </div>
+        <div class="battle-slot battle-slot--empty">
+          <div class="battle-slot__avatar">👤</div>
+          <div class="battle-slot__name">대기 중</div>
+          <div class="battle-slot__score">—</div>
+        </div>
+        <div class="battle-slot battle-slot--empty">
+          <div class="battle-slot__avatar">👤</div>
+          <div class="battle-slot__name">대기 중</div>
+          <div class="battle-slot__score">—</div>
         </div>
       </section>
     </main>

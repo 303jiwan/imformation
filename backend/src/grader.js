@@ -161,13 +161,31 @@ function spawnWithTimeout(cmd, args, { stdinData, timeoutMs, maxOutputBytes, she
 // ---------------------------------------------------------------------------
 // 컴파일 (공통)
 // ---------------------------------------------------------------------------
+// unsafeNoContainer=1 → 호스트 gcc 직접 호출 (호스트에 gcc 필요)
+// unsafeNoContainer=0 → gcc:9 컨테이너 내부에서 컴파일 (Linux ELF 산출 → runOneDocker 가 그대로 실행)
 async function compileOnce(source, workDir) {
   await writeFile(join(workDir, "sol.c"), source, "utf8");
-  const r = await spawnWithTimeout(
-    "gcc",
-    ["-O2", "-std=c11", "-o", join(workDir, "sol"), join(workDir, "sol.c")],
-    { timeoutMs: CONFIG.compileTimeoutMs, maxOutputBytes: CONFIG.maxOutputBytes, shell: true }
-  );
+
+  let r;
+  if (CONFIG.unsafeNoContainer) {
+    r = await spawnWithTimeout(
+      "gcc",
+      ["-O2", "-std=c11", "-o", join(workDir, "sol"), join(workDir, "sol.c")],
+      { timeoutMs: CONFIG.compileTimeoutMs, maxOutputBytes: CONFIG.maxOutputBytes, shell: true }
+    );
+  } else {
+    r = await spawnWithTimeout(
+      "docker",
+      [
+        "run", "--rm",
+        "-v", `${workDir}:/work`,
+        CONFIG.dockerImage,
+        "gcc", "-O2", "-std=c11", "-o", "/work/sol", "/work/sol.c",
+      ],
+      { timeoutMs: CONFIG.compileTimeoutMs, maxOutputBytes: CONFIG.maxOutputBytes, shell: false }
+    );
+  }
+
   if (r.timedOut) {
     return { ok: false, output: "(컴파일 타임아웃)" };
   }

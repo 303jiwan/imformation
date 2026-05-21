@@ -18,9 +18,15 @@
 //     });
 
 import "dotenv/config";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 import pg from "pg";
 
 const { Pool } = pg;
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const DATABASE_URL = process.env.DATABASE_URL;
 if (!DATABASE_URL) {
@@ -422,10 +428,31 @@ export async function withTx(fn) {
 
 // One-shot connectivity check + housekeeping at startup. Logs a clear hint if
 // the connection string is wrong so the dev knows what to fix.
+//
+// Also auto-applies backend/sql/*.sql migration files at boot. Each file is
+// expected to be idempotent (IF NOT EXISTS / ON CONFLICT DO NOTHING) so
+// re-running on every boot is safe.
+async function applyMigrations() {
+  const sqlDir = path.join(__dirname, "..", "sql");
+  let files;
+  try {
+    files = fs.readdirSync(sqlDir).filter((f) => f.endsWith(".sql")).sort();
+  } catch (err) {
+    if (err?.code === "ENOENT") return;
+    throw err;
+  }
+  for (const f of files) {
+    const sql = fs.readFileSync(path.join(sqlDir, f), "utf8");
+    await pool.query(sql);
+    console.log(`[db] applied migration ${f}`);
+  }
+}
+
 (async () => {
   try {
     await stmts.deleteExpiredSessions.run();
     await stmts.deleteExpiredEmailAuthCodes.run();
+    await applyMigrations();
     console.log("[db] connected to Postgres, expired sessions/codes cleaned");
   } catch (err) {
     console.error(
