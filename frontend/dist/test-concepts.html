@@ -10,11 +10,11 @@
         z-index: 9999; opacity: 1; pointer-events: auto;
       }
     </style>
-    <script type="module" crossorigin src="/assets/testConcepts-3hAwbc4V.js"></script>
+    <script type="module" crossorigin src="/assets/testConcepts-BgHkyYA2.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/modulepreload-polyfill-B5Qt9EMX.js">
-    <link rel="modulepreload" crossorigin href="/assets/main-MQOOgDGO.js">
+    <link rel="modulepreload" crossorigin href="/assets/main-CL2wirBG.js">
     <link rel="modulepreload" crossorigin href="/assets/test-problems-DTQSoVo9.js">
-    <link rel="stylesheet" crossorigin href="/assets/main-LWxE4RR6.css">
+    <link rel="stylesheet" crossorigin href="/assets/main-8bU4lbbM.css">
   </head>
   <body>
     <div class="page-fade" id="page-fade"></div>
@@ -109,6 +109,29 @@
           <button type="submit" class="cta" id="submit-btn" data-i18n="auth.login">로그인</button>
         </div>
       </form>
+    </div>
+
+    <div id="concept-detail-modal" class="modal concept-detail-modal" hidden
+         role="dialog" aria-modal="true" aria-labelledby="concept-detail-name">
+      <div class="modal-backdrop" data-close></div>
+      <div class="modal-card concept-detail-modal__card">
+        <button type="button" class="modal-close concept-detail-modal__close"
+                data-close aria-label="닫기">✕</button>
+        <span class="concept-detail-modal__tag detail__tag"></span>
+        <h3 class="concept-detail-modal__name detail__name" id="concept-detail-name"></h3>
+        <section class="concept-detail-modal__section">
+          <h4 class="concept-detail-modal__h">개념 요약</h4>
+          <p class="detail__summary"></p>
+        </section>
+        <section class="concept-detail-modal__section">
+          <h4 class="concept-detail-modal__h">예시 코드</h4>
+          <pre class="detail__example"></pre>
+        </section>
+        <section class="concept-detail-modal__section">
+          <h4 class="concept-detail-modal__h">자주 하는 실수</h4>
+          <ul class="detail__pitfalls"></ul>
+        </section>
+      </div>
     </div>
 
     <section class="concept-section">

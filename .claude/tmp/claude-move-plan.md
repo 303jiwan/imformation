@@ -1,188 +1,117 @@
-# Implementation Plan v2 — 친구초대 → 배틀(PvP) (AR 반영)
+# Implementation Plan (AR 반영) — test-concepts 기본 개념 설명 보강
 
-## 목표
-`친구 초대` → `배틀` 교체 + 배틀 진입/매치 페이지 신규. 5문제 3승 선취 = 승리 + 배터리 보상. HTTP 폴링 멀티플레이. 화이트/그린/퍼플 톤 유지.
+## Goal
+test-concepts.html의 12개 C 기본 개념 카드가 1줄 `desc`만 보여줘 부족함. 각 개념에 요약·예시 코드·자주 하는 실수까지 노출해 학습 효과 강화. 동시에 체크박스 선택과 "자세히" 보기 동작을 **DOM 구조 수준에서** 분리해 상태 오염 차단.
 
----
+## AR 반영 핵심 변경
+**자세히 버튼은 `<label>` 안에 두지 않는다.** label은 체크박스 선택 영역만 감싸고, "자세히" 버튼은 같은 tile 컨테이너 안 **sibling**으로 배치. → 마우스 클릭/Enter/Space/모바일 탭/합성 클릭 어떤 경로로도 체크박스 토글 위험 없음. `event.stopPropagation()` 의존 제거.
 
-## 핵심 결정 (AR 반영)
-
-### D1. 채점 reference
-- 백엔드에 `battle_problems` 테이블 + 시드 5~10문제.
-- 채점: 백엔드가 testcases 보유 → grader.js → 전 케이스 통과 시 정답.
-- `/match/:id/state` 응답은 설명/예제만 (testcases/expected 제외).
-
-### D2. 좀비 청소
-- `battle_queue.joined_at` 60초 이상 → 매칭 트랜잭션 진입 시 lazy 삭제
-- `battle_matches.last_activity_at` 컬럼. 180초 무활동 → 상대 승리 (forfeit)
-- waiting 방 `created_at + 10분` 만료
-- 페이지 unload 시 `navigator.sendBeacon` 으로 leave
-
-### D3. 매치 시작 동기화
-- 매치 생성 시 `started_at = now() + 3s`
-- 응답에 `serverNow, startedAt` 포함 → 클라 카운트다운 3-2-1
-- started_at 전에는 제출 비활성
-
-### D4. /match/:id/state 인가
-- 요청자 ∉ match_players → 403
-
-### D5. users.batteries 충돌 확인
-- Role A 가 grep 후 결정. 충돌 시 `battle_batteries` 컬럼 분기
-
----
-
-## 변경할 파일
-
-### 신규
-- `frontend/battle.html`, `frontend/battle-match.html`
-- `frontend/src/battle.js`, `frontend/src/battle-match.js`
-- `backend/src/battle.js`
-- `backend/sql/battle.sql`
-
-### 수정
-- 14 HTML (index, avatar, codetrails, lectures, lessons, pricing, results, survey, trail, test-concepts, test-gauge, test-intro, test-login, test-result) — nav `<a data-action="invite">`/`my-menu <li>` 교체
-- `admin.html`, `test-problem.html` — Role C 먼저 grep 검증 후 처리/스킵 보고
-- `frontend/index.html` — invite-modal DOM 삭제
-- `frontend/src/main.js` — invite 제거, battle i18n 추가
-- `frontend/src/style.css` — invite-* 삭제, `.battle-*` 추가, `.code-editor-shell` 공용 클래스 추출
-- `frontend/vite.config.js` — `battle`, `battleMatch` 엔트리
-- `backend/src/index.js` — battle 라우터 마운트
-
----
-
-## 단계
-
-### Step 1 (Role A) DB 스키마 + 시드
-```sql
-create table if not exists battle_queue (
-  user_id int primary key references users(id) on delete cascade,
-  joined_at timestamptz not null default now()
-);
-
-create table if not exists battle_problems (
-  id serial primary key,
-  title text not null, description text not null,
-  input_desc text, output_desc text,
-  constraints jsonb default '[]'::jsonb,
-  examples jsonb default '[]'::jsonb,
-  testcases jsonb not null default '[]'::jsonb,
-  starter_code text default '',
-  time_limit_ms int default 1000,
-  memory_kb int default 65536
-);
-
-create table if not exists battle_matches (
-  id uuid primary key default gen_random_uuid(),
-  created_at timestamptz default now(),
-  started_at timestamptz not null,
-  last_activity_at timestamptz default now(),
-  problem_ids int[] not null,
-  state text not null default 'in_progress',
-  winner_user_id int null references users(id),
-  ended_at timestamptz null
-);
-
-create table if not exists battle_match_players (
-  match_id uuid references battle_matches(id) on delete cascade,
-  user_id int references users(id) on delete cascade,
-  score int not null default 0,
-  current_problem_idx int not null default 0,
-  primary key(match_id, user_id)
-);
-
-create table if not exists battle_rooms (
-  id uuid primary key default gen_random_uuid(),
-  code text unique not null,
-  host_user_id int references users(id) on delete cascade,
-  created_at timestamptz default now(),
-  state text not null default 'waiting',
-  match_id uuid null references battle_matches(id)
-);
-
--- batteries column: Role A 가 ALTER 전 grep 후 결정
--- alter table users add column if not exists batteries int not null default 0;
-
--- 시드 5문제 (test-problems.js 쉬운 문제 이식)
+### tile DOM 구조 (변경 후)
+```html
+<div class="concept-tile">
+  <label class="concept-tile__select">
+    <input type="checkbox" name="concept" value="..." />
+    <span class="concept-tile__tag">기초</span>
+    <div class="concept-tile__head">
+      <h3 class="concept-tile__name">...</h3>
+      <span class="concept-tile__check" aria-hidden="true">✓</span>
+    </div>
+    <p class="concept-tile__desc">...</p>
+  </label>
+  <button type="button" class="concept-tile__detail-btn"
+          data-concept-id="..."
+          aria-haspopup="dialog"
+          aria-controls="concept-detail-modal">
+    자세히
+  </button>
+</div>
 ```
+- 외곽 `<div class="concept-tile">`이 wrapper.
+- `<label>`이 체크박스 + 라벨 콘텐츠만 감쌈. label 활성화 시 체크박스만 토글.
+- `<button>`은 label 밖. `type="button"` 명시(폼 submit 방지). `aria-haspopup="dialog"` + `aria-controls`.
+- 버튼 클릭 핸들러는 그냥 모달 열기 — propagation 차단 불필요(label 외부라).
 
-### Step 2 (Role A) 엔드포인트
-모두 `requireAuth`, 응답에 `serverNow` 포함. 매칭/룸 API rate limit 적용.
+## 변경 파일
 
-| Endpoint | 동작 |
-|---|---|
-| `POST /api/battle/queue/join` | TX: 좀비 청소 → SKIP LOCKED 매칭 → 매칭 시 양쪽 큐 삭제 + match insert (started_at=now()+3s, problem_ids=random 5) + match_players insert / 없으면 자기 큐 insert 후 202 `{status:'waiting'}` |
-| `POST /api/battle/queue/leave` | DELETE 멱등 |
-| `POST /api/battle/rooms` | code = `crypto.randomBytes(4).toString('hex').toUpperCase().slice(0,6)`, UNIQUE 실패 시 3회 재시도 |
-| `POST /api/battle/rooms/:code/join` | 404/409 처리. 매치 생성 + state='matched' |
-| `POST /api/battle/rooms/:code/leave` | 호스트만, waiting 상태만 |
-| `GET /api/battle/rooms/:code/state` | host or joiner만, 외 404. `{state, matchId?, hostUserId, serverNow}` |
-| `GET /api/battle/match/:id/state` | 인가 검증 (403). last_activity_at 업데이트. 무활동 180초 시 forfeit. 응답에 currentProblem(testcases 제외), startedAt, serverNow |
-| `POST /api/battle/match/:id/submit` | 인가 + problemIdx 일치 검증 → grader 호출 → 전 케이스 통과 시 score++. score>=3 시 finished + winner + batteries +5. grader 503 시 `{verdict:'pending', retryAfterMs:2000}` |
+### frontend/src/test-concepts.js
+- `CONCEPTS` 항목마다 `detail` 객체 추가:
+  ```js
+  detail: {
+    summary: string,     // 2~3문장 풀어쓴 개념 요약 (한국어)
+    example: string,     // 핵심 문법 보여주는 짧은 C 코드 (gcc -std=c99 기준, 컴파일 가능)
+    pitfalls: string[],  // 초보자가 자주 하는 실수 1~2개
+  }
+  ```
+- 12개 항목 전부 작성 (`vars`, `operators`, `cond`, `loops`, `arrays`, `strings`, `functions`, `io`, `pointers`, `structs`, `memory`, `recursion`).
+- `renderTiles()` 리팩터: tile 마크업을 위 새 구조로 출력. 체크박스/카운트 selector는 기존과 동일하게 `input[name=concept]:checked` 유지(`getCheckedIds`/`setCheckedIds` 무수정).
+- "자세히" 버튼에 `addEventListener("click", ...)` → `openDetailModal(conceptId)`. propagation 차단 코드 **없음**(불필요).
+- 모달 open/close 헬퍼:
+  - `openDetailModal(id)` — 모달에 detail 데이터 주입 후 `hidden=false`, 직전 포커스 저장, `<button class="close">`에 포커스 이동.
+  - `closeDetailModal()` — `hidden=true`, 저장한 직전 포커스 복원.
+  - 닫기: 닫기 버튼 클릭, backdrop 클릭(`[data-close]`), 모달 열려있을 때 `keydown Escape`.
+  - 모달 열린 동안 `aria-hidden` 토글, 페이지 스크롤 잠금은 생략(가벼움). [?]
 
-### Step 3 (Role B) 디자인/UI
-- `battle.html`: nav + `.battle-stage` 배경 카드 + `.battle-actions` (랜덤 PvP / 방 입력) + 모달들 (방 입력, 방 생성, 방 들어가기, 매칭 대기)
-- `battle-match.html`: 3행 그리드 (문제 / 좌·우 아바타 + 점수 / Monaco 에디터) + 카운트다운 오버레이 + 결과 모달
-- `style.css`: invite-* 삭제, `.code-editor-shell` 추출 (problem-editor 시각 베이스), `.battle-*` 추가, `.battle-disabled` 토스트
+### frontend/test-concepts.html
+- 기존 `auth-modal` 옆에 `concept-detail-modal` 마크업 추가. id 충돌 없게 `id="concept-detail-modal"`.
+- 내부 슬롯: `.detail__tag`, `.detail__name`, `.detail__summary`, `<pre class="detail__example">`, `<ul class="detail__pitfalls">`.
+- 닫기 버튼 `aria-label="닫기"`.
+- `role="dialog"` + `aria-modal="true"` + `aria-labelledby` 명시.
 
-### Step 4 (Role C) 프론트 로직 + 정리
-- nav 14파일 + my-menu grep/edit. admin/test-problem 검증 후 처리
-- `main.js`:
-  - invite 코드/함수/case/i18n 제거
-  - `nav.battle`, `my.battle` 추가
-  - 비로그인 시 `sessionStorage[REDIRECT_AFTER_LOGIN_KEY]='battle.html'` + 로그인 모달
-  - 데모 모드 차단 alert
-- `battle.js`:
-  - 랜덤 PvP → `POST /queue/join` 1.5초 폴링 멱등 재호출
-  - 방 생성/들어가기 폴링 → matchId 받으면 이동
-  - sessionStorage `codenergy:battle:matchId`
-  - `beforeunload` 시 sendBeacon leave (큐 대기 중 또는 호스트만)
-- `battle-match.js`:
-  - Monaco CDN 부트스트랩 (test-problem.html 패턴 복사)
-  - 1.5초 폴링 `/match/:id/state`
-  - 카운트다운: `serverNow - startedAt` 기준
-  - 제출 → verdict==='pending' 2초 후 재시도. correct 시 다음 문제. finished/forfeit 시 결과 모달
-- `vite.config.js`: 신규 엔트리
+### frontend/src/style.css
+- 신규 클래스: `.concept-tile`(이전 label 클래스를 wrapper로 승격), `.concept-tile__select`(label), `.concept-tile__detail-btn`(sibling button).
+- 기존 `.concept-tile` 스타일이 label에 걸려있으면 이름 재배치(wrapper로 옮기고 label은 `.concept-tile__select`로 분리). 회귀 막으려 기존 selectors 점검 필수.
+- 모달: `.concept-detail-modal` (기존 `.modal` 패턴 재사용 가능하면 재사용, 충돌 시 BEM 분리). `.detail__example` 코드 블록 모노스페이스 + 가로 스크롤 허용.
 
-### Step 5 빌드/검증 (Role C 마지막)
-- `npm run build`
-- `npm run dev` + 두 브라우저 시나리오 (랜덤 PvP, 방 생성/들어가기, 3승 → 배터리)
-- 한쪽 닫고 forfeit 동작 (dev 단축 옵션 [?])
-- curl 403 인가 검증
+## 데이터/API/스키마
+없음. sessionStorage 키/형태(`codenergy:test:concepts`) 불변. 백엔드 변경 없음.
 
----
+## 리스크/가정
+- 기존 `.concept-tile` 셀렉터가 label에 직접 걸려 있어 wrapper 분리 시 스타일 회귀 가능 → C 역할이 기존 CSS 전부 grep해서 .concept-tile* 셀렉터 영향 파악 후 마이그레이션.
+- 콘텐츠 정확성: 12개 detail 본문 Claude가 작성. `gets()`/`itoa` 등 비표준·금지 함수 사용 금지. printf 형식 지정자는 `%d`,`%f`,`%c`,`%s` 등 표준만.
+- i18n 토큰: 다른 페이지에 `data-i18n` 토큰 다수. 신규 detail 콘텐츠는 **한국어 하드코딩**으로 시작. 모달 chrome(닫기 버튼 등)도 한국어 하드코딩.
+- 모달 접근성: focus trap은 MVP에서 생략(닫기 버튼에만 포커스 이동 + ESC 동작). 추후 강화. [?]
 
-## sessionStorage 키
-- `codenergy:battle:matchId`
+## 검증
+- `npm run dev` → http://localhost:5173/test-concepts.html
+  - 12개 tile 모두 "자세히" 버튼 노출
+  - 마우스 클릭 → 모달 열림, 체크박스 상태 **변화 없음**
+  - 자세히 버튼에 키보드 포커스 → Enter/Space → 모달 열림, 체크박스 상태 변화 없음
+  - 모바일 viewport(DevTools 토글) 탭 → 모달 열림, 체크박스 상태 변화 없음
+  - 체크박스/label 영역 클릭 → 체크박스 토글, 모달은 열리지 않음
+  - 모달 닫기: 닫기 버튼, backdrop, ESC 모두 동작
+  - 모달 닫힌 후 직전 포커스가 자세히 버튼으로 복귀
+  - 시작/전체선택/모두해제 회귀 없음
+- `npm run build` 성공
+- `npm run test:e2e` 기존 케이스 회귀 없음
 
-## i18n 추가
-- `nav.battle`, `my.battle`
-- `battle.title`, `battle.randomPvp`, `battle.roomEntry`, `battle.createRoom`, `battle.joinRoom`, `battle.waiting`, `battle.preparing`, `battle.youWon`, `battle.youLost`, `battle.batteryReward`, `battle.demoBlocked`, `battle.opponentLeft`
-
-## 결정값
-- 배터리 +5 / 폴링 1.5초 / forfeit 180초 / 시드 5문제
-
-## 리스크
-- 폴링 부하 → MVP 가정. 동시 100매치 이상 시 SSE/WS
-- grader 큐 공유 → 503 retry 로 대응
-- dist/ 빌드 후 git 반영은 사용자 위임
-
----
+## prompt.md 두 번째 항목 (컴파일러 설치) — 이번 plan 제외
+WSL/Docker 사용자 수동 설치 대기 중. 설치 완료 알림 받으면 별도 `backend/.env` 수정.
 
 ## 에이전트 로스터
 
-### Role A: 백엔드 (병렬 안전)
-- `backend/src/battle.js`, `backend/src/index.js`, `backend/sql/battle.sql`
-- 8개 엔드포인트 + 시드 5문제 + users 컬럼 확인 보고
+### A. 콘텐츠 작성
+- 담당: `frontend/src/test-concepts.js`의 `CONCEPTS[*].detail` 12개 셋 본문 작성.
+- 산출물: detail 12개 summary/example/pitfalls 완성. example C 코드는 컴파일 가능한 완전 스니펫(`#include` + `main` 또는 함수 단위로 자체 설명 가능한 형태).
+- 의존성: 없음(병렬 안전). 스키마는 plan에서 고정.
+- 포함 이유: 콘텐츠 품질이 핵심 가치. 코드/디자인과 분리 검토.
 
-### Role B: 디자인/UI (병렬 안전)
-- `frontend/battle.html`, `frontend/battle-match.html`, `frontend/src/style.css`
-- 신규 마크업 + 톤 일관성 + `.code-editor-shell` 공용 클래스
+### B. 기능구현 (프론트 로직)
+- 담당: `frontend/src/test-concepts.js`의 `renderTiles()` 리팩터, tile DOM 새 구조, "자세히" 버튼 핸들러, 모달 open/close 헬퍼, 포커스 관리.
+- 산출물: 동작하는 모달 토글. 마우스/키보드/모바일 모든 경로에서 체크박스 오염 없음.
+- 의존성: A의 detail 스키마와 합의된 키만 사용. **A 완료 후** 통합.
+- 포함 이유: AR 지적 핵심 — DOM 구조 변경 + 이벤트 안전성.
 
-### Role C: 기능구현 (Role A + B 완료 후)
-- `frontend/src/battle.js`, `frontend/src/battle-match.js`, `frontend/src/main.js`, `frontend/vite.config.js`
-- 14 HTML nav 교체, index.html invite-modal 삭제
-- 마지막 빌드/검증 담당
+### C. 디자인/UI
+- 담당: `frontend/test-concepts.html` 모달 마크업(`role="dialog"` + ARIA) + `frontend/src/style.css` 신규 클래스. 기존 `.concept-tile`/`label` 셀렉터 마이그레이션도 책임.
+- 산출물: 마크업 + 스타일. 기존 그리드 레이아웃 회귀 없음.
+- 의존성: B의 새 DOM 구조 클래스명과 합의(plan에 고정) → B와 병렬 안전, A와도 병렬 안전.
+- 포함 이유: HTML/CSS 신규 + 기존 셀렉터 마이그레이션.
 
 ### 제외
-- 테스트: 수동 + curl + build 로 갈음
-- DB 마이그레이션 전담: SQL 작성은 Role A, 실행은 사용자
+- 백엔드: 변경 없음.
+- 테스트(e2e 신규): scope 작음 + 명시 요청 없음. 검증은 수동 + 빌드 + 기존 e2e 회귀.
+
+### 실행 그래프
+1. **A** 먼저 (콘텐츠 12 항목).
+2. A 끝나면 **B + C** 병렬 (스키마/클래스명 plan에 고정돼 충돌 없음).
+3. 메인 통합 검증.

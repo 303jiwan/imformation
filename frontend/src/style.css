@@ -1527,11 +1527,6 @@ body:has(.page-fade.is-hidden) .mascot {
   position: relative;
   border: 1.5px solid #e5e7eb;
   border-radius: 14px;
-  padding: 16px 18px;
-  cursor: pointer;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
   background: #fff;
   transition: border-color 160ms ease, box-shadow 160ms ease,
               background-color 160ms ease, transform 160ms ease;
@@ -1540,15 +1535,50 @@ body:has(.page-fade.is-hidden) .mascot {
   border-color: #c7c0ff;
   box-shadow: 0 6px 20px rgba(124, 58, 237, 0.08);
 }
-.concept-tile input {
+.concept-tile:has(.concept-tile__select input:checked) {
+  border-color: #7c3aed;
+  background: #f5f3ff;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+/* inner label — wraps checkbox + tile content */
+/* bottom padding leaves room for the absolute "자세히" button */
+.concept-tile__select {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px 18px 32px;
+  cursor: pointer;
+}
+.concept-tile__select input {
   position: absolute;
   opacity: 0;
   pointer-events: none;
 }
-.concept-tile:has(input:checked) {
+
+/* "자세히" button — absolute, bottom-right of tile */
+.concept-tile__detail-btn {
+  position: absolute;
+  bottom: 10px;
+  right: 12px;
+  z-index: 2;
+  background: transparent;
+  border: 1.5px solid #c7c0ff;
+  color: #7c3aed;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 140ms ease, color 140ms ease, border-color 140ms ease;
+  line-height: 1.6;
+}
+.concept-tile__detail-btn:hover,
+.concept-tile__detail-btn:focus-visible {
+  background: #ede9fe;
   border-color: #7c3aed;
-  background: #f5f3ff;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  color: #5b21b6;
+  outline: none;
 }
 .concept-tile__head {
   display: flex;
@@ -1577,7 +1607,7 @@ body:has(.page-fade.is-hidden) .mascot {
   color: transparent;
   line-height: 1;
 }
-.concept-tile:has(input:checked) .concept-tile__check {
+.concept-tile:has(.concept-tile__select input:checked) .concept-tile__check {
   background: linear-gradient(135deg, var(--purple) 0%, var(--purple-deep) 100%);
   border-color: var(--purple-deep);
   color: #fff;
@@ -1648,6 +1678,117 @@ body:has(.page-fade.is-hidden) .mascot {
   opacity: 0.45;
   cursor: not-allowed;
   box-shadow: none;
+}
+
+/* ---------- Concept Detail Modal (test-concepts.html) ---------- */
+.concept-detail-modal__card {
+  position: relative;
+  width: min(92vw, 600px);
+  max-height: min(88vh, 720px);
+  overflow-y: auto;
+  background: #fff;
+  color: #111;
+  border-radius: 20px;
+  padding: 32px 28px 28px;
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.30),
+              0 0 0 6px rgba(168, 85, 247, 0.14);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.concept-detail-modal__close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  color: #9ca3af;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 140ms ease, color 140ms ease;
+  line-height: 1;
+}
+.concept-detail-modal__close:hover,
+.concept-detail-modal__close:focus-visible {
+  background: #f3f4f6;
+  color: #111;
+  outline: none;
+}
+
+.concept-detail-modal__tag {
+  align-self: flex-start;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: #7c3aed;
+  background: #ede9fe;
+  padding: 3px 11px;
+  border-radius: 999px;
+}
+
+.concept-detail-modal__name {
+  font-size: clamp(20px, 2.4vw, 24px);
+  font-weight: 800;
+  color: #111;
+  line-height: 1.3;
+  margin: 0;
+}
+
+.concept-detail-modal__section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.concept-detail-modal__h {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.6px;
+  text-transform: uppercase;
+  color: #7c3aed;
+  margin: 0;
+}
+
+.detail__summary {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.65;
+  margin: 0;
+}
+
+.detail__example {
+  background: #1a1a2e;
+  color: #e2e8f0;
+  font-family: "Consolas", "Fira Code", "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  padding: 16px 18px;
+  border-radius: 12px;
+  overflow-x: auto;
+  white-space: pre;
+  margin: 0;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.25);
+}
+
+.detail__pitfalls {
+  list-style: disc;
+  padding-left: 20px;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.detail__pitfalls li {
+  font-size: 13.5px;
+  color: #4b5563;
+  line-height: 1.55;
 }
 
 /* ---------- Test Intro Page (test-intro.html) ---------- */
