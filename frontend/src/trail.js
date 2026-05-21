@@ -19,9 +19,17 @@ const TRAILS = [
   {
     id: 0, color: "green", eyebrow: "Trail 0. Codetree 101", title: "프로그래밍 시작",
     chapters: [
-      { name: "Ch 1. 기본",     nodes: ["출력 입문", "변수", "기본 자료형", "연산자"] },
-      { name: "Ch 2. 입출력",   nodes: ["출력", "입력 입문", "입력", "입출력 연습"] },
-      { name: "Ch 3. 조건문 1", nodes: ["조건문 입문", "조건문"] },
+      { name: "Ch 1. 기본",       nodes: ["출력 입문", "변수", "기본 자료형", "연산자", "변수와 자료형"] },
+      { name: "Ch 2. 입출력",     nodes: ["출력", "입력 입문", "입력", "입출력 연습", "표준 입출력"] },
+      { name: "Ch 3. 조건문",     nodes: ["조건문 입문", "조건문", "if/else", "switch"] },
+      { name: "Ch 4. 반복문",     nodes: ["for 입문", "while", "do-while", "중첩 반복"] },
+      { name: "Ch 5. 배열",       nodes: ["배열 선언", "배열 입출력", "2차원 배열", "배열 순회"] },
+      { name: "Ch 6. 문자열",     nodes: ["char 배열", "문자열 출력", "문자열 길이", "문자열 비교"] },
+      { name: "Ch 7. 함수",       nodes: ["함수 정의", "매개변수", "반환 값", "지역/전역"] },
+      { name: "Ch 8. 포인터",     nodes: ["주소와 &", "역참조 *", "포인터 산술", "포인터와 배열"] },
+      { name: "Ch 9. 구조체",     nodes: ["struct 선언", "멤버 접근", "typedef", "구조체 포인터"] },
+      { name: "Ch 10. 동적 메모리", nodes: ["malloc", "calloc", "free", "메모리 누수"] },
+      { name: "Ch 11. 재귀",      nodes: ["재귀 입문", "종료 조건", "재귀 vs 반복", "호출 스택"] },
     ],
     lesson: {
       title: "출력 입문",
@@ -34,14 +42,15 @@ const TRAILS = [
   {
     id: 1, color: "yellow", eyebrow: "Trail 1. Novice Low", title: "프로그래밍 기초",
     chapters: [
-      { name: "Ch 1. 출력",   nodes: ["기본 출력", "변수와 자료형", "출력 형식", "소수점 맞춰 출력", "변수 값 변경", "다른 변수로부터 값 변경", "두 변수 값을 교환", "변수값 동시에 복사"] },
-      { name: "Ch 2. 입출력", nodes: ["정수 입력", "실수 입력", "공백을 사이에 두고 입력", "2개씩 줄에 실수 입력", "문자, 문자열 입력", "특정 문자를 사이에 두고 입력"] },
-      { name: "Ch 3. 연산자",      nodes: ["산술 연산자", "관계 연산자", "논리 연산자", "비트 연산자"] },
-      { name: "Ch 4. 단순 반복문", nodes: ["for 입문", "while 입문", "for vs while", "do-while"] },
-      { name: "Ch 5. 다중 반복문", nodes: ["중첩 for", "별 찍기", "구구단"] },
-      { name: "Ch 6. 1차원 배열",  nodes: ["배열 선언", "배열 입출력", "배열 합계", "최대/최소"] },
-      { name: "Ch 7. 2차원 배열",  nodes: ["2차원 배열 선언", "2차원 입출력", "행렬 전치"] },
-      { name: "Ch 8. 문자열",      nodes: ["문자열 입력", "strlen", "strcpy/strcmp", "문자열 뒤집기"] },
+      { name: "Ch 1. 출력",        nodes: ["기본 출력", "변수와 자료형", "출력 형식", "소수점 맞춰 출력", "변수 값 변경", "다른 변수로부터 값 변경", "두 변수 값을 교환", "변수값 동시에 복사"] },
+      { name: "Ch 2. 입출력",      nodes: ["정수 입력", "실수 입력", "공백을 사이에 두고 입력", "2개씩 줄에 실수 입력", "문자, 문자열 입력", "특정 문자를 사이에 두고 입력"] },
+      { name: "Ch 3. 연산자",      nodes: ["산술 연산자", "관계 연산자", "논리 연산자", "비트 연산자", "대입 연산자", "증감 연산자"] },
+      { name: "Ch 4. 조건문",      nodes: ["if 입문", "if/else", "else if", "switch/case", "삼항 연산자"] },
+      { name: "Ch 5. 단순 반복문", nodes: ["for 입문", "while 입문", "for vs while", "do-while", "break/continue"] },
+      { name: "Ch 6. 다중 반복문", nodes: ["중첩 for", "별 찍기", "구구단", "다이아몬드 패턴"] },
+      { name: "Ch 7. 1차원 배열",  nodes: ["배열 선언", "배열 입출력", "배열 합계", "최대/최소", "배열 순회"] },
+      { name: "Ch 8. 2차원 배열",  nodes: ["2차원 배열 선언", "2차원 입출력", "행렬 전치", "행렬 곱셈"] },
+      { name: "Ch 9. 문자열",      nodes: ["문자열 입력", "strlen", "strcpy/strcmp", "문자열 뒤집기", "토큰 분리"] },
     ],
     lesson: {
       title: "기본 출력",
@@ -62,14 +71,14 @@ const TRAILS = [
   {
     id: 2, color: "orange", eyebrow: "Trail 2. Novice Mid", title: "프로그래밍 연습",
     chapters: [
-      { name: "Ch 1. 함수",     nodes: ["값을 반환하지 않는 함수", "값을 반환하는 함수", "Call by value / Call by reference", "변수의 영역"] },
-      { name: "Ch 2. 재귀함수", nodes: ["값을 반환하지 않는 재귀함수", "값을 반환하는 재귀함수"] },
-      { name: "Ch 3. 정렬",     nodes: ["일반 정렬", "객체", "객체 정렬"] },
-      { name: "Ch 4. 시뮬레이션 I", nodes: [] },
-      { name: "Ch 5. 포인터",      nodes: ["포인터 입문", "주소와 역참조", "함수 인자 포인터", "포인터와 배열"] },
-      { name: "Ch 6. 구조체",      nodes: ["struct 입문", "typedef", "구조체 배열", "구조체 포인터"] },
-      { name: "Ch 7. 동적 메모리", nodes: ["malloc 입문", "calloc/realloc", "free와 메모리 누수", "동적 배열"] },
-      { name: "Ch 8. 파일 입출력", nodes: ["fopen/fclose", "fprintf/fscanf", "fread/fwrite", "파일 모드"] },
+      { name: "Ch 1. 함수",         nodes: ["값을 반환하지 않는 함수", "값을 반환하는 함수", "Call by value / Call by reference", "변수의 영역", "함수 오버로드 개념", "함수 포인터"] },
+      { name: "Ch 2. 재귀함수",     nodes: ["값을 반환하지 않는 재귀함수", "값을 반환하는 재귀함수", "팩토리얼", "피보나치", "하노이의 탑"] },
+      { name: "Ch 3. 정렬",         nodes: ["버블 정렬", "선택 정렬", "삽입 정렬", "qsort 사용", "객체 정렬"] },
+      { name: "Ch 4. 시뮬레이션 I", nodes: ["격자 이동", "방향 배열 활용", "회전 시뮬레이션", "큐브 굴리기", "달팽이 채우기"] },
+      { name: "Ch 5. 포인터",       nodes: ["포인터 입문", "주소와 역참조", "함수 인자 포인터", "포인터와 배열", "이중 포인터", "포인터 산술"] },
+      { name: "Ch 6. 구조체",       nodes: ["struct 입문", "typedef", "구조체 배열", "구조체 포인터", "중첩 구조체"] },
+      { name: "Ch 7. 동적 메모리",  nodes: ["malloc 입문", "calloc/realloc", "free와 메모리 누수", "동적 배열", "동적 2차원 배열"] },
+      { name: "Ch 8. 파일 입출력",  nodes: ["fopen/fclose", "fprintf/fscanf", "fread/fwrite", "파일 모드", "바이너리 파일"] },
     ],
     lesson: {
       title: "값을 반환하지 않는 함수",
@@ -90,7 +99,11 @@ const TRAILS = [
     id: 3, color: "red", eyebrow: "Trail 3. Novice High", title: "자료구조 알고리즘",
     chapters: [
       { name: "Ch 1. 시간, 공간복잡도", nodes: ["수도코드", "점근 표기법", "시간복잡도의 정의", "반복문의 시간복잡도", "재귀함수의 시간복잡도", "공간복잡도"] },
-      { name: "Ch 2. 배열, 연결 리스트", nodes: ["배열", "Dynamic Array", "단일 연결 리스트", "Doubly-LinkedList"] },
+      { name: "Ch 2. 배열, 연결 리스트", nodes: ["배열", "Dynamic Array", "단일 연결 리스트", "Doubly-LinkedList", "순환 연결 리스트"] },
+      { name: "Ch 3. 스택과 큐",        nodes: ["스택 개념", "스택 구현", "큐 개념", "큐 구현", "덱(Deque)", "괄호 검사", "후위 표기법"] },
+      { name: "Ch 4. 해시",             nodes: ["해시 함수", "체이닝", "오픈 어드레싱", "충돌 처리", "HashMap 사용법"] },
+      { name: "Ch 5. 트리 기초",        nodes: ["트리 용어", "이진 트리", "트리 순회", "전위/중위/후위", "이진 탐색 트리"] },
+      { name: "Ch 6. 그래프 기초",      nodes: ["그래프 표현", "인접 행렬", "인접 리스트", "방문 배열", "그래프 입력 처리"] },
     ],
     lesson: {
       title: "수도코드",
@@ -104,9 +117,12 @@ const TRAILS = [
   {
     id: 4, color: "blue", eyebrow: "Trail 4. Intermediate Low", title: "알고리즘 입문",
     chapters: [
-      { name: "Ch 1. Simulation", nodes: ["격자 안에서 완전탐색", "격자 안에서 밀고 당기기", "격자 안에서 터지고 떨어지는 경우", "격자 안에서 단일 객체로 이동", "격자 안에서 여러 객체로 이동"] },
-      { name: "Ch 2. Backtracking", nodes: ["K개 중 하나를 N번 선택하기(Simple)", "K개 중 하나를 N번 선택하기(Conditional)", "N개 중에 M개 고르기(Simple)", "순열 만들기"] },
-      { name: "Ch 3. DFS", nodes: ["DFS 기본", "DFS와 백트래킹", "DFS vs BFS"] },
+      { name: "Ch 1. Simulation",   nodes: ["격자 안에서 완전탐색", "격자 안에서 밀고 당기기", "격자 안에서 터지고 떨어지는 경우", "격자 안에서 단일 객체로 이동", "격자 안에서 여러 객체로 이동"] },
+      { name: "Ch 2. Backtracking", nodes: ["K개 중 하나를 N번 선택하기(Simple)", "K개 중 하나를 N번 선택하기(Conditional)", "N개 중에 M개 고르기(Simple)", "순열 만들기", "조합 만들기", "부분집합 만들기"] },
+      { name: "Ch 3. DFS",          nodes: ["DFS 기본", "DFS와 백트래킹", "DFS vs BFS", "재귀 DFS", "스택 DFS"] },
+      { name: "Ch 4. BFS",          nodes: ["BFS 기본", "큐를 활용한 BFS", "최단 거리", "다중 시작점 BFS", "격자 위 BFS"] },
+      { name: "Ch 5. 이진 탐색",    nodes: ["이진 탐색 기본", "Lower Bound", "Upper Bound", "Parametric Search", "회전된 배열 탐색"] },
+      { name: "Ch 6. 그리디",       nodes: ["그리디 개념", "거스름돈", "회의실 배정", "활동 선택", "교환 정렬"] },
     ],
     lesson: {
       title: "격자 안에서 완전탐색",
@@ -124,8 +140,12 @@ const TRAILS = [
   {
     id: 5, color: "purple", eyebrow: "Trail 5. Intermediate Mid", title: "알고리즘 기본",
     chapters: [
-      { name: "Ch 1. 중급 자료구조", nodes: ["HashMap", "TreeMap", "HashSet", "TreeSet", "Priority Queue", "Doubly-LinkedList"] },
-      { name: "Ch 2. Shorten time Technique", nodes: ["Prefix Sum", "Grid Compression", "LR Technique", "+1-1 technique"] },
+      { name: "Ch 1. 중급 자료구조",          nodes: ["HashMap", "TreeMap", "HashSet", "TreeSet", "Priority Queue", "Doubly-LinkedList"] },
+      { name: "Ch 2. Shorten time Technique", nodes: ["Prefix Sum", "Grid Compression", "LR Technique", "+1-1 technique", "Difference Array"] },
+      { name: "Ch 3. Two Pointer",            nodes: ["Two Pointer 개념", "정렬된 배열에서 합", "구간 합", "투 포인터로 부분 배열", "병합"] },
+      { name: "Ch 4. Sliding Window",         nodes: ["고정 윈도우", "가변 윈도우", "최대 합 부분배열", "중복 없는 가장 긴 부분문자열"] },
+      { name: "Ch 5. Bitmask",                nodes: ["비트 연산 복습", "부분집합 표현", "비트마스크 DP 입문", "켜진 비트 개수", "XOR 활용"] },
+      { name: "Ch 6. DP 입문",                nodes: ["DP 정의", "메모이제이션", "타뷸레이션", "1차원 DP", "2차원 DP"] },
     ],
     lesson: {
       title: "HashMap",
@@ -148,10 +168,13 @@ const TRAILS = [
   {
     id: 6, color: "dark", eyebrow: "Trail 6. Intermediate High", title: "알고리즘 실전",
     chapters: [
-      { name: "Ch 1. Tree", nodes: ["트리", "이진 트리와 탐색", "Tree DP", "LCA"] },
-      { name: "Ch 2. MST",  nodes: ["Disjoint Set (Union Find)", "Kruskal", "Prim"] },
-      { name: "Ch 3. 위상정렬", nodes: ["Topological Sort", "Graph DP"] },
-      { name: "Ch 4. String", nodes: ["문자열 매칭 기본", "KMP", "Trie"] },
+      { name: "Ch 1. Tree",            nodes: ["트리", "이진 트리와 탐색", "Tree DP", "LCA", "트리 지름"] },
+      { name: "Ch 2. MST",             nodes: ["Disjoint Set (Union Find)", "Kruskal", "Prim", "MST 응용"] },
+      { name: "Ch 3. 위상정렬",        nodes: ["Topological Sort", "Graph DP", "최장 경로", "사이클 판정"] },
+      { name: "Ch 4. String",          nodes: ["문자열 매칭 기본", "KMP", "Trie", "Aho-Corasick", "해싱 매칭"] },
+      { name: "Ch 5. 최단 경로",       nodes: ["Dijkstra", "Bellman-Ford", "Floyd-Warshall", "음수 사이클", "다중 출발지"] },
+      { name: "Ch 6. Segment Tree",    nodes: ["세그먼트 트리 개념", "점 업데이트", "구간 쿼리", "Lazy Propagation", "Persistent Segment Tree"] },
+      { name: "Ch 7. 고급 그래프",     nodes: ["SCC (Tarjan)", "이분 매칭", "최대 유량 (Network Flow)", "오일러 경로"] },
     ],
     lesson: {
       title: "트리",

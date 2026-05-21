@@ -4218,6 +4218,19 @@ body.is-resizing-problem * {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+}
+.trail-page__chapters::-webkit-scrollbar {
+  width: 8px;
+}
+.trail-page__chapters::-webkit-scrollbar-thumb {
+  background: var(--trail-hex, #cbd5e1);
+  border-radius: 4px;
+}
+.trail-page__chapters::-webkit-scrollbar-track {
+  background: transparent;
 }
 .chapter-head {
   align-self: center;
